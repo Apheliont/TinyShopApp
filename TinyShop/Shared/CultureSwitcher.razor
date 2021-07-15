@@ -1,0 +1,43 @@
+﻿@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localizer
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration config
+
+@if (cultures is not null)
+{
+<span class="mr-2">@Localizer["Language"]</span>
+    <form class="form-inline">
+        <select class="form-control mr-2" @onchange="RequestChangeCulture">
+            @foreach (var culture in cultures)
+            {
+                if (selectedCulture == culture.Key)
+                {
+                    <option value="@culture.Key" selected>@culture.Value</option>
+                }
+                else
+                {
+                    <option value="@culture.Key">@culture.Value</option>
+                }
+
+            }
+        </select>
+    </form>
+}
+
+@code {
+    private string selectedCulture = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+    private Dictionary<string, string> cultures;
+
+    protected override void OnInitialized()
+    {
+        cultures = config.GetSection("Cultures").GetChildren().ToDictionary(x => x.Key, x => x.Value);
+    }
+
+    private void RequestChangeCulture(ChangeEventArgs e)
+    {
+        selectedCulture = e.Value.ToString();
+        var uri = new Uri(NavigationManager.Uri).GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+        var query = $"?culture={Uri.EscapeDataString(selectedCulture)}&redirectUri={Uri.EscapeDataString(uri)}";
+        NavigationManager.NavigateTo($"/Culture/SetCulture/{query}", forceLoad: true);
+    }
+}

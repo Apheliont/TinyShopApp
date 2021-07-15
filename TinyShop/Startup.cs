@@ -1,3 +1,5 @@
+using DataAccessLib.Data;
+using DataAccessLib.DataAccess;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -33,14 +35,31 @@ namespace TinyShop
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                    Configuration.GetConnectionString("AuthConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddControllers();
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            services.AddSingleton<ISqlDataAccess>(x => new SqlDataAccess(Configuration.GetConnectionString("DataConnection")));
+            services.AddScoped<IProductSqlDataService, ProductSqlDataService>();
+        }
+
+        private RequestLocalizationOptions GetLocalizationOptions()
+        {
+            Dictionary<string, string> cultures = Configuration
+                .GetSection("Cultures")
+                .GetChildren()
+                .ToDictionary(x => x.Key, x => x.Value);
+
+            var supportedCultures = cultures.Keys.ToArray();
+            var localizationOptions = new RequestLocalizationOptions()
+                .AddSupportedCultures(supportedCultures)
+                .AddSupportedUICultures(supportedCultures);
+            return localizationOptions;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +79,8 @@ namespace TinyShop
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseRequestLocalization(GetLocalizationOptions());
 
             app.UseRouting();
 

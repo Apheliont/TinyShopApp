@@ -1,4 +1,6 @@
-﻿<AuthorizeView>
+﻿@inject IStringLocalizer<App> Localizer
+
+<AuthorizeView>
     <Authorized>
         <a href="Identity/Account/Manage">Hello, @context.User.Identity.Name!</a>
         <form method="post" action="Identity/Account/LogOut">
@@ -6,7 +8,11 @@
         </form>
     </Authorized>
     <NotAuthorized>
-        <a href="Identity/Account/Register">Register</a>
-        <a href="Identity/Account/Login">Log in</a>
+        <a class="btn btn-outline-info mr-2" href="Identity/Account/Register">
+            <span class="oi oi-account-login" aria-hidden="true"></span> @Localizer["Register"]
+        </a>
+        <a class="btn btn-outline-primary" href="Identity/Account/Login">
+            <span class="oi oi-account-login" aria-hidden="true"></span> @Localizer["Log in"]
+        </a>
     </NotAuthorized>
 </AuthorizeView>
