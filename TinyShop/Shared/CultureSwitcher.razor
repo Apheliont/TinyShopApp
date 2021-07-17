@@ -5,23 +5,46 @@
 
 @if (cultures is not null)
 {
-<span class="mr-2">@Localizer["Language"]</span>
-    <form class="form-inline">
-        <select class="form-control mr-2" @onchange="RequestChangeCulture">
+
+    <div class="ui selection dropdown item">
+        <input type="hidden" name="language" value="@selectedCulture" @onchange="RequestChangeCulture">
+        <i class="dropdown icon"></i>
+        <div class="default text">@Localizer["Language"]</div>
+        <div class="menu">
             @foreach (var culture in cultures)
             {
-                if (selectedCulture == culture.Key)
+                var flagClass = culture.Key.Substring(0, 2).ToLower();
+                if (flagClass == "en")
                 {
-                    <option value="@culture.Key" selected>@culture.Value</option>
+                    flagClass = "gb flag";
                 }
                 else
                 {
-                    <option value="@culture.Key">@culture.Value</option>
+                    flagClass += " flag";
+
                 }
+                <div class="item" data-value="@culture.Key"><i class="@flagClass"></i>@culture.Value</div>
 
             }
-        </select>
-    </form>
+        </div>
+    </div>
+    @*<span class="mr-2"></span>
+        <form class="form-inline">
+            <select class="form-control mr-2" @onchange="RequestChangeCulture">
+                @foreach (var culture in cultures)
+                {
+                    if (selectedCulture == culture.Key)
+                    {
+                        <option value="@culture.Key" selected>@culture.Value</option>
+                    }
+                    else
+                    {
+                        <option value="@culture.Key">@culture.Value</option>
+                    }
+
+                }
+            </select>
+        </form>*@
 }
 
 @code {

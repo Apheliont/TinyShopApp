@@ -1,14 +1,22 @@
 ﻿@inject IStringLocalizer<App> Localizer
 
-<div class="row py-1 info__stripe">
-    <div class="container ">
-        <div class="row justify-content-center">
-            <div class="col-4">@Localizer["Your location"]</div>
-            <div class="col-4">@Localizer["Our shops"]</div>
-            <div class="col-4">@Localizer["Contact phone"]: 888-999-000-111</div>
+    <div class="ui orange mini secondary menu">
+        <a class="item">
+            @Localizer["Your location"]
+        </a>
+        <a class="item">
+            @Localizer["Our shops"]
+        </a>
+        <a class="item">
+            @Localizer["Contact phone"]: 888-999-000-111
+        </a>
+        <div class="right menu">
+            <CultureSwitcher />
+            <div class="item">
+                <LoginDisplay />
+            </div>
         </div>
     </div>
-</div>
 @code {
 
 }

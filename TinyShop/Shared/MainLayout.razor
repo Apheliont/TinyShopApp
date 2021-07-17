@@ -1,8 +1,62 @@
 ﻿@inherits LayoutComponentBase
 @inject IStringLocalizer<App> Localizer
+@inject IJSRuntime JS
 
-    <div class="container-fluid">
-        <InfoStripe />
-        <NavbarTop />
+<InfoStripe />
+
+<div class="ui secondary  menu">
+    <a class="header item">
+        Home
+    </a>
+    <a class="item">
+        Messages
+    </a>
+    <a class="item">
+        Friends
+    </a>
+    <div class="right menu">
+        <div class="item">
+            <div class="ui icon input">
+                <input type="text" placeholder="Search...">
+                <i class="search link icon"></i>
+            </div>
+        </div>
+        <a class="ui item">
+            Logout
+        </a>
     </div>
+</div>
+
+@*<div class="container-fluid">
+        <div class="row py-1 info__stripe">
+            <InfoStripe />
+        </div>
+        <div class="row">
+            <div class="col-12 p-0 bg-light">
+                <NavbarTop />
+            </div>
+        </div>
+        <div class="row p-0 bg-light">
+            <div class="container">
+                <div class="row justify-content-between mt-3">
+                    <div class="col-4">
+                        <CategoryMenu />
+                    </div>
+                    <div class="col-8">
+                        @Body
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JS.InvokeVoidAsync("onBlazorReady");
+        base.OnAfterRender(firstRender);
+    }
+
+}
 

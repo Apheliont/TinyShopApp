@@ -12,10 +12,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TinyShop</title>
     <base href="~/" />
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
-    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/semantic.min.js"></script>
+    <link href="css/semantic.min.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
-    <link href="TinyShop.styles.css" rel="stylesheet" />
 </head>
 <body>
     <component type="typeof(App)" render-mode="ServerPrerendered" />
@@ -32,5 +32,11 @@
     </div>
 
     <script src="_framework/blazor.server.js"></script>
+
+    <script>
+        window.onBlazorReady = () => {
+            $('.ui.dropdown').dropdown();
+        }
+    </script>
 </body>
 </html>

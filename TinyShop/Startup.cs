@@ -46,6 +46,7 @@ namespace TinyShop
             services.AddLocalization(options => options.ResourcesPath = "Resources");
             services.AddSingleton<ISqlDataAccess>(x => new SqlDataAccess(Configuration.GetConnectionString("DataConnection")));
             services.AddScoped<IProductSqlDataService, ProductSqlDataService>();
+            services.AddScoped<ICategorySqlDataService, CategorySqlDataService>();
         }
 
         private RequestLocalizationOptions GetLocalizationOptions()

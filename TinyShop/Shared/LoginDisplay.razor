@@ -1,18 +1,39 @@
 ﻿@inject IStringLocalizer<App> Localizer
-
+@inject NavigationManager NavigationManager
 <AuthorizeView>
     <Authorized>
-        <a href="Identity/Account/Manage">Hello, @context.User.Identity.Name!</a>
-        <form method="post" action="Identity/Account/LogOut">
-            <button type="submit" class="nav-link btn btn-link">Log out</button>
-        </form>
+        <button class="ui button basic mini" @onclick="OnUserManageHandler">@Localizer["Hello"], @context.User.Identity.Name!</button>
+        <button class="ui button basic mini" @onclick="OnLogoutHandler"><i class="door open icon"></i>Log out</button>
     </Authorized>
     <NotAuthorized>
-        <a class="btn btn-outline-info mr-2" href="Identity/Account/Register">
-            <span class="oi oi-account-login" aria-hidden="true"></span> @Localizer["Register"]
-        </a>
-        <a class="btn btn-outline-primary" href="Identity/Account/Login">
-            <span class="oi oi-account-login" aria-hidden="true"></span> @Localizer["Log in"]
-        </a>
+        <div class="ui buttons mini">
+            <button class="ui button positive basic" @onclick="OnLoginHandler">@Localizer["Log in"]</button>
+            <div class="or" data-text="@Localizer["Or"]"></div>
+            <button class="ui button blue basic" @onclick="OnRegisterHandler">@Localizer["Register"]</button>
+        </div>
     </NotAuthorized>
 </AuthorizeView>
+
+@code {
+    private void OnRegisterHandler()
+    {
+        NavigationManager.NavigateTo("Identity/Account/Register", true);
+    }
+
+    private void OnLoginHandler()
+    {
+        NavigationManager.NavigateTo("Identity/Account/Login", true);
+    }
+
+    private void OnLogoutHandler()
+    {
+        NavigationManager.NavigateTo("Identity/Account/LogOut", true);
+    }
+
+    private void OnUserManageHandler()
+    {
+        NavigationManager.NavigateTo("Identity/Account/Manage", true);
+    }
+}
+
+

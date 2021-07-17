@@ -123,6 +123,9 @@
   <data name="Goods" xml:space="preserve">
     <value>Товары</value>
   </data>
+  <data name="Hello" xml:space="preserve">
+    <value>Привет</value>
+  </data>
   <data name="Hello world" xml:space="preserve">
     <value>Привет, мир!</value>
   </data>
@@ -134,6 +137,9 @@
   </data>
   <data name="Log in" xml:space="preserve">
     <value>Войти</value>
+  </data>
+  <data name="Or" xml:space="preserve">
+    <value>или</value>
   </data>
   <data name="Our shops" xml:space="preserve">
     <value>Магазины</value>

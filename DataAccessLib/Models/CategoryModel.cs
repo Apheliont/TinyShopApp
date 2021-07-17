@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace DataAccessLib.Models
 {
-    public class ProductModel
+    public class CategoryModel
     {
         public int Id { get; set; }
-        public string ProductName { get; set; }
+        public string CategoryName { get; set; }
         public string Description { get; set; }
-        public decimal Price { get; set; }
     }
 }
