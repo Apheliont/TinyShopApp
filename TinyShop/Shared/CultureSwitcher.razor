@@ -6,7 +6,7 @@
 @if (cultures is not null)
 {
 
-    <div class="ui selection dropdown item">
+    <div class="ui selection dropdown small item">
         <input type="hidden" name="language" value="@selectedCulture" @onchange="RequestChangeCulture">
         <i class="dropdown icon"></i>
         <div class="default text">@Localizer["Language"]</div>
@@ -28,23 +28,6 @@
             }
         </div>
     </div>
-    @*<span class="mr-2"></span>
-        <form class="form-inline">
-            <select class="form-control mr-2" @onchange="RequestChangeCulture">
-                @foreach (var culture in cultures)
-                {
-                    if (selectedCulture == culture.Key)
-                    {
-                        <option value="@culture.Key" selected>@culture.Value</option>
-                    }
-                    else
-                    {
-                        <option value="@culture.Key">@culture.Value</option>
-                    }
-
-                }
-            </select>
-        </form>*@
 }
 
 @code {

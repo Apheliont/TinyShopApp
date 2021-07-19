@@ -1,0 +1,65 @@
+﻿@page
+@model LoginModel
+@using TinyShop
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<App> Localizor
+
+<div class="row">
+    <div class="ui placeholder segment">
+        <div class="ui two column very relaxed stackable divided grid">
+            <div class="centered row">
+                <h1 class="two wide left" style="padding: 0px">
+                    @Localizor["Login"]
+                </h1>
+            </div>
+            <div class="row">
+                <div class="column">
+                    <form id="account" method="post" class="ui form">
+                        <div asp-validation-summary="All" class="form_validationInfo"></div>
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <input asp-for="Input.Email" placeholder="@Localizor["Email"]">
+                                <i class="user icon"></i>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <input type="password" asp-for="Input.Password" placeholder="@Localizor["Password"]">
+                                <i class="lock icon"></i>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui checkbox">
+                                <label asp-for="Input.RememberMe">
+                                    <input type="checkbox" tabindex="0" class="hidden" asp-for="Input.RememberMe" />
+                                    @Localizor["Remember me?"]
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="ui button" type="submit">@Localizor["Login"]</button>
+
+                    </form>
+                </div>
+                <div class="column">
+                    <div>
+                        <p>
+                            <a id="forgot-password" asp-page="./ForgotPassword">@Localizor["Forgot your password?"]</a>
+                        </p>
+                        <p>
+                            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">@Localizor["Register as a new user"]</a>
+                        </p>
+                        <p>
+                            <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">@Localizor["Resend email confirmation"]</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+}
+

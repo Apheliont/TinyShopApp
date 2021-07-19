@@ -2,14 +2,17 @@
 @inject NavigationManager NavigationManager
 <AuthorizeView>
     <Authorized>
-        <button class="ui button basic mini" @onclick="OnUserManageHandler">@Localizer["Hello"], @context.User.Identity.Name!</button>
-        <button class="ui button basic mini" @onclick="OnLogoutHandler"><i class="door open icon"></i>Log out</button>
+        <div class="ui small buttons">
+            <button class="ui inverted basic button" style="margin-right: 5px;" @onclick="OnUserManageHandler">@Localizer["Hello"], @context.User.Identity.Name!</button>
+            <form method="post" action="Identity/Account/LogOut">
+                <button class="ui inverted basic button" type="submit"><i class="door open icon"></i>@Localizer["Logout"]</button>
+            </form>
+        </div>
     </Authorized>
     <NotAuthorized>
-        <div class="ui buttons mini">
-            <button class="ui button positive basic" @onclick="OnLoginHandler">@Localizer["Log in"]</button>
-            <div class="or" data-text="@Localizer["Or"]"></div>
-            <button class="ui button blue basic" @onclick="OnRegisterHandler">@Localizer["Register"]</button>
+        <div class="ui small buttons">
+            <button class="ui inverted basic button" style="margin-right: 5px;" @onclick="OnLoginHandler"><i class="sign in alternate icon"></i>@Localizer["Login"]</button>
+            <button class="ui inverted basic button" @onclick="OnRegisterHandler"><i class="user plus icon"></i>@Localizer["Register"]</button>
         </div>
     </NotAuthorized>
 </AuthorizeView>
@@ -25,7 +28,7 @@
         NavigationManager.NavigateTo("Identity/Account/Login", true);
     }
 
-    private void OnLogoutHandler()
+    private void OnLogOutHandler()
     {
         NavigationManager.NavigateTo("Identity/Account/LogOut", true);
     }
