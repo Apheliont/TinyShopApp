@@ -16,14 +16,10 @@ namespace DataAccessLib.Data
             _dataAccess = dataAccess;
         }
 
-        public async Task<List<ProductModel>> GetRangeByCategory(int categoryId, int from, int to)
+
+        public async Task<List<ProductModel>> GetFilteredWithMetadata(ProductFilterModel filterModel)
         {
-            return await _dataAccess.GetData<ProductModel, dynamic>("dbo.spProducts_GetRangeByCategory", new
-            {
-                CategoryId = categoryId,
-                From = from,
-                To = to
-            });
+            return await _dataAccess.GetData<ProductModel, ProductFilterModel>("dbo.spProducts_GetFilteredWithMetadata", filterModel);
         }
     }
 }

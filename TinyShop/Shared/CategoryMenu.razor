@@ -1,18 +1,17 @@
 ﻿@inject ICategorySqlDataService categoryDataAccess
-<ul class="nav flex-column rounded bg-white">
+<div class="ui vertical fluid tabular menu">
     @if (categories is not null)
     {
         @foreach (CategoryModel category in categories)
         {
-            var url = "products/" + category.Id.ToString();
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="@url" Match="NavLinkMatch.All">
-                    <span class="oi oi-plus" aria-hidden="true"></span> @category.CategoryName
+            var url = "products/category/" + category.Id.ToString();
+                <NavLink class="item" href="@url" Match="NavLinkMatch.All">
+                    @category.CategoryName
                 </NavLink>
-            </li>
         }
     }
-</ul>
+</div>
+
 @code {
     private List<CategoryModel> categories;
 

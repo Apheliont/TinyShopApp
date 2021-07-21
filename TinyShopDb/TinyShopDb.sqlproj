@@ -68,6 +68,7 @@
     <Build Include="dbo\Tables\ProductCategories.sql" />
     <Build Include="dbo\StoredProcedures\spProducts_GetRangeByCategory.sql" />
     <Build Include="dbo\StoredProcedures\spCategories_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\spProducts_GetFilteredWithMetadata.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="TinyShopDb.refactorlog" />

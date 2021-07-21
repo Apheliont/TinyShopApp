@@ -1,53 +1,55 @@
-﻿@page "/products/{categoryId:int}"
+﻿@page "/products/category/{categoryId:int}"
 @inject IProductSqlDataService dataService
+@inject IStringLocalizer<App> Localizer
+@using TinyShop.Extensions
+@inject NavigationManager NavigationManager
+@implements IDisposable
 
 @if (products is not null)
 {
-    @foreach (ProductModel product in products)
-    {
-        var targetId = "carousel" + product.Id.ToString();
-        <div class="row">
-            <div class="col-12">
-                <div class="card mb-3">
-                    <div class="row g-0">
-                        <div class="col-md-2 p-3">
-                            <div id="@targetId" class="carousel slide" data-bs-interval="false">
-                                <div class="carousel-indicators">
-                                    <button type="button" data-bs-target="#@targetId" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                                    <button type="button" data-bs-target="#@targetId" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                                    <button type="button" data-bs-target="#@targetId" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                                </div>
-                                <div class="carousel-inner">
-                                    <div class="carousel-item active">
-                                        <img src="https://c.dns-shop.ru/thumb/st1/fit/320/250/f6b172885b875667704cd5e81ddf1ae2/ee726604f2aba57d1902e154e3b11d59d300834ba9f3d0aa113c21dc161e112c.jpg" class="d-block w-100" alt="...">
-                                    </div>
-                                    <div class="carousel-item">
-                                        <img src="https://c.dns-shop.ru/thumb/st1/fit/320/250/e4a2ed063c363c4e683d425ceb644f13/12daf95484c07c66efc97e1078dfae7c89ccf8a0bf3d6c455fdd216350e9077b.jpg" class="d-block w-100" alt="...">
-                                    </div>
-                                    <div class="carousel-item">
-                                        <img src="https://c.dns-shop.ru/thumb/st1/fit/320/250/9e55a75f328b6d8c4dc6dadf5ccdc25b/65a873f6935be0201bb19c63b13ecf46b374982c1d03d78bf1dbc369a24841a3.jpg" class="d-block w-100" alt="...">
-                                    </div>
-                                </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#@targetId" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#@targetId" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">@product.ProductName</h5>
-                                <p class="card-text">@product.Description</p>
-                                <p class="card-text"><small class="text-muted">@product.Price</small></p>
-                            </div>
+    <div class="ui divided items">
+        @foreach (ProductModel product in products)
+        {
+            var targetId = "carousel" + product.Id.ToString();
+            <div class="ui item">
+                <div class="image">
+                    <img src="https://c.dns-shop.ru/thumb/st1/fit/320/250/f6b172885b875667704cd5e81ddf1ae2/ee726604f2aba57d1902e154e3b11d59d300834ba9f3d0aa113c21dc161e112c.jpg" class="d-block w-100" alt="...">
+                </div>
+
+                <div class="content">
+                    <a class="header">@product.ProductName</a>
+                    <div class="meta">
+                        <span class="cinema">Union Square 14</span>
+                    </div>
+                    <div class="description">
+                        <p>@product.Description</p>
+                    </div>
+                    <div class="extra">
+                        <div class="ui right floated primary button">
+                            Buy tickets
+                            <i class="right chevron icon"></i>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    }
+        }
+        @if (numberOfPages > 1)
+        {
+            <div class="pagination__container">
+                <div class="ui pagination menu">
+                    @for (int i = 1; i <= numberOfPages; i++)
+                    {
+                        var url = $"/products/category/{CategoryId}?page={i}";
+                        var css = PaginationItemCssClass(i);
+                        <a class="@css"href="@url">
+                            @i
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+
+    </div>
 }
 
 @code {
@@ -55,9 +57,69 @@
     public int CategoryId { get; set; }
 
     private List<ProductModel> products;
+    private ProductFilterModel filterModel;
+    private int numberOfPages ;
+    private int currentPage;
 
     protected override async Task OnParametersSetAsync()
     {
-        products = await dataService.GetRangeByCategory(CategoryId, 0, 100);
+        ResetAllVariables();
+        GetQueryStringValues();
+        filterModel = new ProductFilterModel
+        {
+            CategoryId = CategoryId,
+            RowsPerPage = 3,
+            PageNumber = currentPage > 0 ? currentPage : 1
+        };
+        products = await dataService.GetFilteredWithMetadata(filterModel);
+
+        if (products.Any())
+        {
+            numberOfPages = (int)(Math.Ceiling((double)products[0].FoundRecords / filterModel.RowsPerPage));
+        }
     }
+
+    private void ResetAllVariables()
+    {
+        currentPage = 0;
+        numberOfPages = 0;
+
+        filterModel = null;
+        products = null;
+    }
+
+
+    void GetQueryStringValues()
+    {
+        NavigationManager.TryGetQueryString<int>("page", out currentPage);
+    }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += HandleLocationChanged;
+    }
+
+    private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        base.InvokeAsync(async () =>
+        {
+            //await Task.Delay(1);
+            GetQueryStringValues();
+            filterModel.PageNumber = currentPage;
+            products = await dataService.GetFilteredWithMetadata(filterModel);
+            StateHasChanged();
+        });
+
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+
+    private string PaginationItemCssClass(int itemNumber)
+    {
+        return currentPage == itemNumber ? "active item" : "item";
+    }
+
 }

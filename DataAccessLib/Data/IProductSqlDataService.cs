@@ -6,6 +6,6 @@ namespace DataAccessLib.Data
 {
     public interface IProductSqlDataService
     {
-        Task<List<ProductModel>> GetRangeByCategory(int categoryId, int from, int to);
+        Task<List<ProductModel>> GetFilteredWithMetadata(ProductFilterModel filterModel);
     }
 }

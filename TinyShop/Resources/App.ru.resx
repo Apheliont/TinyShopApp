@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Add to cart" xml:space="preserve">
+    <value>Добавить в корзину</value>
+  </data>
+  <data name="Cart" xml:space="preserve">
+    <value>Корзина</value>
+  </data>
   <data name="ConfirmPassword" xml:space="preserve">
     <value>Подтверждение пароля</value>
   </data>
@@ -170,6 +176,9 @@
   </data>
   <data name="Resend email confirmation" xml:space="preserve">
     <value>Прислать подтверждение на почту</value>
+  </data>
+  <data name="Sales" xml:space="preserve">
+    <value>Скидки</value>
   </data>
   <data name="Search" xml:space="preserve">
     <value>Искать</value>

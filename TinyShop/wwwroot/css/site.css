@@ -79,3 +79,12 @@ a, .btn-link {
 .identity__main-container {
     margin-top: 45px !important;
 }
+
+.main__container {
+    margin-top: 45px !important;
+}
+
+.pagination__container {
+    margin-top: 15px;
+    text-align: center;
+}
