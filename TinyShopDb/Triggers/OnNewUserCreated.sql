@@ -1,0 +1,10 @@
+﻿CREATE TRIGGER [OnNewUserCreated]
+	ON AspNetUsers
+	FOR INSERT
+	AS
+	BEGIN
+		SET NOCOUNT ON;
+		INSERT INTO Carts(UserId)
+		SELECT I.Id
+		FROM inserted I
+	END

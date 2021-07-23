@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TinyShop.Areas.Identity;
 using TinyShop.Data;
+using TinyShop.Helpers;
 
 namespace TinyShop
 {
@@ -47,6 +48,8 @@ namespace TinyShop
             services.AddSingleton<ISqlDataAccess>(x => new SqlDataAccess(Configuration.GetConnectionString("DataConnection")));
             services.AddScoped<IProductSqlDataService, ProductSqlDataService>();
             services.AddScoped<ICategorySqlDataService, CategorySqlDataService>();
+            services.AddScoped<ICartSqlDataService, CartSqlDataService>();
+            services.AddScoped<IUserUtilities, UserUtilities>();
         }
 
         private RequestLocalizationOptions GetLocalizationOptions()

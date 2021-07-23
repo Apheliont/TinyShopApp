@@ -2,8 +2,11 @@
 @inject IProductSqlDataService dataService
 @inject IStringLocalizer<App> Localizer
 @using TinyShop.Extensions
+@using TinyShop.Helpers
 @inject NavigationManager NavigationManager
 @implements IDisposable
+@inject ICartSqlDataService cartDataService
+@inject IUserUtilities userUtilities 
 
 @if (products is not null)
 {
@@ -25,30 +28,15 @@
                         <p>@product.Description</p>
                     </div>
                     <div class="extra">
-                        <div class="ui right floated primary button">
-                            Buy tickets
+                        <div class="ui right floated primary button" @onclick="async () => { await AddToCartHandler(product.Id); }">
+                            @Localizer["Add to cart"]
                             <i class="right chevron icon"></i>
                         </div>
                     </div>
                 </div>
             </div>
         }
-        @if (numberOfPages > 1)
-        {
-            <div class="pagination__container">
-                <div class="ui pagination menu">
-                    @for (int i = 1; i <= numberOfPages; i++)
-                    {
-                        var url = $"/products/category/{CategoryId}?page={i}";
-                        var css = PaginationItemCssClass(i);
-                        <a class="@css"href="@url">
-                            @i
-                        </a>
-                    }
-                </div>
-            </div>
-        }
-
+        <Paginator NumberOfPages="@numberOfPages" CurrentPage="@currentPage" OnPageChanged="PageHasChanged" />
     </div>
 }
 
@@ -58,8 +46,9 @@
 
     private List<ProductModel> products;
     private ProductFilterModel filterModel;
-    private int numberOfPages ;
+    private int numberOfPages;
     private int currentPage;
+
 
     protected override async Task OnParametersSetAsync()
     {
@@ -76,6 +65,16 @@
         if (products.Any())
         {
             numberOfPages = (int)(Math.Ceiling((double)products[0].FoundRecords / filterModel.RowsPerPage));
+        }
+
+    }
+
+    private async Task AddToCartHandler(int productId)
+    {
+        string userId = await userUtilities.GetLoggedInUserId();
+        if (userId is not null)
+        {
+            await cartDataService.AddPurchase(userId, productId, 1);
         }
     }
 
@@ -117,9 +116,9 @@
         NavigationManager.LocationChanged -= HandleLocationChanged;
     }
 
-    private string PaginationItemCssClass(int itemNumber)
+    private void PageHasChanged(int page)
     {
-        return currentPage == itemNumber ? "active item" : "item";
+        NavigationManager.NavigateTo($"/products/category/{CategoryId}?page={page}");
     }
 
 }

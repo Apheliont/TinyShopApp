@@ -1,0 +1,38 @@
+﻿@if (NumberOfPages > 1)
+{
+    <div class="pagination__container">
+        <div class="ui pagination menu">
+            @for (int i = 1; i <= NumberOfPages; i++)
+            {
+                var tmpI = i;
+                var css = PaginationItemCssClass(i);
+                <a class="@css" @onclick="() => { PageHasChanged(tmpI); }">
+                    @i
+                </a>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public EventCallback<int> OnPageChanged { get; set; }
+
+    [Parameter]
+    public int NumberOfPages { get; set; }
+
+    [Parameter]
+    public int CurrentPage { get; set; }
+
+
+    private string PaginationItemCssClass(int itemNumber)
+    {
+        return CurrentPage == itemNumber ? "active item" : "item";
+    }
+
+    private void PageHasChanged(int pageToChange)
+    {
+        if (CurrentPage == pageToChange) return;
+        OnPageChanged.InvokeAsync(pageToChange);
+    }
+}

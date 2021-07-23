@@ -3,16 +3,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <Name>TinyShopDb</Name>
+    <Name>TinyShopAuth</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
-    <ProjectGuid>{29dea4a0-4e8c-4289-973b-4fcee7293883}</ProjectGuid>
+    <ProjectGuid>{7ec76340-c50c-4e69-b0b5-8e533217d9b2}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
-    <RootNamespace>TinyShopDb</RootNamespace>
-    <AssemblyName>TinyShopDb</AssemblyName>
+    <RootNamespace>TinyShopAuth</RootNamespace>
+    <AssemblyName>TinyShopAuth</AssemblyName>
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
@@ -57,30 +57,10 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="dbo" />
-    <Folder Include="dbo\Tables" />
-    <Folder Include="dbo\StoredProcedures" />
+    <Folder Include="dbo\Triggers" />
     <Folder Include="Publications" />
-    <Folder Include="dbo\Views" />
-    <Folder Include="Triggers" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Tables\Categories.sql" />
-    <Build Include="dbo\Tables\Products.sql" />
-    <Build Include="dbo\Tables\ProductCategories.sql" />
-    <Build Include="dbo\StoredProcedures\spProducts_GetRangeByCategory.sql" />
-    <Build Include="dbo\StoredProcedures\spCategories_GetAll.sql" />
-    <Build Include="dbo\StoredProcedures\spProducts_GetFilteredWithMetadata.sql" />
-    <Build Include="dbo\Tables\Carts.sql" />
-    <Build Include="Triggers\OnNewUserCreated.sql" />
-    <Build Include="dbo\Tables\AspNetUsers.sql" />
-    <Build Include="dbo\Tables\Purchases.sql" />
-    <Build Include="dbo\Tables\CartPurchases.sql" />
-    <Build Include="dbo\StoredProcedures\spCarts_AddPurchase.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <RefactorLog Include="TinyShopDb.refactorlog" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Publications\TinyShopDb.publish.xml" />
+    <Build Include="dbo\Triggers\OnNewUserCreate.sql" />
   </ItemGroup>
 </Project>

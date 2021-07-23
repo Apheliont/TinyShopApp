@@ -7,4 +7,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[FK_ProductCategories_Products]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="cf9df92e-1dd1-4f93-977f-0e6bfefc150a" ChangeDateTime="07/23/2021 17:42:06">
+    <Property Name="ElementName" Value="[dbo].[FK_CartPurchases_Purchased]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[CartPurchases]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_CartPurchases_Purchases]" />
+  </Operation>
 </Operations>
