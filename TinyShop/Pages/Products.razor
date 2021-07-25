@@ -5,7 +5,7 @@
 @using TinyShop.Helpers
 @inject NavigationManager NavigationManager
 @implements IDisposable
-@inject ICartSqlDataService cartDataService
+@inject IPurchaseSqlDataService purchaseDataService
 @inject IUserUtilities userUtilities 
 
 @if (products is not null)
@@ -74,7 +74,7 @@
         string userId = await userUtilities.GetLoggedInUserId();
         if (userId is not null)
         {
-            await cartDataService.AddPurchase(userId, productId, 1);
+            await purchaseDataService.AddToCart(userId, productId, 1);
         }
     }
 

@@ -1,0 +1,80 @@
+﻿@page "/cart"
+@using TinyShop.Helpers
+@inject IUserUtilities userUtilities
+@inject IPurchaseSqlDataService purchaseDataService
+
+@if (purchases is not null)
+{
+    @if (purchases.Any())
+    {
+        <table class="ui compact celled definition table">
+            <thead class="full-width">
+                <tr>
+                    <th>ProductName</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (PurchaseModel purchase in purchases)
+                {
+                    <tr>
+                        <td>@purchase.ProductName</td>
+                        <td>@purchase.Price</td>
+                        <td>
+                            <div class="ui input focus">
+                                <input type="number"
+                                       min="1"
+                                       value="@purchase.Quantity"
+                                       @onchange="async (args) => { await ChangeQuantityHandler(purchase.Id, args); }">
+                            </div>
+                        </td>
+                        <td><i class="trash icon" @onclick="async () => { await DeletePurchaseHandler(purchase.Id); }"></i></td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="full-width">
+                <tr>
+                    <th></th>
+                    <th colspan="4">
+                        <div class="ui right floated small primary labeled icon button">
+                            <i class="user icon"></i> Buy
+                        </div>
+                        <div class="ui small  button">
+                            Total:
+                        </div>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    }
+}
+
+@code {
+    private List<PurchaseModel> purchases;
+
+    protected override async Task OnInitializedAsync()
+    {
+        string userId = await userUtilities.GetLoggedInUserId();
+        if (userId is not null)
+        {
+            purchases = await purchaseDataService.GetAll(userId);
+        }
+    }
+
+    private async Task DeletePurchaseHandler(int purchaseId)
+    {
+        await purchaseDataService.Delete(purchaseId);
+        purchases.Remove(purchases.Where(p => p.Id == purchaseId).FirstOrDefault());
+    }
+
+    private async Task ChangeQuantityHandler(int purchaseId, ChangeEventArgs args)
+    {
+        int q;
+        if (Int32.TryParse(args.Value.ToString(), out q))
+        {
+            await purchaseDataService.Update(purchaseId, q);
+        }
+    }
+}

@@ -4,7 +4,10 @@
 	AS
 	BEGIN
 		SET NOCOUNT ON;
-		INSERT INTO Carts(UserId)
-		SELECT I.Id
-		FROM inserted I
+
+		INSERT INTO Carts DEFAULT VALUES;
+		INSERT INTO UserCarts(CartId, UserId) VALUES(SCOPE_IDENTITY(), (
+			SELECT I.Id
+			FROM inserted I
+		));
 	END

@@ -75,7 +75,11 @@
     <Build Include="dbo\Tables\AspNetUsers.sql" />
     <Build Include="dbo\Tables\Purchases.sql" />
     <Build Include="dbo\Tables\CartPurchases.sql" />
-    <Build Include="dbo\StoredProcedures\spCarts_AddPurchase.sql" />
+    <Build Include="dbo\StoredProcedures\spPurchases_Add.sql" />
+    <Build Include="dbo\Tables\UserCarts.sql" />
+    <Build Include="dbo\StoredProcedures\spPurchases_GetAllCartItems.sql" />
+    <Build Include="dbo\StoredProcedures\spPurchases_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\spPurchases_Update.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="TinyShopDb.refactorlog" />

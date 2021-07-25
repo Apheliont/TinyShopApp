@@ -36,7 +36,7 @@ namespace TinyShop
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
-                    Configuration.GetConnectionString("AuthConnection")));
+                    Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
@@ -45,10 +45,10 @@ namespace TinyShop
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddControllers();
             services.AddLocalization(options => options.ResourcesPath = "Resources");
-            services.AddSingleton<ISqlDataAccess>(x => new SqlDataAccess(Configuration.GetConnectionString("DataConnection")));
+            services.AddSingleton<ISqlDataAccess>(x => new SqlDataAccess(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IProductSqlDataService, ProductSqlDataService>();
             services.AddScoped<ICategorySqlDataService, CategorySqlDataService>();
-            services.AddScoped<ICartSqlDataService, CartSqlDataService>();
+            services.AddScoped<IPurchaseSqlDataService, PurchaseSqlDataService>();
             services.AddScoped<IUserUtilities, UserUtilities>();
         }
 
@@ -80,7 +80,11 @@ namespace TinyShop
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            app.Use(async (context, next) => {
+                Console.WriteLine("Request started");
+                await next();
+                Console.WriteLine("Request ended");
+            });
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

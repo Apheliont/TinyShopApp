@@ -15,8 +15,7 @@ BEGIN
 	INNER JOIN (
 		SELECT ProductId
 		FROM ProductCategories
-		WHERE
-			@CategoryId IS NULL OR CategoryId = @CategoryId
+		WHERE @CategoryId IS NULL OR CategoryId = @CategoryId
 			) pc
 	ON p.Id = pc.ProductId
 	WHERE

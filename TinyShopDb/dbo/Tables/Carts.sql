@@ -1,5 +1,6 @@
 ﻿CREATE TABLE [dbo].[Carts]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
-	[UserId] NVARCHAR(450) NOT NULL 
+	[ItemQuantity] INT NOT NULL DEFAULT 0,
+    [UpdatedAt] DATETIME2 NULL 
 )
