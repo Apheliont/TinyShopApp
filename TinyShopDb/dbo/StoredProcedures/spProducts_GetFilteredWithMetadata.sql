@@ -9,8 +9,21 @@
 AS
 BEGIN
 	SET NOCOUNT ON;
+	IF @RowsPerPage < 1
+		SET @RowsPerPage = 1
+	IF @PageNumber < 1
+		SET @PageNumber = 1
 
-	SELECT p.Id, p.ProductName, p.Description, p.Price, Count(*) OVER () AS FoundRecords
+
+	SELECT 
+		 p.Id
+		,p.ProductName
+		,p.Description
+		,p.Price
+		,Count(*) OVER () AS FoundRecords
+		,MIN(p.Price) OVER() AS [MinPrice]
+		,MAX(p.Price) OVER() AS [MaxPrice]
+
 	FROM Products p
 	INNER JOIN (
 		SELECT ProductId

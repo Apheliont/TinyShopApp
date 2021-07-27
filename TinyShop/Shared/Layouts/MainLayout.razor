@@ -1,6 +1,5 @@
 ﻿@inherits LayoutComponentBase
 @inject IStringLocalizer<App> Localizer
-@inject IJSRuntime JS
 
 <InfoStripe />
 <NavbarTop />
@@ -19,12 +18,6 @@
 
 
 @code {
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await JS.InvokeVoidAsync("onBlazorReady");
-        base.OnAfterRender(firstRender);
-    }
 
 }
 

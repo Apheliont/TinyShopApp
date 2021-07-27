@@ -2,6 +2,8 @@
 @inject IStringLocalizer<App> Localizer
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration config
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
 
 @if (cultures is not null)
 {
@@ -31,6 +33,7 @@
 }
 
 @code {
+    private IJSObjectReference module;
     private string selectedCulture = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
     private Dictionary<string, string> cultures;
 
@@ -39,11 +42,29 @@
         cultures = config.GetSection("Cultures").GetChildren().ToDictionary(x => x.Key, x => x.Value);
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
+        }
+
+        await module.InvokeVoidAsync("initializeDropdownMenu");
+    }
+
     private void RequestChangeCulture(ChangeEventArgs e)
     {
         selectedCulture = e.Value.ToString();
         var uri = new Uri(NavigationManager.Uri).GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
         var query = $"?culture={Uri.EscapeDataString(selectedCulture)}&redirectUri={Uri.EscapeDataString(uri)}";
         NavigationManager.NavigateTo($"/Culture/SetCulture/{query}", forceLoad: true);
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
     }
 }

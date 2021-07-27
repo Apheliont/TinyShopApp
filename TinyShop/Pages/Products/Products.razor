@@ -1,0 +1,108 @@
+﻿@using TinyShop.Shared.Layouts
+@layout ProductsLayout
+@page "/products/category/{categoryId:int}"
+@inject IProductSqlDataService dataService
+
+@using TinyShop.Extensions
+@using TinyShop.Helpers
+@inject NavigationManager NavigationManager
+@inject IPurchaseSqlDataService purchaseDataService
+@inject IUserUtilities userUtilities
+
+<div class="ui grid">
+    <div class="row">
+        <div class="four wide column">
+            <ProductFilterComponent FilterModel="@FilterModel"/>
+        </div>
+        <div class="twelve wide column">
+            <ProductListComponent Products="@products" OnAddToCart="AddToCartHandler"/>
+            <Paginator NumberOfPages="@numberOfPages" CurrentPage="@currentPage" OnPageChanged="PageHasChanged" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int CategoryId { get; set; }
+
+    private List<ProductModel> products;
+    public ProductFilterModel FilterModel { get; set; }
+    private int numberOfPages;
+    private int currentPage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ResetAllVariables();
+        GetQueryStringValues();
+        FilterModel = new ProductFilterModel {
+            CategoryId = CategoryId,
+            RowsPerPage = 3,
+            PageNumber = currentPage
+        };
+
+        products = await dataService.GetFilteredWithMetadata(FilterModel);
+
+        if (products.Any())
+        {
+            numberOfPages = (int)(Math.Ceiling((double)products[0].FoundRecords / FilterModel.RowsPerPage));
+            FilterModel.MinPrice = products[0].MinPrice;
+            FilterModel.MaxPrice = products[0].MaxPrice;
+        }
+
+    }
+
+    private void ResetAllVariables()
+    {
+        currentPage = 0;
+        numberOfPages = 0;
+
+        if (FilterModel is not null)
+        {
+            FilterModel.ResetModel();
+        }
+
+        products = null;
+    }
+
+    void GetQueryStringValues()
+    {
+        NavigationManager.TryGetQueryString<int>("page", out currentPage);
+    }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += HandleLocationChanged;
+    }
+
+    private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        base.InvokeAsync(async () =>
+        {
+            //await Task.Delay(1);
+            GetQueryStringValues();
+            FilterModel.PageNumber = currentPage;
+            products = await dataService.GetFilteredWithMetadata(FilterModel);
+            StateHasChanged();
+        });
+
+    }
+
+    private async Task AddToCartHandler(int productId)
+    {
+        string userId = await userUtilities.GetLoggedInUserId();
+        if (userId is not null)
+        {
+            await purchaseDataService.AddToCart(userId, productId, 1);
+        }
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+
+    private void PageHasChanged(int page)
+    {
+        NavigationManager.NavigateTo($"/products/category/{CategoryId}?page={page}");
+    }
+}
