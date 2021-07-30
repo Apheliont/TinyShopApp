@@ -2,7 +2,7 @@
 @layout ProductsLayout
 @page "/products/category/{categoryId:int}"
 @inject IProductSqlDataService dataService
-
+@using System.Text;
 @using TinyShop.Extensions
 @using TinyShop.Helpers
 @inject NavigationManager NavigationManager
@@ -11,12 +11,15 @@
 
 <div class="ui grid">
     <div class="row">
-        <div class="four wide column">
-            <ProductFilterComponent FilterModel="@FilterModel"/>
+        <div class="five wide column">
+            <ProductFilterComponent FilterModel="@FilterModel"
+                                    MetadataModel="@metadataModel"
+                                    OnApplyFilter="ApplyFilterHandler"
+                                    OnResetFilter="ResetFilterHandler" />
         </div>
-        <div class="twelve wide column">
-            <ProductListComponent Products="@products" OnAddToCart="AddToCartHandler"/>
-            <Paginator NumberOfPages="@numberOfPages" CurrentPage="@currentPage" OnPageChanged="PageHasChanged" />
+        <div class="eleven wide column">
+            <ProductListComponent Products="@products" OnAddToCart="AddToCartHandler" />
+            <Paginator NumberOfPages="@numberOfPages" CurrentPage="@FilterModel.PageNumber" OnPageChanged="PageHasChanged" />
         </div>
     </div>
 </div>
@@ -27,46 +30,67 @@
 
     private List<ProductModel> products;
     public ProductFilterModel FilterModel { get; set; }
+    private ProductMetadataModel metadataModel;
+
     private int numberOfPages;
-    private int currentPage;
 
     protected override async Task OnParametersSetAsync()
     {
-        ResetAllVariables();
-        GetQueryStringValues();
-        FilterModel = new ProductFilterModel {
-            CategoryId = CategoryId,
-            RowsPerPage = 3,
-            PageNumber = currentPage
-        };
-
-        products = await dataService.GetFilteredWithMetadata(FilterModel);
-
-        if (products.Any())
-        {
-            numberOfPages = (int)(Math.Ceiling((double)products[0].FoundRecords / FilterModel.RowsPerPage));
-            FilterModel.MinPrice = products[0].MinPrice;
-            FilterModel.MaxPrice = products[0].MaxPrice;
-        }
-
+        InitFilterModel();
+        await InitializeData();
     }
 
-    private void ResetAllVariables()
+
+    private async Task InitializeData()
     {
-        currentPage = 0;
-        numberOfPages = 0;
+        GetQueryStringValues();
 
-        if (FilterModel is not null)
+        await Task.WhenAll(new List<Task> {
+            LoadMetadata(),
+            LoadProducts()
+        });
+
+
+        if (metadataModel is not null)
         {
-            FilterModel.ResetModel();
+            numberOfPages = (int)(Math.Ceiling((double)metadataModel.FoundRecords / FilterModel.RowsPerPage));
         }
-
-        products = null;
     }
+
+    private void InitFilterModel()
+    {
+        FilterModel = new ProductFilterModel
+        {
+            CategoryId = CategoryId,
+            RowsPerPage = 3
+        };
+    }
+
+    private async Task LoadMetadata()
+    {
+        metadataModel = await dataService.GetMetadata(FilterModel);
+    }
+
+    private async Task LoadProducts()
+    {
+        products = await dataService.GetFiltered(FilterModel);
+    }
+
 
     void GetQueryStringValues()
     {
-        NavigationManager.TryGetQueryString<int>("page", out currentPage);
+        if (NavigationManager.TryGetQueryString<int>("page", out int pageNumber))
+        {
+            FilterModel.PageNumber = pageNumber;
+        }
+        if (NavigationManager.TryGetQueryString<int>("minPrice", out int minPrice))
+        {
+            FilterModel.MinPrice = minPrice;
+        }
+        if (NavigationManager.TryGetQueryString<int>("maxPrice", out int maxPrice))
+        {
+            FilterModel.MaxPrice = maxPrice;
+        }
     }
 
     protected override void OnInitialized()
@@ -78,10 +102,7 @@
     {
         base.InvokeAsync(async () =>
         {
-            //await Task.Delay(1);
-            GetQueryStringValues();
-            FilterModel.PageNumber = currentPage;
-            products = await dataService.GetFilteredWithMetadata(FilterModel);
+            await InitializeData();
             StateHasChanged();
         });
 
@@ -103,6 +124,31 @@
 
     private void PageHasChanged(int page)
     {
-        NavigationManager.NavigateTo($"/products/category/{CategoryId}?page={page}");
+        StringBuilder sb = new StringBuilder();
+        sb.Append($"/products/category/{CategoryId}?");
+        sb.Append($"page={page}");
+        if (FilterModel.MinPrice is not null)
+        {
+            sb.Append($"&minPrice={FilterModel.MinPrice}");
+        }
+        if (FilterModel.MaxPrice is not null)
+        {
+            sb.Append($"&maxPrice={FilterModel.MaxPrice}");
+        }
+
+        NavigationManager.NavigateTo(sb.ToString());
+    }
+
+    private void ApplyFilterHandler()
+    {
+        // Если был применен фильтр то переходим на 1ю страницу
+        FilterModel.PageNumber = 1;
+        PageHasChanged(FilterModel.PageNumber);
+    }
+
+    private void ResetFilterHandler()
+    {
+        InitFilterModel();
+        PageHasChanged(FilterModel.PageNumber);
     }
 }

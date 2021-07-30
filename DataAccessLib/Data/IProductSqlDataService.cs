@@ -6,6 +6,7 @@ namespace DataAccessLib.Data
 {
     public interface IProductSqlDataService
     {
-        Task<List<ProductModel>> GetFilteredWithMetadata(ProductFilterModel filterModel);
+        Task<List<ProductModel>> GetFiltered(ProductFilterModel filterModel);
+        Task<ProductMetadataModel> GetMetadata(ProductFilterModel filterModel);
     }
 }

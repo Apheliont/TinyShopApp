@@ -86,3 +86,7 @@ a, .btn-link {
     margin-top: 15px;
     text-align: center;
 }
+
+.btn__filterblock {
+    padding: 10px 5px;
+}

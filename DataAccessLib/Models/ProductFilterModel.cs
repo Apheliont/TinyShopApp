@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace DataAccessLib.Models
 {
-#nullable enable
-    public class ProductFilterModel
+    #nullable enable
+    public record ProductFilterModel
     {
-        private int _rowsPerPage = 1;
+        private int _rowsPerPage = 20;
         private int _pageNumber = 1;
         private decimal? _minPrice;
         private decimal? _maxPrice;
@@ -35,26 +35,15 @@ namespace DataAccessLib.Models
         {
             get => _minPrice; set
             {
-                _minPrice = value >= 0 ? value : 0;
+                _minPrice = value is null ? null : value >= 0 ? value : 0;
             }
         }
         public decimal? MaxPrice
         {
             get => _maxPrice; set
             {
-                _maxPrice = value >= 0 ? value : 0;
+                _maxPrice = value is null ? null : value >= 0 ? value : 0;
             }
-        }
-
-        public void ResetModel()
-        {
-            CategoryId = null;
-            RowsPerPage = 20;
-            PageNumber = 1;
-            OrderBy = "ProductName";
-            OrderType = "DESC";
-            MinPrice = null;
-            MaxPrice = null;
         }
     }
 }

@@ -17,9 +17,22 @@ namespace DataAccessLib.Data
         }
 
 
-        public async Task<List<ProductModel>> GetFilteredWithMetadata(ProductFilterModel filterModel)
+        public async Task<List<ProductModel>> GetFiltered(ProductFilterModel filterModel)
         {
-            return await _dataAccess.GetData<ProductModel, ProductFilterModel>("dbo.spProducts_GetFilteredWithMetadata", filterModel);
+            return await _dataAccess
+                .GetData<ProductModel, ProductFilterModel>("dbo.spProducts_GetFiltered", filterModel);
+        }
+
+        public async Task<ProductMetadataModel> GetMetadata(ProductFilterModel filterModel)
+        {
+            var data = await _dataAccess
+                .GetData<ProductMetadataModel, dynamic>("dbo.spProducts_GetMetadata",
+                    new { 
+                        CategoryId = filterModel.CategoryId,
+                        MinPrice = filterModel.MinPrice,
+                        MaxPrice = filterModel.MaxPrice
+                    });
+            return data.FirstOrDefault();
         }
     }
 }

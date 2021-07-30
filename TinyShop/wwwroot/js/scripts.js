@@ -18,8 +18,7 @@ export function initializeSlider(dotNetObj, lowerBound, upperBound, lowerValue, 
 }
 
 export function setSliderState(lowerBound, upperBound) {
-    console.log(`min:${lowerBound}, max:${upperBound}`);
-    $('.ui.range.slider').slider('set rangeValue', parseInt(lowerBound), upperBound, false);
+    $('.ui.range.slider').slider('set rangeValue', lowerBound, upperBound, true);
 }
 
 

@@ -120,6 +120,9 @@
   <data name="Add to cart" xml:space="preserve">
     <value>Добавить в корзину</value>
   </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Применить</value>
+  </data>
   <data name="Cart" xml:space="preserve">
     <value>Корзина</value>
   </data>
@@ -182,6 +185,9 @@
   </data>
   <data name="Resend email confirmation" xml:space="preserve">
     <value>Прислать подтверждение на почту</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Сбросить</value>
   </data>
   <data name="Sales" xml:space="preserve">
     <value>Скидки</value>

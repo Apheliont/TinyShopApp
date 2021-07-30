@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLib.Models
 {
-    public class PurchaseModel
+    public record PurchaseModel
     {
         public int Id { get; set; }
         public string ProductName { get; set; }

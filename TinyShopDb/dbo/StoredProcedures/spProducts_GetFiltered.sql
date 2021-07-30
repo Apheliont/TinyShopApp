@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[spProducts_GetFilteredWithMetadata]
+﻿CREATE PROCEDURE [dbo].[spProducts_GetFiltered]
 	@CategoryId int = NULL,
 	@RowsPerPage int,
 	@PageNumber int,
@@ -20,16 +20,12 @@ BEGIN
 		,p.ProductName
 		,p.Description
 		,p.Price
-		,Count(*) OVER () AS FoundRecords
-		,MIN(p.Price) OVER() AS [MinPrice]
-		,MAX(p.Price) OVER() AS [MaxPrice]
 
 	FROM Products p
 	INNER JOIN (
 		SELECT ProductId
 		FROM ProductCategories
-		WHERE @CategoryId IS NULL OR CategoryId = @CategoryId
-			) pc
+		WHERE @CategoryId IS NULL OR CategoryId = @CategoryId) pc
 	ON p.Id = pc.ProductId
 	WHERE
 			(@MinPrice IS NULL OR p.Price >= @MinPrice)

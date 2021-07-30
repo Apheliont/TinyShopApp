@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLib.Models
 {
-    public class CategoryModel
+    public record CategoryModel
     {
         public int Id { get; set; }
         public string CategoryName { get; set; }
