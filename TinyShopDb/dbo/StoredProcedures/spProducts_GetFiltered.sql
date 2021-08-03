@@ -1,9 +1,20 @@
-﻿CREATE PROCEDURE [dbo].[spProducts_GetFiltered]
+﻿/*
+	@OrderBy is C# enum which has a representation in number:
+	1 = ProductName
+	2 = Price
+	3 = Rating
+
+	@SortOrder C# enum which has a representation in number:
+	1 = DESC
+	2 = ASC
+*/
+
+CREATE PROCEDURE [dbo].[spProducts_GetFiltered]
 	@CategoryId int = NULL,
 	@RowsPerPage int,
 	@PageNumber int,
-	@OrderBy VARCHAR(50) = 'ProductName',
-	@OrderType VARCHAR(4) = 'DESC',
+	@OrderBy INT = 1,
+	@SortOrder INT = 1,
 	@MinPrice MONEY = NULL,
 	@MaxPrice MONEY = NULL
 AS
@@ -31,9 +42,9 @@ BEGIN
 			(@MinPrice IS NULL OR p.Price >= @MinPrice)
 		AND (@MaxPrice IS NULL OR p.Price <= @MaxPrice)
 	ORDER BY
-		CASE WHEN @OrderBy = 'Price' AND @OrderType ='ASC' THEN Price END ,
-		CASE WHEN @OrderBy = 'Price' AND @OrderType ='DESC' THEN Price END DESC,
-		CASE WHEN @OrderBy = 'ProductName' AND @OrderType ='ASC' THEN ProductName END ,
-		CASE WHEN @OrderBy = 'ProductName' AND @OrderType ='DESC' THEN ProductName END DESC
+		CASE WHEN @OrderBy = 2 AND @SortOrder = 2 THEN Price END ,
+		CASE WHEN @OrderBy = 2 AND @SortOrder = 1 THEN Price END DESC,
+		CASE WHEN @OrderBy = 1 AND @SortOrder = 2 THEN ProductName END ,
+		CASE WHEN @OrderBy = 1 AND @SortOrder = 1 THEN ProductName END DESC
 	OFFSET (@RowsPerPage * (@PageNumber - 1)) ROWS FETCH NEXT @RowsPerPage ROWS ONLY
 END

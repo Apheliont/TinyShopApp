@@ -1,0 +1,120 @@
+﻿@inject IStringLocalizer<App> Localizer
+@using System.ComponentModel
+@using TinyShop.Extensions
+
+<div class="ui small menu">
+    @if (MetadataModel is not null)
+    {
+        <div class="item">@Localizer["Found records"]: @MetadataModel.FoundRecords</div>
+    }
+    <div class="right menu">
+        <div class="ui dropdown item">
+            <input type="hidden" value="@_orderBy" @onchange="OrderByHandler">
+            @Localizer["Sort by"] <i class="dropdown icon"></i>
+            <div class="menu">
+                @foreach (KeyValuePair<int, string> orderBy in orderBys)
+                {
+                    <div data-value="@orderBy.Key" class="item">@Localizer[orderBy.Value]</div>
+                }
+            </div>
+        </div>
+        <div class="ui dropdown item">
+            <input type="hidden" value="@_sortOrder" @onchange="SortOrderHandler">
+            @Localizer["Order"] <i class="dropdown icon"></i>
+            <div class="menu">
+                @foreach (KeyValuePair<int, string> sortOrder in sortOrders)
+                {
+                    <div data-value="@sortOrder.Key" class="item">@Localizer[sortOrder.Value]</div>
+                }
+            </div>
+        </div>
+        <div class="ui dropdown item">
+            <input type="hidden" value="@_rowsPerPage" @onchange="RowsPerPageHandler">
+            @Localizer["Show"] <i class="dropdown icon"></i>
+            <div class="menu">
+                @foreach (KeyValuePair<int, string> rowsPerPage in rowsPerPages)
+                {
+                    <div data-value="@rowsPerPage.Key" class="item">@rowsPerPage.Value</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Dictionary<int, string> sortOrders = new Dictionary<int, string>();
+    private Dictionary<int, string> orderBys = new Dictionary<int, string>();
+    private Dictionary<int, string> rowsPerPages = new Dictionary<int, string>();
+
+    private int _rowsPerPage;
+    private int _sortOrder;
+    private int _orderBy;
+
+    [Parameter]
+    public ProductFilterModel FilterModel { get; set; }
+
+    [Parameter]
+    public EventCallback OnSortChange { get; set; }
+
+    [Parameter]
+    public ProductMetadataModel MetadataModel { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _rowsPerPage = (int)FilterModel.RowsPerPage;
+        _sortOrder = (int)FilterModel.SortOrder;
+        _orderBy = (int)FilterModel.OrderBy;
+
+        if (orderBys.Count == 0)
+        {
+            foreach (OrderByEnum orderBy in Enum.GetValues(typeof(OrderByEnum)))
+            {
+                orderBys.Add((int)orderBy, orderBy.DescriptionAttr());
+            }
+        }
+
+        if (sortOrders.Count == 0)
+        {
+            foreach (SortOrderEnum sortOrder in Enum.GetValues(typeof(SortOrderEnum)))
+            {
+                sortOrders.Add((int)sortOrder, sortOrder.DescriptionAttr());
+            }
+        }
+
+        if (rowsPerPages.Count == 0)
+        {
+            foreach (RowsPerPageEnum rowsPerPage in Enum.GetValues(typeof(RowsPerPageEnum)))
+            {
+                rowsPerPages.Add((int)rowsPerPage, rowsPerPage.DescriptionAttr());
+            }
+        }
+    }
+
+    private async Task OrderByHandler(ChangeEventArgs args)
+    {
+        if (Int32.TryParse(args.Value.ToString(), out _orderBy))
+        {
+            FilterModel.OrderBy = (OrderByEnum)_orderBy;
+            await OnSortChange.InvokeAsync();
+        }
+    }
+
+    private async Task RowsPerPageHandler(ChangeEventArgs args)
+    {
+        if (Int32.TryParse(args.Value.ToString(), out _rowsPerPage))
+        {
+            FilterModel.RowsPerPage = (RowsPerPageEnum)_rowsPerPage;
+            await OnSortChange.InvokeAsync();
+        }
+    }
+
+    private async Task SortOrderHandler(ChangeEventArgs args)
+    {
+        if (Int32.TryParse(args.Value.ToString(), out _sortOrder))
+        {
+            FilterModel.SortOrder = (SortOrderEnum)_sortOrder;
+            await OnSortChange.InvokeAsync();
+        }
+    }
+
+}

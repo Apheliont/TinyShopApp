@@ -1,18 +1,50 @@
 ﻿@inject ICategorySqlDataService categoryDataAccess
-<div class="ui vertical fluid tabular menu">
-    @if (categories is not null)
-    {
-        @foreach (CategoryModel category in categories)
-        {
-            var url = "products/category/" + category.Id.ToString();
-                <NavLink class="item" href="@url" Match="NavLinkMatch.All">
-                    @category.CategoryName
-                </NavLink>
-        }
-    }
+@inject IStringLocalizer<App> Localizer
+<div class="@AccordionCssString">
+    <div class="title">
+        <i class="bars icon"></i>
+        @Localizer["Categories"]
+    </div>
+    <div class="@openedMenuCssString">
+        <div class="ui secondary vertical fluid menu">
+            @if (categories is not null)
+            {
+                @foreach (CategoryModel category in categories)
+                {
+                    var url = "products/category/" + category.Id.ToString();
+                    <NavLink class="item" href="@url" Match="NavLinkMatch.All">
+                        @category.CategoryName
+                    </NavLink>
+                }
+            }
+        </div>
+    </div>
 </div>
 
 @code {
+    [Parameter]
+    public bool IsMenuOpened { get; set; } = false;
+
+    private string openedMenuCssString;
+
+    private string accordionCssString = "ui styled accordion";
+    [Parameter]
+    public string AccordionCssString
+    {
+        get => accordionCssString; set
+        {
+            if (!String.IsNullOrEmpty(value))
+            {
+                accordionCssString += $" {value}";
+            }
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        openedMenuCssString = IsMenuOpened ? "active content" : "content";
+    }
+
     private List<CategoryModel> categories;
 
     protected override async Task OnInitializedAsync()

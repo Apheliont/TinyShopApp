@@ -118,13 +118,25 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Add to cart" xml:space="preserve">
-    <value>Добавить в корзину</value>
+    <value>В корзину</value>
   </data>
   <data name="Apply" xml:space="preserve">
     <value>Применить</value>
   </data>
+  <data name="By name" xml:space="preserve">
+    <value>По названию</value>
+  </data>
+  <data name="By price" xml:space="preserve">
+    <value>По цене</value>
+  </data>
+  <data name="By rating" xml:space="preserve">
+    <value>По рейтингу</value>
+  </data>
   <data name="Cart" xml:space="preserve">
     <value>Корзина</value>
+  </data>
+  <data name="Categories" xml:space="preserve">
+    <value>Категории</value>
   </data>
   <data name="ConfirmPassword" xml:space="preserve">
     <value>Подтверждение пароля</value>
@@ -137,6 +149,9 @@
   </data>
   <data name="Forgot your password?" xml:space="preserve">
     <value>Забыли пароль?</value>
+  </data>
+  <data name="Found records" xml:space="preserve">
+    <value>Найдено записей</value>
   </data>
   <data name="From" xml:space="preserve">
     <value>От</value>
@@ -165,6 +180,9 @@
   <data name="Or" xml:space="preserve">
     <value>или</value>
   </data>
+  <data name="Order" xml:space="preserve">
+    <value>Порядок</value>
+  </data>
   <data name="Our shops" xml:space="preserve">
     <value>Магазины</value>
   </data>
@@ -189,11 +207,23 @@
   <data name="Reset" xml:space="preserve">
     <value>Сбросить</value>
   </data>
+  <data name="Reverse order" xml:space="preserve">
+    <value>По убыванию</value>
+  </data>
   <data name="Sales" xml:space="preserve">
     <value>Скидки</value>
   </data>
   <data name="Search" xml:space="preserve">
     <value>Искать</value>
+  </data>
+  <data name="Show" xml:space="preserve">
+    <value>Показать</value>
+  </data>
+  <data name="Sort by" xml:space="preserve">
+    <value>Сортировать по</value>
+  </data>
+  <data name="Straight order" xml:space="preserve">
+    <value>По возрастанию</value>
   </data>
   <data name="To" xml:space="preserve">
     <value>До</value>

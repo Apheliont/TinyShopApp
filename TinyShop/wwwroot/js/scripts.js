@@ -27,3 +27,15 @@ export function initializeAccordion() {
         .accordion();
 }
 
+export function showElement(elemntId) {
+    $(`#${elemntId}`).slideDown(400);
+}
+
+export function hideElement(elemntId) {
+    $(`#${elemntId}`).slideUp(400);
+}
+
+export function hideAllElements() {
+    $('.product__carousel-container').slideUp(400);
+}
+

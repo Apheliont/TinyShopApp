@@ -8,16 +8,27 @@
 @inject NavigationManager NavigationManager
 @inject IPurchaseSqlDataService purchaseDataService
 @inject IUserUtilities userUtilities
+@inject IStringLocalizer<App> Localizer
 
 <div class="ui grid">
     <div class="row">
-        <div class="five wide column">
+        <div class="four wide column">
+        </div>
+        <div class="twelve wide column">
+            <SortPannelComponent MetadataModel="@MetadataModel"
+                                 FilterModel="@FilterModel" 
+                                 OnSortChange="OnSortChangeHandler"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="four wide column">
+            <CategoryMenu AccordionCssString="categories__accordion"/>
             <ProductFilterComponent FilterModel="@FilterModel"
-                                    MetadataModel="@metadataModel"
+                                    MetadataModel="@MetadataModel"
                                     OnApplyFilter="ApplyFilterHandler"
                                     OnResetFilter="ResetFilterHandler" />
         </div>
-        <div class="eleven wide column">
+        <div class="twelve wide column">
             <ProductListComponent Products="@products" OnAddToCart="AddToCartHandler" />
             <Paginator NumberOfPages="@numberOfPages" CurrentPage="@FilterModel.PageNumber" OnPageChanged="PageHasChanged" />
         </div>
@@ -30,7 +41,7 @@
 
     private List<ProductModel> products;
     public ProductFilterModel FilterModel { get; set; }
-    private ProductMetadataModel metadataModel;
+    public ProductMetadataModel MetadataModel { get; set; }
 
     private int numberOfPages;
 
@@ -51,9 +62,9 @@
         });
 
 
-        if (metadataModel is not null)
+        if (MetadataModel is not null)
         {
-            numberOfPages = (int)(Math.Ceiling((double)metadataModel.FoundRecords / FilterModel.RowsPerPage));
+            numberOfPages = (int)(Math.Ceiling((double)MetadataModel.FoundRecords / (int)FilterModel.RowsPerPage));
         }
     }
 
@@ -62,13 +73,12 @@
         FilterModel = new ProductFilterModel
         {
             CategoryId = CategoryId,
-            RowsPerPage = 3
         };
     }
 
     private async Task LoadMetadata()
     {
-        metadataModel = await dataService.GetMetadata(FilterModel);
+        MetadataModel = await dataService.GetMetadata(FilterModel);
     }
 
     private async Task LoadProducts()
@@ -90,6 +100,27 @@
         if (NavigationManager.TryGetQueryString<int>("maxPrice", out int maxPrice))
         {
             FilterModel.MaxPrice = maxPrice;
+        }
+        if (NavigationManager.TryGetQueryString<int>("orderBy", out int orderBy))
+        {
+            if(Enum.IsDefined(typeof(OrderByEnum), orderBy))
+            {
+                FilterModel.OrderBy = (OrderByEnum)orderBy;
+            }
+        }
+        if (NavigationManager.TryGetQueryString<int>("sortOrder", out int sortOrder))
+        {
+            if (Enum.IsDefined(typeof(SortOrderEnum), sortOrder))
+            {
+                FilterModel.SortOrder = (SortOrderEnum)sortOrder;
+            }
+        }
+        if (NavigationManager.TryGetQueryString<int>("rowsPerPage", out int rowsPerPage))
+        {
+            if (Enum.IsDefined(typeof(RowsPerPageEnum), rowsPerPage))
+            {
+                FilterModel.RowsPerPage = (RowsPerPageEnum)rowsPerPage;
+            }
         }
     }
 
@@ -135,6 +166,9 @@
         {
             sb.Append($"&maxPrice={FilterModel.MaxPrice}");
         }
+        sb.Append($"&orderBy={(int)FilterModel.OrderBy}");
+        sb.Append($"&sortOrder={(int)FilterModel.SortOrder}");
+        sb.Append($"&rowsPerPage={(int)FilterModel.RowsPerPage}");
 
         NavigationManager.NavigateTo(sb.ToString());
     }
@@ -149,6 +183,12 @@
     private void ResetFilterHandler()
     {
         InitFilterModel();
+        PageHasChanged(FilterModel.PageNumber);
+    }
+
+    private void OnSortChangeHandler()
+    {
+        FilterModel.PageNumber = 1;
         PageHasChanged(FilterModel.PageNumber);
     }
 }
