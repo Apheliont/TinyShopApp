@@ -36,6 +36,6 @@ export function hideElement(elemntId) {
 }
 
 export function hideAllElements() {
-    $('.product__carousel-container').slideUp(400);
+    $('.product__carousel').slideUp(400);
 }
 

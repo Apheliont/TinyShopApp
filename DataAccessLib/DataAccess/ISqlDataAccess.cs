@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DataAccessLib.DataAccess
@@ -7,5 +8,6 @@ namespace DataAccessLib.DataAccess
     {
         Task<List<T>> GetData<T, U>(string storedProcedure, U parameters);
         Task SaveData<U>(string storedProcedure, U parameters);
+        List<T> GetNestedData<T, V, U>(string storedProcedure, string nestedProp, U parameters);
     }
 }

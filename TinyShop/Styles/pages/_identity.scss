@@ -1,0 +1,25 @@
+﻿.form_validationInfo > ul {
+    background-color: #fef6f6;
+    border: 1px;
+    border-color: #a35756;
+    border-radius: 10px;
+    color: #a35756;
+}
+
+.form_validationInfo > ul > li {
+    padding: 10px 0 0 40px;
+}
+
+.form_validationInfo > ul > li:last-child {
+    padding: 10px 0 10px 40px;
+}
+
+.field-validation-error {
+    display: block;
+    color: #a35756;
+    padding: 5px 10px;
+}
+
+.identity__main-container {
+    margin-top: 45px !important;
+}

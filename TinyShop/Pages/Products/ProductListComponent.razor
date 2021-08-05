@@ -3,33 +3,53 @@
 
 @if (Products is not null)
 {
-    <div class="product-list__container">
+    <div class="product-list">
         @foreach (ProductModel product in Products)
         {
             var carouselId = $"carousel-{product.Id}";
-            <div id="@carouselId" class="product__carousel-container">
-                <button @onclick="() => CloseButtonHandler(carouselId)"
-                        class="circular ui icon basic button product__carousel-close-btn">
-                    <i class="big times circle outline icon"></i>
-                </button>
-            </div>
+            @if (product.Images is not null && product.Images.Count > 1)
+            {
+                <div id="@carouselId" class="product__carousel">
+                    <button @onclick="() => CloseButtonHandler(carouselId)"
+                            class="product__carousel-close-btn">
+                        <i class="big times circle outline icon"></i>
+                    </button>
+                    <div class="product__carousel-container">
+                        @foreach (ImageModel image in product.Images)
+                        {
+                            <img src="@image.Uri" alt="@image.Caption" loading="lazy">
+                        }
+                    </div>
+                </div>
+            }
             <div class="product__list-item">
                 <div class="product__image-container">
-                    <img @onclick="() => ImageClickhandler(carouselId)"
-                         src="https://c.dns-shop.ru/thumb/st1/fit/320/250/f6b172885b875667704cd5e81ddf1ae2/ee726604f2aba57d1902e154e3b11d59d300834ba9f3d0aa113c21dc161e112c.jpg" alt="...">
+                    @if (product.Images is not null)
+                    {
+                        @if (product.Images.Count > 1)
+                        {
+                            <i class="huge search plus icon" @onclick="() => ImageClickhandler(carouselId)"></i>
+                        }
+                        var mainImage = product.Images.Where(i => i.IsMain).FirstOrDefault();
+                        <img src="@mainImage.Uri" alt="@mainImage.Caption" />
+                    }
+                    else
+                    {
+                        <img src="img/products/product-no-photo-placeholder.jpg" alt="@Localizer["No picture available"]">
+                    }
                 </div>
                 <div class="product__content-container">
-                    <a class="product-content__header">@product.ProductName</a>
-                    <p class="product-content__description">
+                    <a class="product__content-header">@product.ProductName</a>
+                    <p class="product__content-description">
                         @product.Description
                     </p>
                 </div>
-                <div class="product-buy__container">
-                    <div class="product-buy__price">
+                <div class="product__buy-container">
+                    <div class="product__buy-price">
                         @product.Price
                     </div>
-                    <div class="product-buy__to-cart">
-                        <button class="product-buy__to-cart-btn" @onclick="async () => { await AddToCartHandler(product.Id); }">@Localizer["Add to cart"]</button>
+                    <div class="product__buy-to-cart">
+                        <button class="product__buy-to-cart-btn" @onclick="async () => { await AddToCartHandler(product.Id); }">@Localizer["Add to cart"]</button>
                     </div>
                 </div>
             </div>
@@ -46,6 +66,7 @@
     public List<ProductModel> Products { get; set; }
 
     private IJSObjectReference module;
+    private string currentlyOppenedCarousel = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -62,12 +83,15 @@
 
     private async Task ImageClickhandler(string carouselId)
     {
+        if (currentlyOppenedCarousel == carouselId) return;
+        currentlyOppenedCarousel = carouselId;
         await module.InvokeVoidAsync("hideAllElements");
         await module.InvokeVoidAsync("showElement", carouselId);
     }
-    
+
     private async Task CloseButtonHandler(string carouselId)
     {
+        currentlyOppenedCarousel = "";
         await module.InvokeVoidAsync("hideElement", carouselId);
     }
 }

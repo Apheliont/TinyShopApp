@@ -1,0 +1,20 @@
+﻿@import 'abstracts/_variables.scss';
+
+
+@import 'base/_typography.scss';
+
+
+@import 'vendors/_blazor.scss';
+
+
+@import 'components/_categories_accordion.scss';
+@import 'components/_paginator.scss';
+@import 'components/_product-filter.scss';
+
+
+@import 'layout/_header.scss';
+@import 'layout/_main.scss';
+
+
+@import 'pages/_identity.scss';
+@import 'pages/_products.scss';

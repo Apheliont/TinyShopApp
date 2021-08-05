@@ -177,6 +177,9 @@
   <data name="Logout" xml:space="preserve">
     <value>Выйти</value>
   </data>
+  <data name="No picture available" xml:space="preserve">
+    <value>Изображение отсутствует</value>
+  </data>
   <data name="Or" xml:space="preserve">
     <value>или</value>
   </data>

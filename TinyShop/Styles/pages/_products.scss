@@ -1,0 +1,122 @@
+﻿.product-list {
+    display: flex;
+    flex-flow: column;
+}
+
+.product__carousel {
+    position: relative;
+    display: none;
+    height: 300px;
+    margin-bottom: -6px;
+    box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.1);
+    border-radius: 10px 10px 0px 0px;
+    padding: 10px 5px;
+    background-color: white;
+}
+
+.product__carousel-container {
+    display: flex;
+    flex-flow: row nowrap;
+    height: 100%;
+    width: 100%;
+    overflow-x: scroll;
+}
+
+.product__carousel-container > img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.product__carousel-close-btn {
+    position: absolute;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    color: red;
+    opacity: 0.8;
+    right: 20px;
+    top: 20px;
+}
+
+.product__list-item {
+    display: flex;
+    flex-flow: row wrap;
+    height: 20vh;
+    margin-bottom: 12px;
+    box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 10px 14px 10px 10px;
+    background-color: white;
+}
+
+.product__image-container {
+    max-height: 100%;
+    width: 180px;
+    position: relative;
+}
+
+.product__image-container > i {
+    display: none;
+}
+
+.product__image-container:hover > i {
+    cursor: pointer;
+    display: block;
+    position: absolute;
+    top: calc(50% - 25px);
+    left: calc(50% - 25px);
+    z-index: 1;
+    color: #f38400;
+}
+
+
+.product__image-container > img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.product__content-container {
+    padding: 15px 10px;
+    flex-grow: 4;
+}
+
+.product-content__header {
+    font-size: 22px;
+}
+
+.product-content-description {
+}
+
+.product__buy-container {
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+    padding: 20px 10px 10px 5px;
+}
+
+.product__buy-price {
+    text-align: right;
+    font-size: 18px;
+}
+
+.product__buy-to-cart {
+}
+
+.product__buy-to-cart-btn {
+    padding: 10px 16px;
+    border: 0px;
+    border-radius: 5px;
+    background-color: $buy-to-cart-btn;
+    color: white;
+    transition: background 0.5s ease-in-out;
+}
+
+.product__buy-to-cart-btn:hover {
+    cursor: pointer;
+    background-color: $buy-to-cart-btn--hover;
+    color: black;
+}

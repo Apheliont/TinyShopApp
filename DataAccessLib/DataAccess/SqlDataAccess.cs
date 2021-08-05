@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using DataAccessLib.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -24,6 +25,46 @@ namespace DataAccessLib.DataAccess
             {
                 var data = await conn.QueryAsync<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
                 return data.ToList();
+            }
+        }
+
+        // T - outer model, V - inner model, U - parameter obj
+        public List<T> GetNestedData<T, V, U>(string storedProcedure, string nestedProp, U parameters)
+        {
+            var lookup = new Dictionary<int, T>();
+            using (IDbConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Query<T, V, T>(
+                    storedProcedure,
+                    (t, v) =>
+                    {
+                        // Временная переменная типа внешней модели
+                        T ps;
+                        // Id внешней модели
+                        int outerModelId = (int)t.GetType().GetProperty("Id").GetValue(t, null);
+                        // Проверяем нашу итоговую коллекцию. Если в ней нет ключа равного Id внешней модели
+                        if (!lookup.TryGetValue(outerModelId, out ps))
+                        {
+                            // Добавляем ключ = ключу внейшней модели, значение - сама модель
+                            lookup.Add(outerModelId, ps = t);
+                        }
+                        // Создаем функцию на получучение ссылки вложенной модели
+                        Func<List<V>> innerModelList = () => (List<V>)ps.GetType().GetProperty(nestedProp).GetValue(ps, null);
+
+                        if (innerModelList() is null && v is not null)
+                        {
+                            ps.GetType().GetProperty(nestedProp).SetValue(ps, new List<V>());
+                        }
+
+                        if (v is not null)
+                        {
+                            innerModelList().Add(v);
+                        }
+
+                        return ps;
+                    }, parameters, commandType: CommandType.StoredProcedure);
+
+                return lookup.Values.ToList();
             }
         }
 
