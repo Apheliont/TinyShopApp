@@ -29,7 +29,7 @@ namespace DataAccessLib.DataAccess
         }
 
         // T - outer model, V - inner model, U - parameter obj
-        public List<T> GetNestedData<T, V, U>(string storedProcedure, string nestedProp, U parameters)
+        public List<T> GetWithNestedListData<T, V, U>(string storedProcedure, string nestedProp, U parameters)
         {
             var lookup = new Dictionary<int, T>();
             using (IDbConnection conn = new SqlConnection(_connectionString))
@@ -65,6 +65,25 @@ namespace DataAccessLib.DataAccess
                     }, parameters, commandType: CommandType.StoredProcedure);
 
                 return lookup.Values.ToList();
+            }
+        }
+
+
+        // T - outer model, V - inner model, U - parameter obj
+        public List<T> GetWithNestedObjectData<T, V, U>(string storedProcedure, string nestedProp, U parameters)
+        {
+            using (IDbConnection conn = new SqlConnection(_connectionString))
+            {
+                return conn.Query<T, V, T>(
+                    storedProcedure,
+                    (t, v) =>
+                    {
+                        if (t.GetType().GetProperty(nestedProp).GetValue(t, null) is null && v is not null)
+                        {
+                            t.GetType().GetProperty(nestedProp).SetValue(t, v);
+                        }
+                        return t;
+                    }, parameters, commandType: CommandType.StoredProcedure).ToList();
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿@using TinyShop.Shared.Layouts
 @layout ProductsLayout
-@page "/products/category/{categoryId:int}"
+@page "/categories/{categoryId:int}/products"
 @inject IProductSqlDataService dataService
 @using System.Text;
 @using TinyShop.Extensions
@@ -22,7 +22,7 @@
     </div>
     <div class="row">
         <div class="four wide column">
-            <CategoryMenu AccordionCssString="categories__accordion"/>
+            <CategoryMenu AccordionCssString="categories-menu"/>
             <ProductFilterComponent FilterModel="@FilterModel"
                                     MetadataModel="@MetadataModel"
                                     OnApplyFilter="ApplyFilterHandler"
@@ -45,8 +45,6 @@
 
     private int numberOfPages;
 
-    //delete
-    private List<ProductSpecialModel> myModel;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -69,6 +67,7 @@
         {
             numberOfPages = (int)(Math.Ceiling((double)MetadataModel.FoundRecords / (int)FilterModel.RowsPerPage));
         }
+
     }
 
     private void InitFilterModel()
@@ -159,7 +158,7 @@
     private void PageHasChanged(int page)
     {
         StringBuilder sb = new StringBuilder();
-        sb.Append($"/products/category/{CategoryId}?");
+        sb.Append($"/categories/{CategoryId}/products?");
         sb.Append($"page={page}");
         if (FilterModel.MinPrice is not null)
         {

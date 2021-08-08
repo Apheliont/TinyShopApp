@@ -31,11 +31,11 @@
                             <i class="huge search plus icon" @onclick="() => ImageClickhandler(carouselId)"></i>
                         }
                         var mainImage = product.Images.Where(i => i.IsMain).FirstOrDefault();
-                        <img src="@mainImage.Uri" alt="@mainImage.Caption" />
+                        <img src="@mainImage.Uri" alt="@mainImage.Caption" loading="lazy"/>
                     }
                     else
                     {
-                        <img src="img/products/product-no-photo-placeholder.jpg" alt="@Localizer["No picture available"]">
+                        <img src="img/products/product-no-photo-placeholder.jpg" alt="@Localizer["No picture available"]" loading="lazy">
                     }
                 </div>
                 <div class="product__content-container">
@@ -73,8 +73,14 @@
         if (firstRender)
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
+            await module.InvokeVoidAsync("fadeUpListItem");
+        }
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("makeListItemsVisible");
         }
     }
+
 
     private async Task AddToCartHandler(int productId)
     {

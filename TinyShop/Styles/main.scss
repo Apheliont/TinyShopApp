@@ -1,13 +1,14 @@
 ﻿@import 'abstracts/_variables.scss';
 
-
+@import 'base/_global.scss';
 @import 'base/_typography.scss';
 
 
 @import 'vendors/_blazor.scss';
 
 
-@import 'components/_categories_accordion.scss';
+@import 'components/_navbar-top.scss';
+@import 'components/_categories_menu.scss';
 @import 'components/_paginator.scss';
 @import 'components/_product-filter.scss';
 
@@ -18,3 +19,4 @@
 
 @import 'pages/_identity.scss';
 @import 'pages/_products.scss';
+@import 'pages/_categories.scss';

@@ -11,5 +11,7 @@ namespace DataAccessLib.Models
         public int Id { get; set; }
         public string CategoryName { get; set; }
         public string Description { get; set; }
+        public bool IsParent { get; set; }
+        public ImageModel Image { get; set; }
     }
 }

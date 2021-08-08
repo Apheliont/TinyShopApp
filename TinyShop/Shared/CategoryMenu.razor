@@ -11,8 +11,20 @@
             {
                 @foreach (CategoryModel category in categories)
                 {
-                    var url = "products/category/" + category.Id.ToString();
+                    var url = $"categories/{category.Id.ToString()}";
+                    @if (!category.IsParent)
+                    {
+                        url += "/products";
+                    }
                     <NavLink class="item" href="@url" Match="NavLinkMatch.All">
+                        @if (category.Image is not null)
+                        {
+                            <img class="category-menu__image" src="@category.Image.Uri" width="30" height="30" alt="@category.Image.Caption">
+                        }
+                        else
+                        {
+                            <div class="category-menu__no-image-placeholder"></div>
+                        }
                         @category.CategoryName
                     </NavLink>
                 }
@@ -49,6 +61,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        categories = await categoryDataAccess.GetAll();
+        categories = await categoryDataAccess.GetRoot();
     }
 }

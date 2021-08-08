@@ -1,0 +1,58 @@
+﻿@using TinyShop.Shared.Layouts
+@layout MainLayout
+@page "/categories/{CategoryId:int}"
+@inject ICategorySqlDataService categoryDataService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localizer
+
+@if (categories is not null)
+{
+    <div class="ui grid">
+        @foreach (CategoryModel category in categories)
+        {
+            <div class="four wide column">
+                <div class="ui fluid raised link card category__card" @onclick="() => CategoryClickHandler(category)">
+
+                    <div class="image category__card-image-container">
+                        @if (category.Image is not null)
+                        {
+                            <img src="@category.Image.Uri" alt="@category.Image.Caption" loading="lazy">
+                        }
+                        else
+                        {
+                            <img src="img/products/product-no-photo-placeholder.jpg" alt="@Localizer["No picture available"]" loading="lazy">
+                        }
+                    </div>
+                    <div class="content">
+                        <div class="header">@category.CategoryName</div>
+                        <div class="description">
+                            @category.Description
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int CategoryId { get; set; }
+
+    private List<CategoryModel> categories;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        categories = await categoryDataService.GetSubcategories(CategoryId);
+    }
+
+    private void CategoryClickHandler(CategoryModel category)
+    {
+        var url = $"/categories/{category.Id.ToString()}";
+        if (!category.IsParent)
+        {
+            url += "/products";
+        }
+        NavigationManager.NavigateTo(url, false);
+    }
+}

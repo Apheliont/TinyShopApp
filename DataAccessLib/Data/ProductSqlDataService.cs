@@ -17,12 +17,6 @@ namespace DataAccessLib.Data
         }
 
 
-        //public async Task<List<ProductModel>> GetFiltered(ProductFilterModel filterModel)
-        //{
-        //    return await _dataAccess
-        //        .GetData<ProductModel, ProductFilterModel>("dbo.spProducts_GetFiltered", filterModel);
-        //}
-
         public async Task<ProductMetadataModel> GetMetadata(ProductFilterModel filterModel)
         {
             var data = await _dataAccess
@@ -41,7 +35,7 @@ namespace DataAccessLib.Data
             return Task.Run(() =>
             {
                 return _dataAccess
-                        .GetNestedData<ProductModel, ImageModel, dynamic>(
+                        .GetWithNestedListData<ProductModel, ImageModel, dynamic>(
                         "spProducts_GetWithImages","Images",filterModel);
             });
         }

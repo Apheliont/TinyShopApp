@@ -39,3 +39,20 @@ export function hideAllElements() {
     $('.product__carousel').slideUp(400);
 }
 
+
+export function fadeUpListItem() {
+    makeListItemsVisible();
+
+    $('.product__list-item')
+        .transition('toggle')
+        .transition({
+            animation: 'fade left',
+            reverse: 'auto', // default setting
+            interval: 150,
+        });
+}
+
+
+export function makeListItemsVisible() {
+    $('.product__list-item').css('visibility', 'visible');
+}

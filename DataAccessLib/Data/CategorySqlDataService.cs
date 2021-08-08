@@ -16,9 +16,31 @@ namespace DataAccessLib.Data
             _dataAccess = dataAccess;
         }
 
-        public async Task<List<CategoryModel>> GetAll()
+
+        public async Task<List<CategoryModel>> GetRoot()
         {
-            return await _dataAccess.GetData<CategoryModel, dynamic>("spCategories_GetAll", new { });
+            return await Task.Run(() =>
+            {
+                return _dataAccess
+                .GetWithNestedObjectData<CategoryModel, ImageModel, dynamic>
+                    (
+                        "spCategories_GetRoot", "Image", new { }
+                    );
+            });
+
+        }
+
+        public async Task<List<CategoryModel>> GetSubcategories(int categoryId)
+        {
+            return await Task.Run(() =>
+            {
+                return _dataAccess
+                .GetWithNestedObjectData<CategoryModel, ImageModel, dynamic>
+                    (
+                        "spCategories_GetSubcategories", "Image", new { CategoryId = categoryId }
+                    );
+            });
+
         }
     }
 }
