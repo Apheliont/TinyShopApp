@@ -20,6 +20,7 @@ CREATE PROCEDURE [dbo].[spProducts_GetFiltered]
 AS
 BEGIN
 	SET NOCOUNT ON;
+
 	IF @RowsPerPage < 1
 		SET @RowsPerPage = 1
 	IF @PageNumber < 1

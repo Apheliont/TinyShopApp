@@ -1,0 +1,122 @@
+﻿@using TinyShop.Shared.Layouts
+@layout ProductsLayout
+@inject IStringLocalizer<App> Localizer
+@inject IJSRuntime JSRuntime
+@using TinyShop.Helpers
+@inject IUserUtilities userUtilities
+@inject IPurchaseSqlDataService purchaseDataService
+@inject IProductSqlDataService productDataService
+@page "/products/{ProductId:int}"
+
+@if (product is not null)
+{
+    <div class="ui grid product_container">
+        <div class="eight wide column product-galery__row">
+            <div class="product-galery__column">
+                <div class="product-galery__container">
+                    <div class="product-thumbnails__container">
+                        @if (product.Images is not null)
+                        {
+                            @foreach (ImageModel image in product.Images)
+                            {
+                                var imageUrl = image.UriSizeS is not null ? image.UriSizeS : image.UriSizeM;
+                                <img src="@imageUrl" alt="@image.Caption" @onmouseover="async () => await ThumbnailMouseOverHandler(image)">
+                            }
+                        }
+                    </div>
+                    <div class="product-image__container">
+                        @if (selectedImage is not null)
+                        {
+                            var imageUrl = selectedImage.UriSizeL is not null ? selectedImage.UriSizeL : selectedImage.UriSizeM;
+                            <img class="product-image__image" src="@imageUrl" alt="@selectedImage.Caption" />
+                        }
+                        else
+                        {
+                            <img src="/img/products/product-no-photo-placeholder.jpg" alt="@Localizer["No picture available"]" />
+                        }
+                    </div>
+                </div>
+                <div class="product-id__container">
+                    <p>@Localizer["Product Id"]: @product.Id</p>
+                </div>
+            </div>
+        </div>
+        <div class="product-info__row">
+            <div class="eight wide column product-info__container">
+                <div class="ui top attached tabular menu">
+                    <a class="item active" data-tab="description">@Localizer["Description"]</a>
+                    <a class="item" data-tab="reviews">@Localizer["Reviews"]</a>
+                </div>
+                <div class="ui bottom attached tab segment active product-info__tabData" data-tab="description">
+                    <div class="product-name__container">
+                        <p>@product.ProductName</p>
+                    </div>
+                    <div class="product-description__container">
+                        <p>@product.Description</p>
+                    </div>
+                    <div class="product-buy__container">
+                        <div class="product__buy-price">
+                            <p>@product.Price</p>
+                        </div>
+                        <div class="product__buy-to-cart">
+                            <button class="product__buy-to-cart-btn" @onclick="async () => { await AddToCartHandler(product.Id); }">@Localizer["Add to cart"]</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui bottom attached tab segment product-info__tabData" data-tab="reviews">
+                    Second
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+
+    private ProductModel product;
+    private IJSObjectReference module;
+    private ImageModel selectedImage;
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
+            await module.InvokeVoidAsync("initializeTab");
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        product = await productDataService.GetOneDetailed(ProductId);
+        try
+        {
+            selectedImage = product.Images.Where(i => i.IsMain).FirstOrDefault();
+        }
+        catch { }
+    }
+
+    private async Task ThumbnailMouseOverHandler(ImageModel image)
+    {
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("fadeInOut", "product-image__image");
+        }
+        selectedImage = image;
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("fadeInOut", "product-image__image");
+        }
+    }
+
+    private async Task AddToCartHandler(int productId)
+    {
+        string userId = await userUtilities.GetLoggedInUserId();
+        if (userId is not null)
+        {
+            await purchaseDataService.AddToCart(userId, productId, 1);
+        }
+    }
+}

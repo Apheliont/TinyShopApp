@@ -6,6 +6,5 @@
     [Price] MONEY NOT NULL, 
     [PurchaseDate] DATETIME2 NOT NULL DEFAULT GETUTCDATE(), 
     [CheckoutDate] DATETIME2 NULL, 
-    CONSTRAINT [FK_Purchases_Products] FOREIGN KEY ([ProductId]) REFERENCES Products(Id),
-
+    CONSTRAINT [FK_Purchases_Products] FOREIGN KEY ([ProductId]) REFERENCES Products(Id) ON DELETE SET NULL
 )

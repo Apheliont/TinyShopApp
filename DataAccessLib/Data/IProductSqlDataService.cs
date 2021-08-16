@@ -8,5 +8,6 @@ namespace DataAccessLib.Data
     {
         Task<List<ProductModel>> GetFiltered(ProductFilterModel filterModel);
         Task<ProductMetadataModel> GetMetadata(ProductFilterModel filterModel);
+        Task<ProductModel> GetOneDetailed(int productId);
     }
 }

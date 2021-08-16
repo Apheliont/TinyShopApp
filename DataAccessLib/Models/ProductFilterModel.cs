@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace DataAccessLib.Models
 {
-    public enum OrderByEnum {
+    public enum OrderByEnum
+    {
         [Description("By name")]
         ProductName = 1,
         [Description("By price")]
@@ -16,7 +17,8 @@ namespace DataAccessLib.Models
         Rating = 3
     };
 
-    public enum SortOrderEnum { 
+    public enum SortOrderEnum
+    {
         [Description("Reverse order")]
         DESC = 1,
         [Description("Straight order")]
@@ -35,13 +37,28 @@ namespace DataAccessLib.Models
         _80 = 80
     }
 
-    #nullable enable
+#nullable enable
     public record ProductFilterModel
     {
         private int _pageNumber = 1;
+        private int _minRating = 0;
         private decimal? _minPrice;
         private decimal? _maxPrice;
-
+        public int MinRating
+        {
+            get => _minRating;
+            set
+            {
+                if (value >= 0 && value <= 5)
+                {
+                    _minRating = value;
+                }
+                else
+                {
+                    _minRating = 0;
+                }
+            }
+        }
         public int? CategoryId { get; set; }
         public RowsPerPageEnum RowsPerPage { get; set; } = RowsPerPageEnum._25;
         public int PageNumber

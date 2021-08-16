@@ -144,6 +144,9 @@
   <data name="Contact phone" xml:space="preserve">
     <value>Телефон</value>
   </data>
+  <data name="Description" xml:space="preserve">
+    <value>Описание</value>
+  </data>
   <data name="Email" xml:space="preserve">
     <value>Почта</value>
   </data>
@@ -195,6 +198,12 @@
   <data name="Price" xml:space="preserve">
     <value>Цена</value>
   </data>
+  <data name="Product Id" xml:space="preserve">
+    <value>Артикул товара</value>
+  </data>
+  <data name="Rating from and above" xml:space="preserve">
+    <value>Рейтинг от и выше</value>
+  </data>
   <data name="Register" xml:space="preserve">
     <value>Регистрация</value>
   </data>
@@ -212,6 +221,9 @@
   </data>
   <data name="Reverse order" xml:space="preserve">
     <value>По убыванию</value>
+  </data>
+  <data name="Reviews" xml:space="preserve">
+    <value>Отзывы</value>
   </data>
   <data name="Sales" xml:space="preserve">
     <value>Скидки</value>

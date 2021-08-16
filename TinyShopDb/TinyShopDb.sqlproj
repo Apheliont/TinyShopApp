@@ -61,7 +61,7 @@
     <Folder Include="dbo\StoredProcedures" />
     <Folder Include="Publications" />
     <Folder Include="dbo\Views" />
-    <Folder Include="Triggers" />
+    <Folder Include="dbo\Triggers" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Categories.sql" />
@@ -70,7 +70,6 @@
     <Build Include="dbo\StoredProcedures\spCategories_GetRoot.sql" />
     <Build Include="dbo\StoredProcedures\spProducts_GetFiltered.sql" />
     <Build Include="dbo\Tables\Carts.sql" />
-    <Build Include="Triggers\OnNewUserCreated.sql" />
     <Build Include="dbo\Tables\AspNetUsers.sql" />
     <Build Include="dbo\Tables\Purchases.sql" />
     <Build Include="dbo\Tables\CartPurchases.sql" />
@@ -87,11 +86,16 @@
     <Build Include="dbo\Tables\CategoryImage.sql" />
     <Build Include="dbo\Tables\CategorySubcategories.sql" />
     <Build Include="dbo\StoredProcedures\spCategories_GetSubcategories.sql" />
+    <Build Include="dbo\StoredProcedures\spProducts_GetOneDetailed.sql" />
+    <Build Include="dbo\Tables\ProductRatings.sql" />
+    <Build Include="dbo\Triggers\OnNewUserCreated.sql" />
+    <Build Include="dbo\Triggers\OnCategoryDelete.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="TinyShopDb.refactorlog" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Publications\TinyShopDb.publish.xml" />
+    <None Include="Publications\TinyShopDbRemote.publish.xml" />
   </ItemGroup>
 </Project>

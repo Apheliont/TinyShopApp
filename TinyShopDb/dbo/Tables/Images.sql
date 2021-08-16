@@ -2,7 +2,8 @@
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
 	[Caption] NVARCHAR(300) NOT NULL DEFAULT 'Image',
-	[Size] CHAR(1) NOT NULL DEFAULT 'M', 	-- T - tiny, S - small, M - medium, L - large
-	[Uri] NVARCHAR(300) NOT NULL,
+	[UriSizeS] NVARCHAR(300) NULL,
+	[UriSizeM] NVARCHAR(300) NOT NULL,
+	[UriSizeL] NVARCHAR(300) NULL,
 	[IsMain] BIT NOT NULL DEFAULT 0
 )

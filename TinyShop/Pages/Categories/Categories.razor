@@ -16,7 +16,8 @@
                     <div class="image category__card-image-container">
                         @if (category.Image is not null)
                         {
-                            <img src="@category.Image.Uri" alt="@category.Image.Caption" loading="lazy">
+                            var categoryImageUrl = category.Image.UriSizeS is not null ? category.Image.UriSizeS : category.Image.UriSizeM;
+                            <img src="@categoryImageUrl" alt="@category.Image.Caption" loading="lazy">
                         }
                         else
                         {

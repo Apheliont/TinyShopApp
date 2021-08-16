@@ -3,5 +3,6 @@
 AS
 BEGIN
 	SET NOCOUNT ON;
+
 	DELETE FROM Purchases WHERE Id = @PurchaseId
 END

@@ -4,6 +4,7 @@
 AS
 BEGIN
 	SET NOCOUNT ON;
+
 	UPDATE Purchases
 	SET Quantity = @Quantity
 	WHERE Id = @PurchaseId

@@ -9,10 +9,19 @@
             @Localizer["Price"]
         </div>
         <div class="active content">
-            <MoneyRangeComponent LowerBound="@_lowerBound"
+            <MoneyRangeComponent FilterModel="@FilterModel"
+                                 LowerBound="@_lowerBound"
                                  UpperBound="@_upperBound"
-                                 OnRangeChange="PriceRangeChangeHandler" />
+                                 OnRangeChange="PriceRangeChangeHandler"
+                                 @ref="moneyRangeComponent"/>
         </div>
+    </div>
+    <div class="item">
+        <span class="ui orange rating"
+              id="@filterRatingId"
+              data-icon="star"
+              data-rating="@FilterModel.MinRating"
+              data-max-rating="5"></span> @Localizer["Rating from and above"]
     </div>
     <div class="two ui buttons btn__filterblock">
         <button class="small ui orange button" disabled="@IsApplyDisabled" @onclick="ApplyFilterHandler">
@@ -37,9 +46,15 @@
     [Parameter]
     public EventCallback OnApplyFilter { get; set; }
 
+    private MoneyRangeComponent moneyRangeComponent;
+
     private bool IsApplyDisabled = true;
     private bool IsResetDisabled = true;
+
+    private string filterRatingId = "filter-rating";
+
     private IJSObjectReference module;
+    private DotNetObjectReference<ProductFilterComponent> thisObjRef;
     private int _lowerBound;
     private int _upperBound;
 
@@ -48,6 +63,8 @@
         if (firstRender)
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
+            thisObjRef = DotNetObjectReference.Create(this);
+            await module.InvokeVoidAsync("initializeFilterRating", thisObjRef, filterRatingId);
             await module.InvokeVoidAsync("initializeAccordion");
         }
     }
@@ -79,16 +96,31 @@
 
     private async Task ApplyFilterHandler()
     {
+        await OnApplyFilter.InvokeAsync();
         IsApplyDisabled = true;
         IsResetDisabled = false;
-        await OnApplyFilter.InvokeAsync();
     }
 
     private async Task ResetFilterHandler()
     {
+        await moneyRangeComponent.SetState(_lowerBound, _upperBound);
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("setFilterRatingState", filterRatingId, 0);
+        }
+        await OnResetFilter.InvokeAsync();
         IsApplyDisabled = true;
         IsResetDisabled = true;
-        await module.InvokeVoidAsync("setSliderState", _lowerBound, _upperBound);
-        await OnResetFilter.InvokeAsync();
+    }
+
+
+    [JSInvokable]
+    public Task FilterRatingChanged(int rating)
+    {
+        IsApplyDisabled = false;
+        IsResetDisabled = false;
+        FilterModel.MinRating = rating;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
 }

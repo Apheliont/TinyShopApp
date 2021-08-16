@@ -19,7 +19,8 @@
                     <NavLink class="item" href="@url" Match="NavLinkMatch.All">
                         @if (category.Image is not null)
                         {
-                            <img class="category-menu__image" src="@category.Image.Uri" width="30" height="30" alt="@category.Image.Caption">
+                            var categoryImageUrl = category.Image.UriSizeS is not null ? category.Image.UriSizeS : category.Image.UriSizeM;
+                            <img class="category-menu__image" src="@categoryImageUrl" width="30" height="30" alt="@category.Image.Caption">
                         }
                         else
                         {
@@ -40,6 +41,7 @@
     private string openedMenuCssString;
 
     private string accordionCssString = "ui styled accordion";
+
     [Parameter]
     public string AccordionCssString
     {

@@ -5,6 +5,7 @@
 AS
 BEGIN
 	SET NOCOUNT ON;
+
 	DECLARE @CartId INT = (SELECT CartId FROM UserCarts WHERE UserId = @UserId)
 	DECLARE @Price MONEY = (SELECT Price FROM Products WHERE Id = @ProductId)
 

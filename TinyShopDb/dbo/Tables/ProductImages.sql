@@ -1,6 +1,5 @@
 ﻿CREATE TABLE [dbo].[ProductImages]
 (
-	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
 	[ProductId] INT NOT NULL,
 	[ImageId] INT NOT NULL,
 	CONSTRAINT [FK_ProductImages_Products] FOREIGN KEY (ProductId) REFERENCES Products(Id) ON DELETE CASCADE,

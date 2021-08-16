@@ -25,7 +25,8 @@ namespace DataAccessLib.Data
                     {
                         CategoryId = filterModel.CategoryId,
                         MinPrice = filterModel.MinPrice,
-                        MaxPrice = filterModel.MaxPrice
+                        MaxPrice = filterModel.MaxPrice,
+                        MinRating = filterModel.MinRating
                     });
             return data.FirstOrDefault();
         }
@@ -36,7 +37,18 @@ namespace DataAccessLib.Data
             {
                 return _dataAccess
                         .GetWithNestedListData<ProductModel, ImageModel, dynamic>(
-                        "spProducts_GetWithImages","Images",filterModel);
+                        "spProducts_GetWithImages", "Images", filterModel);
+            });
+        }
+
+        public Task<ProductModel> GetOneDetailed(int productId)
+        {
+            return Task.Run(() =>
+            {
+                return _dataAccess
+                .GetWithNestedListData<ProductModel, ImageModel, dynamic>(
+                    "spProducts_GetOneDetailed", "Images", new { ProductId = productId }
+                    ).FirstOrDefault();
             });
         }
     }

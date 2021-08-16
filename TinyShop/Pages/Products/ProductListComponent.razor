@@ -1,5 +1,6 @@
 ﻿@inject IStringLocalizer<App> Localizer
 @inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
 
 @if (Products is not null)
 {
@@ -7,23 +8,24 @@
         @foreach (ProductModel product in Products)
         {
             var carouselId = $"carousel-{product.Id}";
+            var productUrl = $"/products/{product.Id}";
             @if (product.Images is not null && product.Images.Count > 1)
             {
-                <div id="@carouselId" class="product__carousel">
+                <div id="@carouselId" class="@productCarouselClass">
                     <button @onclick="() => CloseButtonHandler(carouselId)"
-                            class="product__carousel-close-btn">
+                            class="product-list__carousel-close-btn">
                         <i class="big times circle outline icon"></i>
                     </button>
-                    <div class="product__carousel-container">
+                    <div class="product-list__carousel-container">
                         @foreach (ImageModel image in product.Images)
                         {
-                            <img src="@image.Uri" alt="@image.Caption" loading="lazy">
+                            <img src="@image.UriSizeM" alt="@image.Caption" loading="lazy">
                         }
                     </div>
                 </div>
             }
-            <div class="product__list-item">
-                <div class="product__image-container">
+            <div class="@productListItemClass">
+                <div class="product-list__image-container">
                     @if (product.Images is not null)
                     {
                         @if (product.Images.Count > 1)
@@ -31,25 +33,30 @@
                             <i class="huge search plus icon" @onclick="() => ImageClickhandler(carouselId)"></i>
                         }
                         var mainImage = product.Images.Where(i => i.IsMain).FirstOrDefault();
-                        <img src="@mainImage.Uri" alt="@mainImage.Caption" loading="lazy"/>
+                        var mainImageUri = mainImage.UriSizeS is not null ? mainImage.UriSizeS : mainImage.UriSizeM;
+
+                        <img src="@mainImageUri" alt="@mainImage.Caption" loading="lazy" />
                     }
                     else
                     {
                         <img src="img/products/product-no-photo-placeholder.jpg" alt="@Localizer["No picture available"]" loading="lazy">
                     }
                 </div>
-                <div class="product__content-container">
-                    <a class="product__content-header">@product.ProductName</a>
-                    <p class="product__content-description">
+                <div class="product-list__content-container">
+                    <a class="product-list__content-header" href="@productUrl">@product.ProductName</a>
+                    <p class="product-list__content-description">
                         @product.Description
                     </p>
-                </div>
-                <div class="product__buy-container">
-                    <div class="product__buy-price">
-                        @product.Price
+                    <div>
+                        <div class="ui yellow disabled rating product" data-icon="star" data-rating="@product.Rating" data-max-rating="5"></div>
                     </div>
-                    <div class="product__buy-to-cart">
-                        <button class="product__buy-to-cart-btn" @onclick="async () => { await AddToCartHandler(product.Id); }">@Localizer["Add to cart"]</button>
+                </div>
+                <div class="product-list__buy-container">
+                    <div class="product-list__buy-price">
+                        @Math.Round(@product.Price, 2)<span>₽</span>
+                    </div>
+                    <div class="product-list__buy-to-cart">
+                        <button class="product-list__buy-to-cart-btn" @onclick="async () => { await AddToCartHandler(product.Id); }">@Localizer["Add to cart"]</button>
                     </div>
                 </div>
             </div>
@@ -67,20 +74,31 @@
 
     private IJSObjectReference module;
     private string currentlyOppenedCarousel = "";
+    private string productListItemClass = "product-list__list-item";
+    private string productCarouselClass = "product-list__carousel";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
-            await module.InvokeVoidAsync("fadeUpListItem");
+            await module.InvokeVoidAsync("fadeUpItems", productListItemClass);
         }
         if (module is not null)
         {
-            await module.InvokeVoidAsync("makeListItemsVisible");
+            var initRating = module.InvokeVoidAsync("initializeRatings");
+            var makeItemsVisible = module.InvokeVoidAsync("makeItemsVisible", productListItemClass);
+            await Task.WhenAll(makeItemsVisible.AsTask(), initRating.AsTask());
         }
     }
 
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
 
     private async Task AddToCartHandler(int productId)
     {
@@ -91,7 +109,7 @@
     {
         if (currentlyOppenedCarousel == carouselId) return;
         currentlyOppenedCarousel = carouselId;
-        await module.InvokeVoidAsync("hideAllElements");
+        await module.InvokeVoidAsync("hideElements", productCarouselClass);
         await module.InvokeVoidAsync("showElement", carouselId);
     }
 

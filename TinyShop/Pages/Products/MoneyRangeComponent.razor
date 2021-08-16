@@ -1,7 +1,7 @@
 ﻿@inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
-<div class="ui ticked range slider" id="slider-range"></div>
+<div class="ui ticked range slider" id="@moneyRangeSliderId"></div>
 <div class="ui two column grid">
     <div class="row">
         <div class="column">
@@ -32,9 +32,11 @@
 </div>
 
 @code {
-
     [Parameter]
     public int LowerBound { get; set; }
+
+    [Parameter]
+    public ProductFilterModel FilterModel { get; set; }
 
     [Parameter]
     public int UpperBound { get; set; }
@@ -44,13 +46,13 @@
 
     private int _lowerValue;
     private int _upperValue;
-
+    private string moneyRangeSliderId = "money-range-slider";
 
 
     private IJSObjectReference module;
     // Создаем объект который будет хранить ссылку на экземпляр этой страницы
     // Далее этот объект будет передан на JS строну
-    private DotNetObjectReference<MoneyRangeComponent> thisObjReg;
+    private DotNetObjectReference<MoneyRangeComponent> thisObjRef;
 
     [JSInvokable]
     public async Task SliderChanged(int val, int min, int max)
@@ -63,8 +65,8 @@
 
     protected override void OnParametersSet()
     {
-        _lowerValue = LowerBound;
-        _upperValue = UpperBound;
+        _lowerValue = FilterModel.MinPrice is not null ? (int)FilterModel.MinPrice : LowerBound;
+        _upperValue = FilterModel.MaxPrice is not null ? (int)FilterModel.MaxPrice : UpperBound;
     }
 
 
@@ -75,8 +77,8 @@
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
             // Инициализируем объект контейнер и передаем ему ссылку на экземляр объекта этой страницы
             // Далее ловим его на стороне JS
-            thisObjReg = DotNetObjectReference.Create(this);
-            await module.InvokeVoidAsync("initializeSlider", thisObjReg, LowerBound, UpperBound, _lowerValue, _upperValue, 1);
+            thisObjRef = DotNetObjectReference.Create(this);
+            await module.InvokeVoidAsync("initializeSlider", moneyRangeSliderId, thisObjRef, LowerBound, UpperBound, _lowerValue, _upperValue, 1);
         }
     }
 
@@ -109,6 +111,14 @@
         if (module is not null)
         {
             await module.DisposeAsync();
+        }
+    }
+
+    public async Task SetState(int lowerBound, int upperBound)
+    {
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("setSliderState", moneyRangeSliderId, lowerBound, upperBound);
         }
     }
 }

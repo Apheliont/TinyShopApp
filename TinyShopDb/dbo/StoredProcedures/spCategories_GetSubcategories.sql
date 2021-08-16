@@ -2,6 +2,8 @@
 	@CategoryId INT
 AS
 BEGIN
+	SET NOCOUNT ON;
+
 	SELECT cs.SubcategoryId AS [Id]
 	,c.CategoryName
 	,c.[Description]
@@ -11,7 +13,9 @@ BEGIN
 		ELSE CAST (0 AS BIT) END) AS [IsParent]
 	,i.Id
 	,i.Caption
-	,i.Uri
+	,i.UriSizeS
+	,i.UriSizeM
+	,i.UriSizeL
 	,i.IsMain
 	FROM CategorySubcategories cs
 	INNER JOIN Categories c

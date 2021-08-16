@@ -13,7 +13,9 @@ BEGIN
 	,i.Id
 	,i.Caption
 	,i.IsMain
-	,i.Uri
+	,i.UriSizeS
+	,i.UriSizeM
+	,i.UriSizeL
 	FROM Categories c
 	LEFT JOIN CategoryImage ci
 	ON c.Id = ci.CategoryId

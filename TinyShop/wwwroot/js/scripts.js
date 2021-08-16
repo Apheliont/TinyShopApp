@@ -3,28 +3,27 @@
 }
 
 
-export function initializeSlider(dotNetObj, lowerBound, upperBound, lowerValue, upperValue, step) {
-    $('.ui.range.slider')
+export function initializeSlider(sliderElementId, dotNetObj, lowerBound, upperBound, lowerValue, upperValue, step) {
+    $(`#${sliderElementId}`)
         .slider({
             min: lowerBound,
             max: upperBound,
             start: lowerValue,
             end: upperValue,
             step: step,
-            onMove: function (value, min, max) {
-                return dotNetObj.invokeMethodAsync('SliderChanged', value, min, max);
+            onMove: async function (value, min, max) {
+                return await dotNetObj.invokeMethodAsync('SliderChanged', value, min, max);
             }
         });
 }
 
-export function setSliderState(lowerBound, upperBound) {
-    $('.ui.range.slider').slider('set rangeValue', lowerBound, upperBound, true);
+export function setSliderState(sliderElementId, lowerBound, upperBound) {
+    $(`#${sliderElementId}`).slider('set rangeValue', lowerBound, upperBound, true);
 }
 
 
 export function initializeAccordion() {
-    $('.ui.accordion')
-        .accordion();
+    $('.ui.accordion').accordion();
 }
 
 export function showElement(elemntId) {
@@ -35,15 +34,14 @@ export function hideElement(elemntId) {
     $(`#${elemntId}`).slideUp(400);
 }
 
-export function hideAllElements() {
-    $('.product__carousel').slideUp(400);
+export function hideElements(cssClass) {
+    $(`.${cssClass}`).slideUp(400);
 }
 
 
-export function fadeUpListItem() {
-    makeListItemsVisible();
-
-    $('.product__list-item')
+export function fadeUpItems(cssClass) {
+    makeItemsVisible(cssClass);
+    $(`.${cssClass}`)
         .transition('toggle')
         .transition({
             animation: 'fade left',
@@ -53,6 +51,30 @@ export function fadeUpListItem() {
 }
 
 
-export function makeListItemsVisible() {
-    $('.product__list-item').css('visibility', 'visible');
+export function makeItemsVisible(cssClass) {
+    $(`.${cssClass}`).css('visibility', 'visible');
+}
+
+export function initializeTab() {
+    $('.menu .item').tab();
+}
+
+export function fadeInOut(cssClass) {
+    $(`.${cssClass}`).transition('fade');
+}
+
+export function initializeRatings() {
+    $('.ui.rating.product').rating();
+}
+
+export function initializeFilterRating(dotNetObj, ratingElementId) {
+    $(`#${ratingElementId}`).rating({
+        onRate: async function(value) {
+            return await dotNetObj.invokeMethodAsync('FilterRatingChanged', value);
+        }
+    });
+}
+
+export function setFilterRatingState(ratingElementId, value) {
+    $(`#${ratingElementId}`).rating('set rating', value);
 }
