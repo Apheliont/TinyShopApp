@@ -1,6 +1,7 @@
 ﻿@inject IStringLocalizer<App> Localizer
-@using System.ComponentModel
+@using TinyShop.Helpers
 @using TinyShop.Extensions
+@inject ILocalStorage LocalStorage
 
 <div class="ui small menu">
     @if (MetadataModel is not null)
@@ -88,6 +89,7 @@
                 rowsPerPages.Add((int)rowsPerPage, rowsPerPage.DescriptionAttr());
             }
         }
+        StateHasChanged();
     }
 
     private async Task OrderByHandler(ChangeEventArgs args)
@@ -95,6 +97,7 @@
         if (Int32.TryParse(args.Value.ToString(), out _orderBy))
         {
             FilterModel.OrderBy = (OrderByEnum)_orderBy;
+            await LocalStorage.SetItemAsync("orderBy", _orderBy);
             await OnSortChange.InvokeAsync();
         }
     }
@@ -104,6 +107,7 @@
         if (Int32.TryParse(args.Value.ToString(), out _rowsPerPage))
         {
             FilterModel.RowsPerPage = (RowsPerPageEnum)_rowsPerPage;
+            await LocalStorage.SetItemAsync("rowsPerPage", _rowsPerPage);
             await OnSortChange.InvokeAsync();
         }
     }
@@ -113,6 +117,7 @@
         if (Int32.TryParse(args.Value.ToString(), out _sortOrder))
         {
             FilterModel.SortOrder = (SortOrderEnum)_sortOrder;
+            await LocalStorage.SetItemAsync("sortOrder", _sortOrder);
             await OnSortChange.InvokeAsync();
         }
     }

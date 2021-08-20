@@ -62,6 +62,7 @@
     <Folder Include="Publications" />
     <Folder Include="dbo\Views" />
     <Folder Include="dbo\Triggers" />
+    <Folder Include="dbo\Functions" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Categories.sql" />
@@ -82,7 +83,7 @@
     <Build Include="dbo\Tables\Images.sql" />
     <Build Include="dbo\Tables\ProductImages.sql" />
     <Build Include="dbo\StoredProcedures\spImages_Add.sql" />
-    <Build Include="dbo\StoredProcedures\spProducts_GetWithImages.sql" />
+    <Build Include="dbo\StoredProcedures\spProducts_GetFilteredWithMetadata.sql" />
     <Build Include="dbo\Tables\CategoryImage.sql" />
     <Build Include="dbo\Tables\CategorySubcategories.sql" />
     <Build Include="dbo\StoredProcedures\spCategories_GetSubcategories.sql" />
@@ -90,6 +91,8 @@
     <Build Include="dbo\Tables\ProductRatings.sql" />
     <Build Include="dbo\Triggers\OnNewUserCreated.sql" />
     <Build Include="dbo\Triggers\OnCategoryDelete.sql" />
+    <Build Include="dbo\Functions\tvfProducts_GetMetadata.sql" />
+    <Build Include="dbo\Triggers\OnProductDelete.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="TinyShopDb.refactorlog" />

@@ -1,9 +1,9 @@
 ﻿using DataAccessLib.DataAccess;
 using DataAccessLib.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLib.Data
@@ -31,14 +31,12 @@ namespace DataAccessLib.Data
             return data.FirstOrDefault();
         }
 
-        public Task<List<ProductModel>> GetFiltered(ProductFilterModel filterModel)
+        public ProductsWithMetadataModel GetFilteredWithMetadata(ProductFilterModel filterModel)
         {
-            return Task.Run(() =>
-            {
-                return _dataAccess
-                        .GetWithNestedListData<ProductModel, ImageModel, dynamic>(
-                        "spProducts_GetWithImages", "Images", filterModel);
-            });
+                string jsonText = _dataAccess
+                        .GetJsonText<dynamic>(
+                        "spProducts_GetFilteredWithMetadata", filterModel);
+                return JsonConvert.DeserializeObject<ProductsWithMetadataModel>(jsonText);
         }
 
         public Task<ProductModel> GetOneDetailed(int productId)

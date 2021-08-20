@@ -26,13 +26,16 @@
             }
             <div class="@productListItemClass">
                 <div class="product-list__image-container">
-                    @if (product.Images is not null)
+                    @if (product.Images is not null && product.Images.Count > 1)
                     {
-                        @if (product.Images.Count > 1)
-                        {
-                            <i class="huge search plus icon" @onclick="() => ImageClickhandler(carouselId)"></i>
-                        }
+                        <i class="huge search plus icon" @onclick="() => ImageClickhandler(carouselId)"></i>
+
                         var mainImage = product.Images.Where(i => i.IsMain).FirstOrDefault();
+                        if (mainImage is null)
+                        {
+                            mainImage = product.Images[0];
+                        }
+
                         var mainImageUri = mainImage.UriSizeS is not null ? mainImage.UriSizeS : mainImage.UriSizeM;
 
                         <img src="@mainImageUri" alt="@mainImage.Caption" loading="lazy" />

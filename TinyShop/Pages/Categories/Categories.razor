@@ -1,9 +1,11 @@
 ﻿@using TinyShop.Shared.Layouts
+@using TinyShop.Helpers
 @layout MainLayout
 @page "/categories/{CategoryId:int}"
 @inject ICategorySqlDataService categoryDataService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<App> Localizer
+@inject ILocalStorage LocalStorage
 
 @if (categories is not null)
 {
@@ -11,7 +13,7 @@
         @foreach (CategoryModel category in categories)
         {
             <div class="four wide column">
-                <div class="ui fluid raised link card category__card" @onclick="() => CategoryClickHandler(category)">
+                <div class="ui fluid raised link card category__card" @onclick="async () => await CategoryClickHandler(category)">
 
                     <div class="image category__card-image-container">
                         @if (category.Image is not null)
@@ -47,13 +49,22 @@
         categories = await categoryDataService.GetSubcategories(CategoryId);
     }
 
-    private void CategoryClickHandler(CategoryModel category)
+    private async Task CategoryClickHandler(CategoryModel category)
     {
         var url = $"/categories/{category.Id.ToString()}";
         if (!category.IsParent)
         {
-            url += "/products";
+            string parameters = await LocalStorage.ReadSortingParameters();
+            if (parameters.Length > 0)
+            {
+                url += $"/products?{parameters}";
+            }
+            else
+            {
+                url += "/products";
+            }
         }
+
         NavigationManager.NavigateTo(url, false);
     }
 }

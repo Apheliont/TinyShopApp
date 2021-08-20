@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using DataAccessLib.Data;
 using DataAccessLib.DataAccess;
 using Microsoft.AspNetCore.Builder;
@@ -50,6 +51,8 @@ namespace TinyShop
             services.AddScoped<ICategorySqlDataService, CategorySqlDataService>();
             services.AddScoped<IPurchaseSqlDataService, PurchaseSqlDataService>();
             services.AddScoped<IUserUtilities, UserUtilities>();
+            services.AddScoped<ILocalStorage, LocalStorage>();
+            services.AddBlazoredLocalStorage();
         }
 
         private RequestLocalizationOptions GetLocalizationOptions()

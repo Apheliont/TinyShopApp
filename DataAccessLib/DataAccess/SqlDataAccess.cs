@@ -28,6 +28,15 @@ namespace DataAccessLib.DataAccess
             }
         }
 
+        public string GetJsonText<U>(string storedProcedure, U parameters)
+        {
+            using (IDbConnection conn = new SqlConnection(_connectionString))
+            {
+                var json = conn.Query<string>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+                return string.Concat(json);
+            }
+        }
+
         // T - outer model, V - inner model, U - parameter obj
         public List<T> GetWithNestedListData<T, V, U>(string storedProcedure, string nestedProp, U parameters)
         {

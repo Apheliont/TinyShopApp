@@ -1,5 +1,9 @@
 ﻿@inject ICategorySqlDataService categoryDataAccess
+@using TinyShop.Helpers
+@inject ILocalStorage LocalStorage
 @inject IStringLocalizer<App> Localizer
+@inject NavigationManager NavigationManager
+
 <div class="@AccordionCssString">
     <div class="title">
         <i class="bars icon"></i>
@@ -11,12 +15,7 @@
             {
                 @foreach (CategoryModel category in categories)
                 {
-                    var url = $"categories/{category.Id.ToString()}";
-                    @if (!category.IsParent)
-                    {
-                        url += "/products";
-                    }
-                    <NavLink class="item" href="@url" Match="NavLinkMatch.All">
+                    <NavLink class="item" Match="NavLinkMatch.All" @onclick="async () => await ChangeCategoryHandler(category)">
                         @if (category.Image is not null)
                         {
                             var categoryImageUrl = category.Image.UriSizeS is not null ? category.Image.UriSizeS : category.Image.UriSizeM;
@@ -52,6 +51,25 @@
                 accordionCssString += $" {value}";
             }
         }
+    }
+
+
+    private async Task ChangeCategoryHandler(CategoryModel category)
+    {
+        var url = $"categories/{category.Id.ToString()}";
+        if (!category.IsParent)
+        {
+            string parameters = await LocalStorage.ReadSortingParameters();
+            if (parameters.Length > 0)
+            {
+                url += $"/products?{parameters}";
+            }
+            else
+            {
+                url += "/products";
+            }
+        }
+        NavigationManager.NavigateTo(url);
     }
 
     protected override void OnParametersSet()

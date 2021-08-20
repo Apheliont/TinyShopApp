@@ -15,21 +15,21 @@
         <div class="four wide column">
         </div>
         <div class="twelve wide column">
-            <SortPannelComponent MetadataModel="@MetadataModel"
-                                 FilterModel="@FilterModel" 
-                                 OnSortChange="OnSortChangeHandler"/>
+            <SortPannelComponent MetadataModel="@ProductsWithMetadata.Metadata"
+                                 FilterModel="@FilterModel"
+                                 OnSortChange="OnSortChangeHandler" />
         </div>
     </div>
     <div class="row">
         <div class="four wide column">
-            <CategoryMenu AccordionCssString="categories-menu"/>
+            <CategoryMenu AccordionCssString="categories-menu" />
             <ProductFilterComponent FilterModel="@FilterModel"
-                                    MetadataModel="@MetadataModel"
+                                    MetadataModel="@ProductsWithMetadata.Metadata"
                                     OnApplyFilter="ApplyFilterHandler"
                                     OnResetFilter="ResetFilterHandler" />
         </div>
         <div class="twelve wide column">
-            <ProductListComponent Products="@products" OnAddToCart="AddToCartHandler" />
+            <ProductListComponent Products="@ProductsWithMetadata.Products" OnAddToCart="AddToCartHandler" />
             <Paginator NumberOfPages="@numberOfPages" CurrentPage="@FilterModel.PageNumber" OnPageChanged="PageHasChanged" />
         </div>
     </div>
@@ -38,34 +38,29 @@
 @code {
     [Parameter]
     public int CategoryId { get; set; }
+    public ProductsWithMetadataModel ProductsWithMetadata { get; set; }
 
-    private List<ProductModel> products;
     public ProductFilterModel FilterModel { get; set; }
-    public ProductMetadataModel MetadataModel { get; set; }
 
     private int numberOfPages;
 
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         InitFilterModel();
-        await InitializeData();
+        InitializeData();
     }
 
 
-    private async Task InitializeData()
+    private void InitializeData()
     {
         GetQueryStringValues();
 
-        await Task.WhenAll(new List<Task> {
-            LoadMetadata(),
-            LoadProducts()
-        });
+        ProductsWithMetadata = dataService.GetFilteredWithMetadata(FilterModel);
 
-
-        if (MetadataModel is not null)
+        if (ProductsWithMetadata is not null)
         {
-            numberOfPages = (int)(Math.Ceiling((double)MetadataModel.FoundRecords / (int)FilterModel.RowsPerPage));
+            numberOfPages = (int)(Math.Ceiling((double)ProductsWithMetadata.Metadata.FoundRecords / (int)FilterModel.RowsPerPage));
         }
 
     }
@@ -76,16 +71,6 @@
         {
             CategoryId = CategoryId,
         };
-    }
-
-    private async Task LoadMetadata()
-    {
-        MetadataModel = await dataService.GetMetadata(FilterModel);
-    }
-
-    private async Task LoadProducts()
-    {
-        products = await dataService.GetFiltered(FilterModel);
     }
 
 
@@ -105,7 +90,7 @@
         }
         if (NavigationManager.TryGetQueryString<int>("orderBy", out int orderBy))
         {
-            if(Enum.IsDefined(typeof(OrderByEnum), orderBy))
+            if (Enum.IsDefined(typeof(OrderByEnum), orderBy))
             {
                 FilterModel.OrderBy = (OrderByEnum)orderBy;
             }
@@ -124,6 +109,10 @@
                 FilterModel.RowsPerPage = (RowsPerPageEnum)rowsPerPage;
             }
         }
+        if (NavigationManager.TryGetQueryString<int>("minRating", out int minRating))
+        {
+            FilterModel.MinRating = minRating;
+        }
     }
 
     protected override void OnInitialized()
@@ -133,12 +122,8 @@
 
     private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
     {
-        base.InvokeAsync(async () =>
-        {
-            await InitializeData();
-            StateHasChanged();
-        });
-
+        InitializeData();
+        StateHasChanged();
     }
 
     private async Task AddToCartHandler(int productId)
@@ -171,6 +156,10 @@
         sb.Append($"&orderBy={(int)FilterModel.OrderBy}");
         sb.Append($"&sortOrder={(int)FilterModel.SortOrder}");
         sb.Append($"&rowsPerPage={(int)FilterModel.RowsPerPage}");
+        if (FilterModel.MinRating != 0)
+        {
+            sb.Append($"&minRating={FilterModel.MinRating}");
+        }
 
         NavigationManager.NavigateTo(sb.ToString());
     }
