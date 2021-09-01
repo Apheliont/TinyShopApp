@@ -1,14 +1,33 @@
 ﻿@inject IStringLocalizer<App> Localizer
-
+@inject NavigationManager NavigationManager
+@using TinyShop.Helpers
+@inject IUriUtils UriUtils
 
 <div class="ui small breadcrumb breadcrumb__container">
     <a class="section" href="/">@Localizer["Home"]</a>
-    <i class="right chevron icon divider"></i>
-    <a class="section">Регистрация</a>
-    <i class="right chevron icon divider"></i>
-    <div class="active section">Personal Information</div>
+    @if (parents is not null)
+    {
+        @for (int i = parents.Count - 1; i > 0; i--)
+        {
+            var url = $"/categories/{parents[i].Id}";
+            <i class="right chevron icon divider"></i>
+            if (i != 0)
+            {
+                <a class="section" href="@url">@parents[i].CategoryName</a>
+            }
+        }
+        <i class="right chevron icon divider"></i>
+        <div class="active section">@parents[0].CategoryName</div>
+    }
+
 </div>
 
 @code {
+    private List<CategoryParentModel> parents;
 
+    protected override async Task OnParametersSetAsync()
+    {
+        string uri = NavigationManager.Uri;
+        parents = await UriUtils.GetParents(uri);
+    }
 }

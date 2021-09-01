@@ -2,6 +2,7 @@
 @layout ProductsLayout
 @inject IStringLocalizer<App> Localizer
 @inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
 @using TinyShop.Helpers
 @inject IUserUtilities userUtilities
 @inject IPurchaseSqlDataService purchaseDataService
@@ -15,9 +16,9 @@
             <div class="product-galery__column">
                 <div class="product-galery__container">
                     <div class="product-thumbnails__container">
-                        @if (product.Images is not null)
+                        @if (product.ProductInfo.Images is not null)
                         {
-                            @foreach (ImageModel image in product.Images)
+                            @foreach (ImageModel image in product.ProductInfo.Images)
                             {
                                 var imageUrl = image.UriSizeS is not null ? image.UriSizeS : image.UriSizeM;
                                 <img src="@imageUrl" alt="@image.Caption" @onmouseover="async () => await ThumbnailMouseOverHandler(image)">
@@ -37,7 +38,7 @@
                     </div>
                 </div>
                 <div class="product-id__container">
-                    <p>@Localizer["Product Id"]: @product.Id</p>
+                    <p>@Localizer["Product Id"]: @product.ProductInfo.Id</p>
                 </div>
             </div>
         </div>
@@ -45,24 +46,52 @@
             <div class="eight wide column product-info__container">
                 <div class="ui top attached tabular menu">
                     <a class="item active" data-tab="description">@Localizer["Description"]</a>
+                    @if (product.ProductDetails is not null)
+                    {
+                        <a class="item" data-tab="specifications">@Localizer["Specifications"]</a>
+                    }
                     <a class="item" data-tab="reviews">@Localizer["Reviews"]</a>
                 </div>
                 <div class="ui bottom attached tab segment active product-info__tabData" data-tab="description">
-                    <div class="product-name__container">
-                        <p>@product.ProductName</p>
+                    <div class="product-info__tab-description">
+                        <div class="product-name__container">
+                        <p>@product.ProductInfo.ProductName</p>
                     </div>
                     <div class="product-description__container">
-                        <p>@product.Description</p>
+                        <p>@product.ProductInfo.Description</p>
                     </div>
                     <div class="product-buy__container">
                         <div class="product__buy-price">
-                            <p>@product.Price</p>
+                            <p>@Math.Round(@product.ProductInfo.Price, 2)<span>₽</span></p>
                         </div>
                         <div class="product__buy-to-cart">
-                            <button class="product__buy-to-cart-btn" @onclick="async () => { await AddToCartHandler(product.Id); }">@Localizer["Add to cart"]</button>
+                            <button class="product__buy-to-cart-btn" @onclick="async () => { await AddToCartHandler(product.ProductInfo.Id); }">@Localizer["Add to cart"]</button>
                         </div>
                     </div>
+                    </div>
                 </div>
+                @if (product.ProductDetails is not null)
+                {
+                    <div class="ui bottom attached tab segment product-info__tabData" data-tab="specifications">
+                        <div class="ui grid product-info__tab-specifications">
+                        @foreach (string key in product.ProductDetails.Keys)
+                        {
+                            <div class="sixteen wide column">
+                                <p><b>@key</b></p>
+                                <div class="ui two column grid">
+                                        @foreach(var row in product.ProductDetails[key])
+                                        {
+                                            <div class="row">
+                                                <div class="column">@row.Name</div>
+                                                <div class="column">@row.Value</div>
+                                            </div>
+                                        }
+                                    </div>
+                            </div>
+                        }
+                        </div>
+                    </div>
+                }
                 <div class="ui bottom attached tab segment product-info__tabData" data-tab="reviews">
                     Second
                 </div>
@@ -75,7 +104,7 @@
     [Parameter]
     public int ProductId { get; set; }
 
-    private ProductModel product;
+    private DetailedProductModel product;
     private IJSObjectReference module;
     private ImageModel selectedImage;
 
@@ -88,12 +117,12 @@
         }
     }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
-        product = await productDataService.GetOneDetailed(ProductId);
+        product = productDataService.GetOneDetailed(ProductId);
         try
         {
-            selectedImage = product.Images.Where(i => i.IsMain).FirstOrDefault();
+            selectedImage = product.ProductInfo.Images.Where(i => i.IsMain).FirstOrDefault();
         }
         catch { }
     }
@@ -117,6 +146,14 @@
         if (userId is not null)
         {
             await purchaseDataService.AddToCart(userId, productId, 1);
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
         }
     }
 }

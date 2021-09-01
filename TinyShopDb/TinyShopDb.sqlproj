@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{29dea4a0-4e8c-4289-973b-4fcee7293883}</ProjectGuid>
-    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql150DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
@@ -16,12 +16,13 @@
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <TargetLanguage>CS</TargetLanguage>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <SqlServerVerification>False</SqlServerVerification>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseSet>True</TargetDatabaseSet>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -84,7 +85,6 @@
     <Build Include="dbo\Tables\ProductImages.sql" />
     <Build Include="dbo\StoredProcedures\spImages_Add.sql" />
     <Build Include="dbo\StoredProcedures\spProducts_GetFilteredWithMetadata.sql" />
-    <Build Include="dbo\Tables\CategoryImage.sql" />
     <Build Include="dbo\Tables\CategorySubcategories.sql" />
     <Build Include="dbo\StoredProcedures\spCategories_GetSubcategories.sql" />
     <Build Include="dbo\StoredProcedures\spProducts_GetOneDetailed.sql" />
@@ -93,6 +93,12 @@
     <Build Include="dbo\Triggers\OnCategoryDelete.sql" />
     <Build Include="dbo\Functions\tvfProducts_GetMetadata.sql" />
     <Build Include="dbo\Triggers\OnProductDelete.sql" />
+    <Build Include="dbo\Functions\tvfCategories_GetParents.sql" />
+    <Build Include="dbo\StoredProcedures\spCategories_GetParents.sql" />
+    <Build Include="dbo\Triggers\OnProductAdd.sql" />
+    <Build Include="dbo\Tables\TvSetDetails.sql" />
+    <Build Include="dbo\StoredProcedures\spProducts_GetDetailsTvSet.sql" />
+    <Build Include="dbo\Tables\CategoryProductDetailsSPName.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="TinyShopDb.refactorlog" />

@@ -52,6 +52,7 @@ namespace TinyShop
             services.AddScoped<IPurchaseSqlDataService, PurchaseSqlDataService>();
             services.AddScoped<IUserUtilities, UserUtilities>();
             services.AddScoped<ILocalStorage, LocalStorage>();
+            services.AddScoped<IUriUtils, UriUtils>();
             services.AddBlazoredLocalStorage();
         }
 

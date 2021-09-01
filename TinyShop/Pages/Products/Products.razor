@@ -9,6 +9,7 @@
 @inject IPurchaseSqlDataService purchaseDataService
 @inject IUserUtilities userUtilities
 @inject IStringLocalizer<App> Localizer
+@implements IDisposable
 
 <div class="ui grid">
     <div class="row">
@@ -135,7 +136,7 @@
         }
     }
 
-    public void Dispose()
+    void IDisposable.Dispose()
     {
         NavigationManager.LocationChanged -= HandleLocationChanged;
     }

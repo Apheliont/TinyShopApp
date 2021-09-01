@@ -1,6 +1,6 @@
 ﻿@using TinyShop.Shared.Layouts
 @using TinyShop.Helpers
-@layout MainLayout
+@layout CategoriesLayout
 @page "/categories/{CategoryId:int}"
 @inject ICategorySqlDataService categoryDataService
 @inject NavigationManager NavigationManager
@@ -44,9 +44,9 @@
 
     private List<CategoryModel> categories;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
-        categories = await categoryDataService.GetSubcategories(CategoryId);
+        categories = categoryDataService.GetSubcategories(CategoryId);
     }
 
     private async Task CategoryClickHandler(CategoryModel category)

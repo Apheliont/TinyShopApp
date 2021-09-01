@@ -1,5 +1,6 @@
 ﻿@inject ICategorySqlDataService categoryDataAccess
 @using TinyShop.Helpers
+@inject IUriUtils UriUtils
 @inject ILocalStorage LocalStorage
 @inject IStringLocalizer<App> Localizer
 @inject NavigationManager NavigationManager
@@ -15,7 +16,7 @@
             {
                 @foreach (CategoryModel category in categories)
                 {
-                    <NavLink class="item" Match="NavLinkMatch.All" @onclick="async () => await ChangeCategoryHandler(category)">
+                    <NavLink class="@GetNavLinkCssClass(category)" Match="NavLinkMatch.All" @onclick="async () => await ChangeCategoryHandler(category)">
                         @if (category.Image is not null)
                         {
                             var categoryImageUrl = category.Image.UriSizeS is not null ? category.Image.UriSizeS : category.Image.UriSizeM;
@@ -34,12 +35,14 @@
 </div>
 
 @code {
+
+    private int? rootCategoryId;
+
     [Parameter]
     public bool IsMenuOpened { get; set; } = false;
 
-    private string openedMenuCssString;
-
-    private string accordionCssString = "ui styled accordion";
+    [Parameter]
+    public EventCallback OnCategoryChange { get; set; }
 
     [Parameter]
     public string AccordionCssString
@@ -53,9 +56,19 @@
         }
     }
 
+    private string openedMenuCssString;
+    private List<CategoryModel> categories;
+    private string accordionCssString = "ui styled accordion";
+
+    private string GetNavLinkCssClass(CategoryModel category)
+    {
+        return (rootCategoryId is not null && rootCategoryId == category.Id) ? "active item" : "item";
+    }
 
     private async Task ChangeCategoryHandler(CategoryModel category)
     {
+        await OnCategoryChange.InvokeAsync();
+
         var url = $"categories/{category.Id.ToString()}";
         if (!category.IsParent)
         {
@@ -70,17 +83,22 @@
             }
         }
         NavigationManager.NavigateTo(url);
+
+        var res = await UriUtils.GetParents(url);
+        rootCategoryId = (res is not null && res.Any()) ? res.Last().Id : null;
     }
 
     protected override void OnParametersSet()
     {
+        categories = categoryDataAccess.GetRoot();
         openedMenuCssString = IsMenuOpened ? "active content" : "content";
     }
 
-    private List<CategoryModel> categories;
 
     protected override async Task OnInitializedAsync()
     {
-        categories = await categoryDataAccess.GetRoot();
+        string uri = NavigationManager.Uri;
+        var res = await UriUtils.GetParents(uri);
+        rootCategoryId = (res is not null && res.Any()) ? res.Last().Id : null;
     }
 }

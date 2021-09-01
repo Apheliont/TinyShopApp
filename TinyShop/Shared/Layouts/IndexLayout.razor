@@ -1,0 +1,36 @@
+﻿@inherits LayoutComponentBase
+@layout HeaderFooterLayout
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localizer
+@inject IJSRuntime JSRuntime
+@inject ICategorySqlDataService categoryDataService
+@implements IAsyncDisposable
+
+<div class="four wide column">
+    <CategoryMenu IsMenuOpened="true" />
+</div>
+<div class="twelve wide column">
+    @Body
+</div>
+
+
+@code {
+    private IJSObjectReference module;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
+            await module.InvokeVoidAsync("initializeAccordion");
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+}
+

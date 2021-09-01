@@ -11,18 +11,17 @@ BEGIN
 	 (SELECT * FROM CategorySubcategories csr WHERE cs.SubcategoryId = csr.CategoryId)
 		THEN CAST(1 AS BIT)
 		ELSE CAST (0 AS BIT) END) AS [IsParent]
-	,i.Id
-	,i.Caption
-	,i.UriSizeS
-	,i.UriSizeM
-	,i.UriSizeL
-	,i.IsMain
+	,i.Id		AS 'Image.Id'
+	,i.Caption  AS 'Image.Caption'
+	,i.UriSizeS AS 'Image.UriSizeS'
+	,i.UriSizeM AS 'Image.UriSizeM'
+	,i.UriSizeL AS 'Image.UriSizeL'
+	,i.IsMain   AS 'Image.IsMain'
 	FROM CategorySubcategories cs
 	INNER JOIN Categories c
 	ON cs.SubcategoryId = c.Id
-	LEFT JOIN CategoryImage ci
-	ON ci.CategoryId = cs.SubcategoryId
 	LEFT JOIN Images i
-	ON i.Id = ci.ImageId
+	ON i.Id = c.ImageId
 	WHERE cs.CategoryId = @CategoryId
+	FOR JSON PATH
 END

@@ -1,5 +1,6 @@
 ﻿using DataAccessLib.DataAccess;
 using DataAccessLib.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,30 +18,29 @@ namespace DataAccessLib.Data
         }
 
 
-        public async Task<List<CategoryModel>> GetRoot()
+        public List<CategoryModel> GetRoot()
         {
-            return await Task.Run(() =>
-            {
-                return _dataAccess
-                .GetWithNestedObjectData<CategoryModel, ImageModel, dynamic>
-                    (
-                        "spCategories_GetRoot", "Image", new { }
-                    );
-            });
-
+            string jsonText = _dataAccess
+                        .GetJsonText<dynamic>(
+                        "spCategories_GetRoot", new { });
+            return JsonConvert.DeserializeObject<List<CategoryModel>>(jsonText);
         }
 
-        public async Task<List<CategoryModel>> GetSubcategories(int categoryId)
+        public async Task<List<CategoryParentModel>> GetParents(int id, bool isProduct)
         {
-            return await Task.Run(() =>
-            {
-                return _dataAccess
-                .GetWithNestedObjectData<CategoryModel, ImageModel, dynamic>
-                    (
-                        "spCategories_GetSubcategories", "Image", new { CategoryId = categoryId }
-                    );
-            });
+            return await _dataAccess
+            .GetData<CategoryParentModel, dynamic>
+                (
+                    "spCategories_GetParents", new { Id = id, IsProduct = isProduct }
+                );
+        }
 
+        public List<CategoryModel> GetSubcategories(int categoryId)
+        {
+            string jsonText = _dataAccess
+                        .GetJsonText<dynamic>(
+                        "spCategories_GetSubcategories", new { CategoryId = categoryId });
+            return JsonConvert.DeserializeObject<List<CategoryModel>>(jsonText);
         }
     }
 }

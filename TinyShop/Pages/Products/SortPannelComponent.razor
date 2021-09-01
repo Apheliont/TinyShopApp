@@ -1,7 +1,9 @@
 ﻿@inject IStringLocalizer<App> Localizer
+@inject IJSRuntime JSRuntime
 @using TinyShop.Helpers
 @using TinyShop.Extensions
 @inject ILocalStorage LocalStorage
+@implements IAsyncDisposable
 
 <div class="ui small menu">
     @if (MetadataModel is not null)
@@ -46,6 +48,7 @@
     private Dictionary<int, string> sortOrders = new Dictionary<int, string>();
     private Dictionary<int, string> orderBys = new Dictionary<int, string>();
     private Dictionary<int, string> rowsPerPages = new Dictionary<int, string>();
+    private IJSObjectReference module;
 
     private int _rowsPerPage;
     private int _sortOrder;
@@ -59,6 +62,16 @@
 
     [Parameter]
     public ProductMetadataModel MetadataModel { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
+        }
+
+        await module.InvokeVoidAsync("initializeDropdownMenu");
+    }
 
     protected override void OnParametersSet()
     {
@@ -109,6 +122,14 @@
             FilterModel.RowsPerPage = (RowsPerPageEnum)_rowsPerPage;
             await LocalStorage.SetItemAsync("rowsPerPage", _rowsPerPage);
             await OnSortChange.InvokeAsync();
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
         }
     }
 

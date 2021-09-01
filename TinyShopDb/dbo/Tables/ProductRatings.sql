@@ -7,5 +7,5 @@
 	[CreatedAt] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
 	CONSTRAINT FK_ProductRatings_Products FOREIGN KEY (ProductId) REFERENCES Products(Id) ON DELETE CASCADE,
 	CONSTRAINT FK_ProductRatings_AspNetUsers FOREIGN KEY (UserId) REFERENCES AspNetUsers(Id) ON DELETE SET NULL,
-	CONSTRAINT UK_ProductRatings_UserProduct UNIQUE(ProductId, UserId)
+	CONSTRAINT UQ_ProductRatings_UserProduct UNIQUE(ProductId, UserId)
 )

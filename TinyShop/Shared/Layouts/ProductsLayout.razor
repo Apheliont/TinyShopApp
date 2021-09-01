@@ -1,16 +1,12 @@
 ﻿@inherits LayoutComponentBase
+@layout HeaderFooterLayout
+@inject NavigationManager NavigationManager
 @inject IStringLocalizer<App> Localizer
+@using TinyShop.Helpers
+@inject IUriUtils UriUtils 
 
-<InfoStripe />
-<NavbarTop />
-<div class="main__wrapper">
-    <div class="ui container main__container">
-        <Breadcrumb />
-        @Body
-    </div>
+<div class="sexteen wide column">
+    <Breadcrumb />
+    @Body
 </div>
-
-@code {
-
-}
 

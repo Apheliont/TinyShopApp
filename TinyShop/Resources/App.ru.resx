@@ -234,8 +234,14 @@
   <data name="Show" xml:space="preserve">
     <value>Показать</value>
   </data>
+  <data name="Sorry, there's nothing at this address." xml:space="preserve">
+    <value>Извините, ничего не найдено</value>
+  </data>
   <data name="Sort by" xml:space="preserve">
     <value>Сортировать по</value>
+  </data>
+  <data name="Specifications" xml:space="preserve">
+    <value>Характеристики</value>
   </data>
   <data name="Straight order" xml:space="preserve">
     <value>По возрастанию</value>
