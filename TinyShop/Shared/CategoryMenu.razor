@@ -84,7 +84,7 @@
         }
         NavigationManager.NavigateTo(url);
 
-        var res = await UriUtils.GetParents(url);
+        var res = UriUtils.GetBreadcrumbs(url);
         rootCategoryId = (res is not null && res.Any()) ? res.Last().Id : null;
     }
 
@@ -95,10 +95,10 @@
     }
 
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         string uri = NavigationManager.Uri;
-        var res = await UriUtils.GetParents(uri);
+        var res = UriUtils.GetBreadcrumbs(uri);
         rootCategoryId = (res is not null && res.Any()) ? res.Last().Id : null;
     }
 }

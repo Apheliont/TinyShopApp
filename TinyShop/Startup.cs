@@ -48,6 +48,7 @@ namespace TinyShop
             services.AddLocalization(options => options.ResourcesPath = "Resources");
             services.AddSingleton<ISqlDataAccess>(x => new SqlDataAccess(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IProductSqlDataService, ProductSqlDataService>();
+            services.AddScoped<IBreadcrumbSqlDataService, BreadcrumbSqlDataService>();
             services.AddScoped<ICategorySqlDataService, CategorySqlDataService>();
             services.AddScoped<IPurchaseSqlDataService, PurchaseSqlDataService>();
             services.AddScoped<IUserUtilities, UserUtilities>();

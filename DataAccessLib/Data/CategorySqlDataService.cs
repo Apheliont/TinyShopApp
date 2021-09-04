@@ -26,15 +26,6 @@ namespace DataAccessLib.Data
             return JsonConvert.DeserializeObject<List<CategoryModel>>(jsonText);
         }
 
-        public async Task<List<CategoryParentModel>> GetParents(int id, bool isProduct)
-        {
-            return await _dataAccess
-            .GetData<CategoryParentModel, dynamic>
-                (
-                    "spCategories_GetParents", new { Id = id, IsProduct = isProduct }
-                );
-        }
-
         public List<CategoryModel> GetSubcategories(int categoryId)
         {
             string jsonText = _dataAccess

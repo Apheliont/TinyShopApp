@@ -2,32 +2,52 @@
 @inject NavigationManager NavigationManager
 @using TinyShop.Helpers
 @inject IUriUtils UriUtils
+@implements IDisposable
 
 <div class="ui small breadcrumb breadcrumb__container">
     <a class="section" href="/">@Localizer["Home"]</a>
-    @if (parents is not null)
+    @if (breadcrumbs is not null)
     {
-        @for (int i = parents.Count - 1; i > 0; i--)
+        @foreach (BreadcrumbItemModel breadcrumb in breadcrumbs)
         {
-            var url = $"/categories/{parents[i].Id}";
             <i class="right chevron icon divider"></i>
-            if (i != 0)
+            if (!String.IsNullOrEmpty(breadcrumb.Uri))
             {
-                <a class="section" href="@url">@parents[i].CategoryName</a>
+                <a class="section" href="@breadcrumb.Uri">@breadcrumb.ItemName</a>
+            }
+            else
+            {
+                <div class="active section">@breadcrumb.ItemName</div>
             }
         }
-        <i class="right chevron icon divider"></i>
-        <div class="active section">@parents[0].CategoryName</div>
     }
 
 </div>
 
 @code {
-    private List<CategoryParentModel> parents;
+    private List<BreadcrumbItemModel> breadcrumbs;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += HandleLocationChanged;
+        // We need get breadcrumbs twice. On every initialization and every time url change
+        GetBreadcrumbs();
+    }
+
+    private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        GetBreadcrumbs();
+        StateHasChanged();
+    }
+
+    void IDisposable.Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+
+    private void GetBreadcrumbs()
     {
         string uri = NavigationManager.Uri;
-        parents = await UriUtils.GetParents(uri);
+        breadcrumbs = UriUtils.GetBreadcrumbs(uri);
     }
 }

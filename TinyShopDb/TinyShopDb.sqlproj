@@ -93,8 +93,8 @@
     <Build Include="dbo\Triggers\OnCategoryDelete.sql" />
     <Build Include="dbo\Functions\tvfProducts_GetMetadata.sql" />
     <Build Include="dbo\Triggers\OnProductDelete.sql" />
-    <Build Include="dbo\Functions\tvfCategories_GetParents.sql" />
-    <Build Include="dbo\StoredProcedures\spCategories_GetParents.sql" />
+    <Build Include="dbo\Functions\tvfBreadcrumbs_Get.sql" />
+    <Build Include="dbo\StoredProcedures\spBreadcrumbs_Get.sql" />
     <Build Include="dbo\Triggers\OnProductAdd.sql" />
     <Build Include="dbo\Tables\TvSetDetails.sql" />
     <Build Include="dbo\StoredProcedures\spProducts_GetDetailsTvSet.sql" />

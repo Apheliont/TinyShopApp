@@ -6,6 +6,6 @@ namespace TinyShop.Helpers
 {
     public interface IUriUtils
     {
-        Task<List<CategoryParentModel>> GetParents(string uri);
+        List<BreadcrumbItemModel> GetBreadcrumbs(string uri);
     }
 }

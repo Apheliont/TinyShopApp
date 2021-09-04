@@ -8,6 +8,5 @@ namespace DataAccessLib.Data
     {
         List<CategoryModel> GetRoot();
         List<CategoryModel> GetSubcategories(int categoryId);
-        Task<List<CategoryParentModel>> GetParents(int categoryId, bool isProduct);
     }
 }

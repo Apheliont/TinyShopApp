@@ -11,12 +11,13 @@ namespace TinyShop.Helpers
 {
     public class UriUtils : IUriUtils
     {
-        private ConcurrentDictionary<int, List<CategoryParentModel>> cache = new ConcurrentDictionary<int, List<CategoryParentModel>>();
-        private readonly ICategorySqlDataService _categoryDataService;
+        private ConcurrentDictionary<int, List<BreadcrumbItemModel>> categoryCache = new ConcurrentDictionary<int, List<BreadcrumbItemModel>>();
+        private ConcurrentDictionary<int, List<BreadcrumbItemModel>> productCache = new ConcurrentDictionary<int, List<BreadcrumbItemModel>>();
+        private readonly IBreadcrumbSqlDataService _breadcrumbDataService;
 
-        public UriUtils(ICategorySqlDataService categoryDataService)
+        public UriUtils(IBreadcrumbSqlDataService breadcrumbDataService)
         {
-            _categoryDataService = categoryDataService;
+            _breadcrumbDataService = breadcrumbDataService;
         }
 
         private bool GetIdFromURI(string uri, string type, out int id)
@@ -30,25 +31,36 @@ namespace TinyShop.Helpers
             return false;
         }
 
-        public async Task<List<CategoryParentModel>> GetParents(string uri)
+        public List<BreadcrumbItemModel> GetBreadcrumbs(string uri)
         {
             if (GetIdFromURI(uri, "categories", out int categoryId))
             {
-                if (cache.ContainsKey(categoryId))
+                if (categoryCache.ContainsKey(categoryId))
                 {
-                    return cache.GetValueOrDefault(categoryId);
+                    return categoryCache.GetValueOrDefault(categoryId);
                 }
                 else
                 {
-                    var res = await _categoryDataService.GetParents(categoryId, false);
+                    var res = _breadcrumbDataService.Get(categoryId, false);
                     if (res.Any())
                     {
-                        cache.TryAdd(categoryId, res);
+                        int lastIdx = res.Count - 1;
+                        res = res.Select((item, idx) =>
+                        {
+                            if (idx != lastIdx)
+                            {
+                                item.Uri = $"/categories/{item.Id}";
+                            }
+
+                            return item;
+                        }).ToList();
+
+                        categoryCache.TryAdd(categoryId, res);
                         return res;
                     }
                     else
                     {
-                        cache.TryAdd(categoryId, null);
+                        categoryCache.TryAdd(categoryId, null);
                         return null;
                     }
                 }
@@ -56,21 +68,36 @@ namespace TinyShop.Helpers
 
             if (GetIdFromURI(uri, "products", out int productId))
             {
-                if (cache.ContainsKey(productId))
+                if (productCache.ContainsKey(productId))
                 {
-                    return cache.GetValueOrDefault(productId);
+                    return productCache.GetValueOrDefault(productId);
                 }
                 else
                 {
-                    var res = await _categoryDataService.GetParents(productId, true);
+                    var res = _breadcrumbDataService.Get(productId, true);
                     if (res.Any())
                     {
-                        cache.TryAdd(productId, res);
+                        int lastIdx = res.Count - 1;
+                        res = res.Select((item, idx) =>
+                        {
+                            if (idx == lastIdx - 1)
+                            {
+                                item.Uri = $"/categories/{item.Id}/products";
+                            }
+                            else if (idx != lastIdx)
+                            {
+                                item.Uri = $"/categories/{item.Id}";
+                            }
+
+                            return item;
+                        }).ToList();
+
+                        productCache.TryAdd(productId, res);
                         return res;
                     }
                     else
                     {
-                        cache.TryAdd(productId, null);
+                        productCache.TryAdd(productId, null);
                         return null;
                     }
                 }

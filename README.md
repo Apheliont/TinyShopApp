@@ -2,7 +2,7 @@
 ## _Most useless shop ever. You love it!_
 
 
-TinyShop is a online e-comerce shop written in Blazor C#
+TinyShop is an online e-comerce shop written in Blazor C#
 
 ## Features
 
