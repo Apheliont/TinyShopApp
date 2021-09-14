@@ -5,6 +5,7 @@
 @using System.Text;
 @using TinyShop.Extensions
 @using TinyShop.Helpers
+@using TinyShop.Pages.Products.ProductFilter
 @inject NavigationManager NavigationManager
 @inject IPurchaseSqlDataService purchaseDataService
 @inject IUserUtilities userUtilities
@@ -44,7 +45,7 @@
     public ProductFilterModel FilterModel { get; set; }
 
     private int numberOfPages;
-
+    private DetailsMetadataModel DetailsMetadataModel;
 
     protected override void OnParametersSet()
     {
@@ -61,6 +62,10 @@
 
         if (ProductsWithMetadata is not null)
         {
+            if (ProductsWithMetadata.Metadata.Details is not null)
+            {
+                DetailsMetadataModel = MetadataUtils.CreateDetailsMetadata(ProductsWithMetadata.Metadata.Details);
+            }
             numberOfPages = (int)(Math.Ceiling((double)ProductsWithMetadata.Metadata.FoundRecords / (int)FilterModel.RowsPerPage));
         }
 

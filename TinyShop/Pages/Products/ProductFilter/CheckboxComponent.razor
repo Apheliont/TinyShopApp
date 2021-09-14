@@ -1,0 +1,20 @@
+﻿<div class="ui child checkbox">
+    <input type="checkbox" @onchange="async () => await ChangePropState()">
+    <label>@PropToCheck.Key</label>
+</div>
+
+@code {
+    [Parameter]
+    public KeyValuePair<String, bool> PropToCheck { get; set; }
+
+    [Parameter]
+    public EventCallback<KeyValuePair<String, bool>> OnChange { get; set; }
+
+
+    private async Task ChangePropState()
+    {
+        PropToCheck = new KeyValuePair<string, bool>(PropToCheck.Key, !PropToCheck.Value);
+        await OnChange.InvokeAsync(PropToCheck);
+    }
+}
+

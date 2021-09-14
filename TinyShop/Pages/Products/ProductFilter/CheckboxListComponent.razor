@@ -1,0 +1,45 @@
+﻿@if (PropsToCheck is not null)
+{
+    <div class="list">
+        @foreach (string prop in PropsToCheck)
+        {
+            <div class="item">
+                <div class="ui child checkbox">
+                    <input type="checkbox" @onchange="async () => await ChangePropState(prop)">
+                    <label>@prop</label>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<String> PropsToCheck { get; set; }
+
+    [Parameter]
+    public String ComponentUniqueName { get; set; }
+
+    [Parameter]
+    public EventCallback<(String, List<String>)> OnChange { get;set; }
+
+    private Dictionary<string, bool> propsState = new Dictionary<string, bool>();
+
+    protected override void OnParametersSet()
+    {
+        PropsToCheck.ForEach(p => propsState.TryAdd(p, false));
+    }
+
+    private async Task ChangePropState(string propName)
+    {
+        if (propsState.ContainsKey(propName))
+        {
+            propsState[propName] = !propsState[propName];
+            await OnChange
+            .InvokeAsync((ComponentUniqueName, propsState
+                .Where(kvp => kvp.Value == true)
+                .Select(kvp => kvp.Key)
+                .ToList()));
+        }
+    }
+}
