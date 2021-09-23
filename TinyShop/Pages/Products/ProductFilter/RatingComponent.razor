@@ -1,0 +1,62 @@
+﻿@inject IStringLocalizer<App> Localizer
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<span class="ui orange rating"
+      id="@ComponentUniqueName"
+      data-icon="star"
+      data-rating="@RatingItem.CurrentRating"
+      data-max-rating="@RatingItem.UpperBound"></span>  @Localizer[Text]
+
+@code {
+    [Parameter]
+    public RatingType RatingItem { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    [Parameter]
+    public String ComponentUniqueName
+    {
+        get => _componentUniqueName; set
+        {
+            if (!String.IsNullOrWhiteSpace(value))
+            {
+                _componentUniqueName = value.ToLower();
+            }
+        }
+    }
+    private string _componentUniqueName = "";
+    private IJSObjectReference module;
+    private DotNetObjectReference<RatingComponent> thisObjRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
+            thisObjRef = DotNetObjectReference.Create(this);
+            await module.InvokeVoidAsync("initializeFilterRating", thisObjRef, ComponentUniqueName);
+            await module.InvokeVoidAsync("initializeAccordion");
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+
+    [JSInvokable]
+    public async Task FilterRatingChanged(int rating)
+    {
+        RatingItem.CurrentRating = rating;
+        await OnChange.InvokeAsync();
+        StateHasChanged();
+    }
+}

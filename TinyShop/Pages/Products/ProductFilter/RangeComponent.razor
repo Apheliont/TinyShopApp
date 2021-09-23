@@ -1,31 +1,31 @@
-﻿@*@inject IJSRuntime JSRuntime
+﻿@inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
-<div class="ui ticked range slider" id="@moneyRangeSliderId"></div>
+<div class="ui ticked range slider" id="@ComponentUniqueName"></div>
 <div class="ui two column grid">
     <div class="row">
         <div class="column">
             <div class="ui fluid right small labeled input">
-                <label for="price__lower-bound" class="ui label">₽</label>
+                <label for="range-component__lower-bound" class="ui label">@RangeItem.Measurement</label>
                 <input type="number"
-                       id="price__lower-bound"
+                       id="range-component__lower-bound"
                        class="spinners--disable"
-                       min="@RangeData.Min"
-                       max="@RangeData.Max"
-                       value="@_lowerValue"
-                       @onchange="LowerBoundHandler">
+                       min="@RangeItem.LowerBound"
+                       max="@RangeItem.UpperBound"
+                       value="@RangeItem.From"
+                       @onchange="FromHandler">
             </div>
         </div>
         <div class="column">
             <div class="ui fluid right small labeled input">
-                <label for="price__upper-bound" class="ui label">₽</label>
+                <label for="range-component__upper-bound" class="ui label">@RangeItem.Measurement</label>
                 <input type="number"
-                       id="price__upper-bound"
+                       id="range-component__upper-bound"
                        class="spinners--disable"
-                       min="@RangeData.Min"
-                       max="@RangeData.Max"
-                       value="@_upperValue"
-                       @onchange="UpperBoundHandler">
+                       min="@RangeItem.LowerBound"
+                       max="@RangeItem.UpperBound"
+                       value="@RangeItem.To"
+                       @onchange="ToHandler">
             </div>
         </div>
     </div>
@@ -33,38 +33,43 @@
 
 @code {
     [Parameter]
-    public IRangeable RangeData { get; set; } 
+    public RangeType RangeItem { get; set; }
 
     [Parameter]
-    public String ComponentUniqueName { get; set; }
+    public String ComponentUniqueName
+    {
+        get => _componentUniqueName; set
+        {
+            if (!String.IsNullOrWhiteSpace(value))
+            {
+                _componentUniqueName = value.ToLower();
+            }
+        }
+    }
 
     [Parameter]
-    public EventCallback<(int lowerValue, int upperValue)> OnRangeChange { get; set; }
+    public EventCallback OnChange { get; set; }
 
-    private string moneyRangeSliderId = "money-range-slider";
-
-    private int _lowerValue, _upperValue;
-
+    private string _componentUniqueName = "";
     private IJSObjectReference module;
     // Создаем объект который будет хранить ссылку на экземпляр этой страницы
     // Далее этот объект будет передан на JS строну
-    private DotNetObjectReference<MoneyRangeComponent> thisObjRef;
+    private DotNetObjectReference<RangeComponent> thisObjRef;
 
     [JSInvokable]
-    public async Task SliderChanged(int val, int min, int max)
+    public async Task SliderChanged(int val, int from, int to)
     {
-        await OnRangeChange.InvokeAsync((min, max));
-        _lowerValue = min;
-        _upperValue = max;
+        RangeItem.From = from;
+        RangeItem.To = to;
         StateHasChanged();
+        await OnChange.InvokeAsync();
     }
 
     protected override void OnParametersSet()
     {
-        _lowerValue = FilterModel.MinPrice is not null ? (int)FilterModel.MinPrice : RangeData.Min;
-        _upperValue = FilterModel.MaxPrice is not null ? (int)FilterModel.MaxPrice : RangeData.Max;
+        RangeItem.From = RangeItem.From is not null ? RangeItem.From : RangeItem.LowerBound;
+        RangeItem.To = RangeItem.To is not null ? RangeItem.To : RangeItem.UpperBound;
     }
-
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -74,30 +79,33 @@
             // Инициализируем объект контейнер и передаем ему ссылку на экземляр объекта этой страницы
             // Далее ловим его на стороне JS
             thisObjRef = DotNetObjectReference.Create(this);
-            await module.InvokeVoidAsync("initializeSlider", moneyRangeSliderId, thisObjRef, RangeData.Min, RangeData.Max, _lowerValue, _upperValue, 1);
+            await module.InvokeVoidAsync("initializeSlider", ComponentUniqueName, thisObjRef, RangeItem.LowerBound, RangeItem.UpperBound, RangeItem.From, RangeItem.To, 1);
+            StateHasChanged();
         }
     }
 
-    private async Task LowerBoundHandler(ChangeEventArgs args)
+    private async Task FromHandler(ChangeEventArgs args)
     {
         if (module is not null)
         {
-            if (Int32.TryParse(args.Value.ToString(), out _lowerValue))
+            if (Int32.TryParse(args.Value.ToString(), out int from))
             {
-                await OnRangeChange.InvokeAsync((_lowerValue, _upperValue));
-                await module.InvokeVoidAsync("setSliderState", _lowerValue, _upperValue);
+                RangeItem.From = from;
+                await OnChange.InvokeAsync();
+                await module.InvokeVoidAsync("setSliderState", ComponentUniqueName, RangeItem.From, RangeItem.To);
             }
         }
     }
 
-    private async Task UpperBoundHandler(ChangeEventArgs args)
+    private async Task ToHandler(ChangeEventArgs args)
     {
         if (module is not null)
         {
-            if (Int32.TryParse(args.Value.ToString(), out _upperValue))
+            if (Int32.TryParse(args.Value.ToString(), out int to))
             {
-                await OnRangeChange.InvokeAsync((_lowerValue, _upperValue));
-                await module.InvokeVoidAsync("setSliderState", _lowerValue, _upperValue);
+                RangeItem.To = to;
+                await OnChange.InvokeAsync();
+                await module.InvokeVoidAsync("setSliderState", ComponentUniqueName, RangeItem.From, RangeItem.To);
             }
         }
     }
@@ -114,9 +122,8 @@
     {
         if (module is not null)
         {
-            await module.InvokeVoidAsync("setSliderState", moneyRangeSliderId, lowerBound, upperBound);
+            await module.InvokeVoidAsync("setSliderState", ComponentUniqueName, lowerBound, upperBound);
         }
     }
 }
 
-*@

@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace DataAccessLib.Models
 {
-    public abstract class DetailsMetadataModel
+    public abstract class DetailsFilterModel
     {
         public virtual bool HasProperty(string propName)
         {

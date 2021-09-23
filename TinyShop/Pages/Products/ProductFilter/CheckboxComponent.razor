@@ -8,13 +8,12 @@
     public KeyValuePair<String, bool> PropToCheck { get; set; }
 
     [Parameter]
-    public EventCallback<KeyValuePair<String, bool>> OnChange { get; set; }
+    public EventCallback OnChange { get; set; }
 
 
     private async Task ChangePropState()
     {
-        PropToCheck = new KeyValuePair<string, bool>(PropToCheck.Key, !PropToCheck.Value);
-        await OnChange.InvokeAsync(PropToCheck);
+        await OnChange.InvokeAsync();
     }
 }
 

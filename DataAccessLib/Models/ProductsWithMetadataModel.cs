@@ -1,4 +1,6 @@
-﻿namespace DataAccessLib.Models
+﻿using System.Collections.Generic;
+
+namespace DataAccessLib.Models
 {
     public class ProductsWithMetadataModel
     {

@@ -11,8 +11,7 @@ namespace DataAccessLib.Models
     public record ProductMetadataModel
     {
         public int FoundRecords { get; set; }
-        public decimal MinPrice { get; set; }
-        public decimal MaxPrice { get; set; }
+        public RangeType Price { get; set; }
 
         // Если в jsone нет поля DetailsMetadata и не указать декаратор то получим рантайм ошибку
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]

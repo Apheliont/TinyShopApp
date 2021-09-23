@@ -1,4 +1,5 @@
-﻿@inject IStringLocalizer<App> Localizer
+﻿@using System.Reflection
+@inject IStringLocalizer<App> Localizer
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
@@ -9,26 +10,24 @@
             @Localizer["Price"]
         </div>
         <div class="active content">
-            <MoneyRangeComponent FilterModel="@FilterModel"
-                                 LowerBound="@_lowerBound"
-                                 UpperBound="@_upperBound"
-                                 OnRangeChange="PriceRangeChangeHandler"
-                                 @ref="moneyRangeComponent" />
+            <RangeComponent ComponentUniqueName="Price"
+                            RangeItem="FilterModel.Price"
+                            OnChange="ComponentChanged" />
         </div>
 
 
     </div>
     <div class="item">
-        <span class="ui orange rating"
-              id="@filterRatingId"
-              data-icon="star"
-              data-rating="@FilterModel.MinRating"
-              data-max-rating="5"></span>  @Localizer["Rating from and above"]
+        <RatingComponent ComponentUniqueName="Rating"
+                         Text="Rating from and above"
+                         RatingItem="FilterModel.Rating"
+                         OnChange="ComponentChanged" />
     </div>
-    @*@if (FilterDetailsModel is not null)
+    @if (FilterModel.DetailsFilterModel is not null)
     {
+        var details = FilterModel.DetailsFilterModel;
         <div class="ui styled fluid accordion">
-            @foreach (PropertyInfo prop in FilterDetailsModel.GetType().GetProperties())
+            @foreach (PropertyInfo prop in details.GetType().GetProperties())
             {
                 <div class="title">
                     <i class="dropdown icon"></i>
@@ -37,16 +36,19 @@
                 <div class="content">
                     @switch (prop.PropertyType)
                     {
-                        case Type t when t == typeof(List<String>):
+                        case Type t when t == typeof(CheckboxListType):
                             <CheckboxListComponent ComponentUniqueName="@prop.Name"
-                                   PropsToCheck="@((List<String>)prop.GetValue(FilterDetailsModel, null))"
+                                   CheckboxList="@((CheckboxListType)prop.GetValue(details, null))"
                                    OnChange="ComponentChanged" />
                             break;
                         case Type t when t == typeof(bool):
-                            <CheckboxComponent PropToCheck="@(new KeyValuePair<String, bool>(prop.Name, (bool)prop.GetValue(FilterDetailsModel, null)))" />
+                            <CheckboxComponent PropToCheck="@(new KeyValuePair<String, bool>(prop.Name, (bool)prop.GetValue(details, null)))"
+                               OnChange="ComponentChanged" />
                             break;
-                        case Type t when t.GetInterfaces().Contains(typeof(IRangeable)):
-                            <p>IT WORKS!!</p>
+                        case Type t when t == typeof(RangeType):
+                            <RangeComponent ComponentUniqueName="@prop.Name"
+                            RangeItem="@((RangeType)prop.GetValue(details, null))"
+                            OnChange="ComponentChanged" />
                             break;
                         default:
                             <p>@prop.Name</p>
@@ -55,7 +57,7 @@
                 </div>
             }
         </div>
-    }*@
+    }
 
     <div class="two ui buttons btn__filterblock">
         <button class="small ui orange button" disabled="@IsApplyDisabled" @onclick="ApplyFilterHandler">
@@ -72,45 +74,27 @@
     public ProductFilterModel FilterModel { get; set; }
 
     [Parameter]
-    public ProductMetadataModel MetadataModel { get; init; }
-
-    [Parameter]
     public EventCallback OnResetFilter { get; set; }
 
     [Parameter]
     public EventCallback OnApplyFilter { get; set; }
 
-    private MoneyRangeComponent moneyRangeComponent;
 
     private bool IsApplyDisabled = true;
     private bool IsResetDisabled = true;
 
-    private string filterRatingId = "filter-rating";
 
     private IJSObjectReference module;
-    private DotNetObjectReference<ProductFilterComponent> thisObjRef;
-    private int _lowerBound;
-    private int _upperBound;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
-            thisObjRef = DotNetObjectReference.Create(this);
-            await module.InvokeVoidAsync("initializeFilterRating", thisObjRef, filterRatingId);
             await module.InvokeVoidAsync("initializeAccordion");
         }
     }
 
-    protected override void OnParametersSet()
-    {
-        if (MetadataModel is not null)
-        {
-            _lowerBound = (int)Math.Floor(MetadataModel.MinPrice);
-            _upperBound = (int)Math.Ceiling(MetadataModel.MaxPrice);
-        }
-    }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
@@ -120,13 +104,6 @@
         }
     }
 
-    private void PriceRangeChangeHandler((int lowerValue, int upperValue) t)
-    {
-        FilterModel.MinPrice = t.lowerValue;
-        FilterModel.MaxPrice = t.upperValue;
-        IsApplyDisabled = false;
-        IsResetDisabled = false;
-    }
 
     private async Task ApplyFilterHandler()
     {
@@ -137,29 +114,18 @@
 
     private async Task ResetFilterHandler()
     {
-        await moneyRangeComponent.SetState(_lowerBound, _upperBound);
-        if (module is not null)
-        {
-            await module.InvokeVoidAsync("setFilterRatingState", filterRatingId, 0);
-        }
+        //await moneyRangeComponent.SetState(_lowerBound, _upperBound);
+        //await module.InvokeVoidAsync("setFilterRatingState", filterRatingId, 0);
+
         await OnResetFilter.InvokeAsync();
         IsApplyDisabled = true;
         IsResetDisabled = true;
     }
 
-    // !!!!!!
-    private async Task ComponentChanged((string, List<string>) data)
-    {
-
-    }
-
-    [JSInvokable]
-    public Task FilterRatingChanged(int rating)
+    // TODO: Delete this
+    private async Task ComponentChanged()
     {
         IsApplyDisabled = false;
         IsResetDisabled = false;
-        FilterModel.MinRating = rating;
-        StateHasChanged();
-        return Task.CompletedTask;
     }
-    }
+}

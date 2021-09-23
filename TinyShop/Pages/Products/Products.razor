@@ -6,6 +6,7 @@
 @using TinyShop.Extensions
 @using TinyShop.Helpers
 @using TinyShop.Pages.Products.ProductFilter
+@using DataAccessLib.Enums
 @inject NavigationManager NavigationManager
 @inject IPurchaseSqlDataService purchaseDataService
 @inject IUserUtilities userUtilities
@@ -26,7 +27,6 @@
         <div class="four wide column">
             <CategoryMenu AccordionCssString="categories-menu" />
             <ProductFilterComponent FilterModel="@FilterModel"
-                                    MetadataModel="@ProductsWithMetadata.Metadata"
                                     OnApplyFilter="ApplyFilterHandler"
                                     OnResetFilter="ResetFilterHandler" />
         </div>
@@ -40,12 +40,12 @@
 @code {
     [Parameter]
     public int CategoryId { get; set; }
+
     public ProductsWithMetadataModel ProductsWithMetadata { get; set; }
 
     public ProductFilterModel FilterModel { get; set; }
 
     private int numberOfPages;
-    private DetailsMetadataModel DetailsMetadataModel;
 
     protected override void OnParametersSet()
     {
@@ -62,9 +62,14 @@
 
         if (ProductsWithMetadata is not null)
         {
+            // TODO: Fix this shit!
+            FilterModel.Price.LowerBound = ProductsWithMetadata.Metadata.Price.LowerBound;
+            FilterModel.Price.UpperBound = ProductsWithMetadata.Metadata.Price.UpperBound;
+            FilterModel.Price.Measurement = ProductsWithMetadata.Metadata.Price.Measurement;
+
             if (ProductsWithMetadata.Metadata.Details is not null)
             {
-                DetailsMetadataModel = MetadataUtils.CreateDetailsMetadata(ProductsWithMetadata.Metadata.Details);
+                FilterModel.DetailsFilterModel = MetadataUtils.CreateDetailsFilter(ProductsWithMetadata.Metadata.Details);
             }
             numberOfPages = (int)(Math.Ceiling((double)ProductsWithMetadata.Metadata.FoundRecords / (int)FilterModel.RowsPerPage));
         }
@@ -88,11 +93,11 @@
         }
         if (NavigationManager.TryGetQueryString<int>("minPrice", out int minPrice))
         {
-            FilterModel.MinPrice = minPrice;
+            FilterModel.Price.From = minPrice;
         }
         if (NavigationManager.TryGetQueryString<int>("maxPrice", out int maxPrice))
         {
-            FilterModel.MaxPrice = maxPrice;
+            FilterModel.Price.To = maxPrice;
         }
         if (NavigationManager.TryGetQueryString<int>("orderBy", out int orderBy))
         {
@@ -117,7 +122,7 @@
         }
         if (NavigationManager.TryGetQueryString<int>("minRating", out int minRating))
         {
-            FilterModel.MinRating = minRating;
+            FilterModel.Rating.CurrentRating = minRating;
         }
     }
 
@@ -151,20 +156,20 @@
         StringBuilder sb = new StringBuilder();
         sb.Append($"/categories/{CategoryId}/products?");
         sb.Append($"page={page}");
-        if (FilterModel.MinPrice is not null)
+        if (FilterModel.Price is not null)
         {
-            sb.Append($"&minPrice={FilterModel.MinPrice}");
+            sb.Append($"&minPrice={FilterModel.Price.From}");
         }
-        if (FilterModel.MaxPrice is not null)
+        if (FilterModel.Price is not null)
         {
-            sb.Append($"&maxPrice={FilterModel.MaxPrice}");
+            sb.Append($"&maxPrice={FilterModel.Price.To}");
         }
         sb.Append($"&orderBy={(int)FilterModel.OrderBy}");
         sb.Append($"&sortOrder={(int)FilterModel.SortOrder}");
         sb.Append($"&rowsPerPage={(int)FilterModel.RowsPerPage}");
-        if (FilterModel.MinRating != 0)
+        if (FilterModel.Rating.CurrentRating != 0)
         {
-            sb.Append($"&minRating={FilterModel.MinRating}");
+            sb.Append($"&minRating={FilterModel.Rating.CurrentRating}");
         }
 
         NavigationManager.NavigateTo(sb.ToString());

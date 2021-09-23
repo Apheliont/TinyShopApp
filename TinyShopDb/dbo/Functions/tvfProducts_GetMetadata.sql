@@ -8,8 +8,8 @@
 RETURNS @returntable TABLE
 (
 	[FoundRecords] INT NULL,
-	[MinPrice] MONEY NULL,
-	[MaxPrice] MONEY NULL
+	[MinPrice] INT NULL,
+	[MaxPrice] INT NULL
 )
 AS
 BEGIN
@@ -39,8 +39,8 @@ BEGIN
 			AND (@MaxPrice IS NULL OR Price <= @MaxPrice)
 			AND (ISNULL(Rating, 0) >= @MinRating)
 		) AS [FoundRecords],
-	MIN(Price) AS [MinPrice],
-	MAX(Price) AS [MaxPrice]
+	FLOOR(MIN(Price)) AS [MinPrice],
+	CEILING(MAX(Price)) AS [MaxPrice]
 	FROM @TmpTable
 	RETURN
 END
