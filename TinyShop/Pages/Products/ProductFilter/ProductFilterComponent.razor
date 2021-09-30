@@ -38,7 +38,7 @@
                     {
                         case Type t when t == typeof(CheckboxListType):
                             <CheckboxListComponent ComponentUniqueName="@prop.Name"
-                                   CheckboxList="@((CheckboxListType)prop.GetValue(details, null))"
+                                   CheckboxListItem="@((CheckboxListType)prop.GetValue(details, null))"
                                    OnChange="ComponentChanged" />
                             break;
                         case Type t when t == typeof(bool):

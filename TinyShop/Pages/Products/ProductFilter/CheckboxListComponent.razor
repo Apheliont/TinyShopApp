@@ -1,7 +1,7 @@
-﻿@if (CheckboxList is not null)
+﻿@if (CheckboxListItem is not null)
 {
     <div class="list">
-        @foreach (string name in CheckboxList.Names)
+        @foreach (string name in CheckboxListItem.Names)
         {
             <div class="item">
                 <div class="ui child checkbox">
@@ -15,7 +15,7 @@
 
 @code {
     [Parameter]
-    public CheckboxListType CheckboxList { get; set; }
+    public CheckboxListType CheckboxListItem { get; set; }
 
     [Parameter]
     public String ComponentUniqueName { get; set; }
@@ -25,7 +25,7 @@
 
     private async Task ChangeCheckboxState(string name)
     {
-        if (CheckboxList.ChangeCheckboxState(name))
+        if (CheckboxListItem.ChangeCheckboxState(name))
         {
             await OnChange
             .InvokeAsync();
