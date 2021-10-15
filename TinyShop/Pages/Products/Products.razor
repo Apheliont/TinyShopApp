@@ -49,16 +49,18 @@
 
     protected override void OnParametersSet()
     {
-        InitFilterModel();
-        InitializeData();
+        if (FilterModel is null)
+        {
+            InitFilterModel();
+        }
+         InitializeData();
     }
 
 
     private void InitializeData()
     {
-        GetQueryStringValues();
-
-        ProductsWithMetadata = dataService.GetFilteredWithMetadata(FilterModel);
+        //GetQueryStringValues();
+        ProductsWithMetadata = dataService.GetFilteredWithMetadata(TransformModelUtils.CreateFilterDto(FilterModel));
 
         if (ProductsWithMetadata is not null)
         {
@@ -67,9 +69,9 @@
             FilterModel.Price.UpperBound = ProductsWithMetadata.Metadata.Price.UpperBound;
             FilterModel.Price.Measurement = ProductsWithMetadata.Metadata.Price.Measurement;
 
-            if (ProductsWithMetadata.Metadata.Details is not null)
+            if (ProductsWithMetadata.Metadata.Details is not null && FilterModel.DetailsFilterModel is null)
             {
-                FilterModel.DetailsFilterModel = MetadataUtils.CreateDetailsFilter(ProductsWithMetadata.Metadata.Details);
+                FilterModel.DetailsFilterModel = TransformModelUtils.CreateDetailsFilter(ProductsWithMetadata.Metadata.Details);
             }
             numberOfPages = (int)(Math.Ceiling((double)ProductsWithMetadata.Metadata.FoundRecords / (int)FilterModel.RowsPerPage));
         }
@@ -79,9 +81,9 @@
     private void InitFilterModel()
     {
         FilterModel = new ProductFilterModel
-        {
-            CategoryId = CategoryId,
-        };
+            {
+                CategoryId = CategoryId,
+            };
     }
 
 

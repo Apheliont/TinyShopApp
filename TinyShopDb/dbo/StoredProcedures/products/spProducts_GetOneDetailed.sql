@@ -10,7 +10,7 @@ BEGIN
 	SET @ProductDetailsSPName = (
 		SELECT cpn.ProductDetailsSPName
 		FROM ProductCategories pc
-		INNER JOIN CategoryProductDetailsSPName cpn
+		INNER JOIN CategoryProductDetails cpn
 		ON cpn.CategoryId = pc.CategoryId
 		WHERE pc.ProductId = @ProductId)
 

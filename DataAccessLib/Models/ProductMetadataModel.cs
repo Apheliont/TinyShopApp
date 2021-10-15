@@ -13,7 +13,6 @@ namespace DataAccessLib.Models
         public int FoundRecords { get; set; }
         public RangeType Price { get; set; }
 
-        // Если в jsone нет поля DetailsMetadata и не указать декаратор то получим рантайм ошибку
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ExpandoObject Details { get; set; }
     }

@@ -38,17 +38,18 @@
                     {
                         case Type t when t == typeof(CheckboxListType):
                             <CheckboxListComponent ComponentUniqueName="@prop.Name"
-                                   CheckboxListItem="@((CheckboxListType)prop.GetValue(details, null))"
-                                   OnChange="ComponentChanged" />
+                                    CheckboxListItem="@((CheckboxListType)prop.GetValue(details, null))"
+                                    OnChange="ComponentChanged" />
                             break;
-                        case Type t when t == typeof(bool):
-                            <CheckboxComponent PropToCheck="@(new KeyValuePair<String, bool>(prop.Name, (bool)prop.GetValue(details, null)))"
-                               OnChange="ComponentChanged" />
+                        case Type t when t == typeof(CheckboxType):
+                            <CheckboxComponent ComponentUniqueName="@prop.Name"
+                                    CheckboxItem="@((CheckboxType)prop.GetValue(details, null))"
+                                    OnChange="ComponentChanged" />
                             break;
                         case Type t when t == typeof(RangeType):
                             <RangeComponent ComponentUniqueName="@prop.Name"
-                            RangeItem="@((RangeType)prop.GetValue(details, null))"
-                            OnChange="ComponentChanged" />
+                                    RangeItem="@((RangeType)prop.GetValue(details, null))"
+                                    OnChange="ComponentChanged" />
                             break;
                         default:
                             <p>@prop.Name</p>

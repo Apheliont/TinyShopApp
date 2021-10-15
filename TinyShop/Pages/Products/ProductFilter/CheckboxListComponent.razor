@@ -18,10 +18,15 @@
     public CheckboxListType CheckboxListItem { get; set; }
 
     [Parameter]
-    public String ComponentUniqueName { get; set; }
+    public String ComponentUniqueName { get; init; }
 
     [Parameter]
     public EventCallback OnChange { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        CheckboxListItem.Init();
+    }
 
     private async Task ChangeCheckboxState(string name)
     {

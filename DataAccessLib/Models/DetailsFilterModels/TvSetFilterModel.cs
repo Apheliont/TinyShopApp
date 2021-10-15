@@ -21,8 +21,7 @@ namespace DataAccessLib.Models
         public RangeType Weight { get; set; }
 
 
-
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public bool Wifi { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public CheckboxType Wifi { get; } = new();
     }
 }

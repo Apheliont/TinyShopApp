@@ -8,7 +8,7 @@ namespace DataAccessLib.Models
         private Dictionary<string, bool> _checkboxesState = new Dictionary<string, bool>();
         public List<string> Names { get; init; }
 
-        public CheckboxListType()
+        public void Init()
         {
             if (Names is not null)
             {
@@ -20,12 +20,12 @@ namespace DataAccessLib.Models
 
         }
 
-        public string GetCheckedItemsAsString()
+        public List<string> GetCheckedItems()
         {
             return _checkboxesState
                 .Where(kvp => kvp.Value == true)
                 .Select(kvp => kvp.Key)
-                .ToString();
+                .ToList();
         }
 
         public bool ChangeCheckboxState(string name)

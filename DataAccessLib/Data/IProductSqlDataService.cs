@@ -1,12 +1,13 @@
 ﻿using DataAccessLib.Models;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Threading.Tasks;
 
 namespace DataAccessLib.Data
 {
     public interface IProductSqlDataService
     {
-        ProductsWithMetadataModel GetFilteredWithMetadata(ProductFilterModel filterModel);
+        ProductsWithMetadataModel GetFilteredWithMetadata(ExpandoObject dynamicFilter);
         DetailedProductModel GetOneDetailed(int productId);
     }
 }

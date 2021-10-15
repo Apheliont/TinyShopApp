@@ -91,8 +91,7 @@
     <Build Include="dbo\Functions\tvfBreadcrumbs_Get.sql" />
     <Build Include="dbo\Triggers\OnProductAdd.sql" />
     <Build Include="dbo\Tables\TvSetDetails.sql" />
-    <Build Include="dbo\Tables\CategoryProductDetailsSPName.sql" />
-    <Build Include="dbo\Tables\CategoryProductDetailsMetadataSPName.sql" />
+    <Build Include="dbo\Tables\CategoryProductDetails.sql" />
     <Build Include="dbo\Functions\sfnToRawJsonArray.sql" />
     <Build Include="dbo\StoredProcedures\products\spProducts_GetFiltered.sql" />
     <Build Include="dbo\StoredProcedures\products\spProducts_GetFilteredWithMetadata.sql" />

@@ -3,6 +3,7 @@ using DataAccessLib.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,21 +17,11 @@ namespace DataAccessLib.Data
             _dataAccess = dataAccess;
         }
 
-        public ProductsWithMetadataModel GetFilteredWithMetadata(ProductFilterModel filterModel)
+        public ProductsWithMetadataModel GetFilteredWithMetadata(ExpandoObject dynamicFilter)
         {
-            // TODO: Flatten filterModel to suitable as a parameter for sql
-            var param = new {
-                PageNumber = filterModel.PageNumber,
-                OrderBy = filterModel.OrderBy,
-                MinPrice = filterModel.Price.From is not null ? filterModel.Price.From : 0,
-                MaxPrice = filterModel.Price.To is not null ? filterModel.Price.To : 99999,
-                SortOrder = filterModel.SortOrder,
-                CategoryId = filterModel.CategoryId,
-                RowsPerPage = filterModel.RowsPerPage
-            };
 
-                string jsonText = _dataAccess
-                        .GetJsonText<dynamic>("spProducts_GetFilteredWithMetadata", param);
+            string jsonText = _dataAccess
+                        .GetJsonText<dynamic>("spProducts_GetFilteredWithMetadata", dynamicFilter);
                 return JsonConvert.DeserializeObject<ProductsWithMetadataModel>(jsonText);
         }
 
