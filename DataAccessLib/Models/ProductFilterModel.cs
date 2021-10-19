@@ -1,10 +1,6 @@
 ﻿using DataAccessLib.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace DataAccessLib.Models
 {
@@ -23,6 +19,6 @@ namespace DataAccessLib.Models
         public RangeType Price { get; set; } = new RangeType();
 
         // Optional field
-        public DetailsFilterModel? DetailsFilterModel {  get; set; }
+        public DetailsFilterModel? DetailsFilterModel { get; set; }
     }
 }

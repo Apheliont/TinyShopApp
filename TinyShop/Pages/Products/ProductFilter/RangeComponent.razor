@@ -1,12 +1,15 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@using TinyShop.Interfaces
+@inject IJSRuntime JSRuntime
+@inject IStringLocalizer<App> Localizer
 @implements IAsyncDisposable
+@implements IResetableComponent
 
 <div class="ui ticked range slider" id="@ComponentUniqueName"></div>
 <div class="ui two column grid">
     <div class="row">
         <div class="column">
             <div class="ui fluid right small labeled input">
-                <label for="range-component__lower-bound" class="ui label">@RangeItem.Measurement</label>
+                <label for="range-component__lower-bound" class="ui label">@Localizer[RangeItem.Measurement]</label>
                 <input type="number"
                        id="range-component__lower-bound"
                        class="spinners--disable"
@@ -18,7 +21,7 @@
         </div>
         <div class="column">
             <div class="ui fluid right small labeled input">
-                <label for="range-component__upper-bound" class="ui label">@RangeItem.Measurement</label>
+                <label for="range-component__upper-bound" class="ui label">@Localizer[RangeItem.Measurement]</label>
                 <input type="number"
                        id="range-component__upper-bound"
                        class="spinners--disable"
@@ -32,6 +35,9 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    public List<IResetableComponent> ChildComponentList { get; set; }
+
     [Parameter]
     public RangeType RangeItem { get; set; }
 
@@ -69,6 +75,11 @@
     {
         RangeItem.From = RangeItem.From is not null ? RangeItem.From : RangeItem.LowerBound;
         RangeItem.To = RangeItem.To is not null ? RangeItem.To : RangeItem.UpperBound;
+    }
+
+    protected override void OnInitialized()
+    {
+        ChildComponentList.Add(this);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -118,11 +129,13 @@
         }
     }
 
-    public async Task SetState(int lowerBound, int upperBound)
+    public void Reset()
     {
+        RangeItem.Reset();
+
         if (module is not null)
         {
-            await module.InvokeVoidAsync("setSliderState", ComponentUniqueName, lowerBound, upperBound);
+            module.InvokeVoidAsync("setSliderState", ComponentUniqueName, RangeItem.LowerBound, RangeItem.UpperBound);
         }
     }
 }

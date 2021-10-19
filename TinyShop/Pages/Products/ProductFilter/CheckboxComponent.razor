@@ -1,10 +1,14 @@
-﻿<div class="ui child checkbox">
+﻿@using TinyShop.Interfaces
+@implements IResetableComponent
+
+<div class="ui child checkbox">
     <input type="checkbox" @onchange="async () => await ChangePropState()">
     <label>@ComponentUniqueName</label>
 </div>
 
 @code {
-
+    [CascadingParameter]
+    public List<IResetableComponent> ChildComponentList { get; set; }
 
     [Parameter]
     public String ComponentUniqueName { get; set; }
@@ -20,6 +24,17 @@
     {
         CheckboxItem.ChangeCheckboxState();
         await OnChange.InvokeAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+        ChildComponentList.Add(this);
+    }
+
+    public void Reset()
+    {
+        CheckboxItem.Reset();
+        StateHasChanged();
     }
 }
 

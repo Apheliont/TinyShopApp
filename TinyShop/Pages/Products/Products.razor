@@ -49,30 +49,19 @@
 
     protected override void OnParametersSet()
     {
-        if (FilterModel is null)
-        {
-            InitFilterModel();
-        }
-         InitializeData();
+        InitFilterModel();
+        InitializeData();
     }
 
 
     private void InitializeData()
     {
-        //GetQueryStringValues();
+        GetQueryStringValues();
         ProductsWithMetadata = dataService.GetFilteredWithMetadata(TransformModelUtils.CreateFilterDto(FilterModel));
 
         if (ProductsWithMetadata is not null)
         {
-            // TODO: Fix this shit!
-            FilterModel.Price.LowerBound = ProductsWithMetadata.Metadata.Price.LowerBound;
-            FilterModel.Price.UpperBound = ProductsWithMetadata.Metadata.Price.UpperBound;
-            FilterModel.Price.Measurement = ProductsWithMetadata.Metadata.Price.Measurement;
-
-            if (ProductsWithMetadata.Metadata.Details is not null && FilterModel.DetailsFilterModel is null)
-            {
-                FilterModel.DetailsFilterModel = TransformModelUtils.CreateDetailsFilter(ProductsWithMetadata.Metadata.Details);
-            }
+            TransformModelUtils.FillupFilterModel(ProductsWithMetadata.Metadata, FilterModel);
             numberOfPages = (int)(Math.Ceiling((double)ProductsWithMetadata.Metadata.FoundRecords / (int)FilterModel.RowsPerPage));
         }
 
@@ -93,14 +82,7 @@
         {
             FilterModel.PageNumber = pageNumber;
         }
-        if (NavigationManager.TryGetQueryString<int>("minPrice", out int minPrice))
-        {
-            FilterModel.Price.From = minPrice;
-        }
-        if (NavigationManager.TryGetQueryString<int>("maxPrice", out int maxPrice))
-        {
-            FilterModel.Price.To = maxPrice;
-        }
+
         if (NavigationManager.TryGetQueryString<int>("orderBy", out int orderBy))
         {
             if (Enum.IsDefined(typeof(OrderByEnum), orderBy))
@@ -121,10 +103,6 @@
             {
                 FilterModel.RowsPerPage = (RowsPerPageEnum)rowsPerPage;
             }
-        }
-        if (NavigationManager.TryGetQueryString<int>("minRating", out int minRating))
-        {
-            FilterModel.Rating.CurrentRating = minRating;
         }
     }
 
@@ -158,21 +136,10 @@
         StringBuilder sb = new StringBuilder();
         sb.Append($"/categories/{CategoryId}/products?");
         sb.Append($"page={page}");
-        if (FilterModel.Price is not null)
-        {
-            sb.Append($"&minPrice={FilterModel.Price.From}");
-        }
-        if (FilterModel.Price is not null)
-        {
-            sb.Append($"&maxPrice={FilterModel.Price.To}");
-        }
+
         sb.Append($"&orderBy={(int)FilterModel.OrderBy}");
         sb.Append($"&sortOrder={(int)FilterModel.SortOrder}");
         sb.Append($"&rowsPerPage={(int)FilterModel.RowsPerPage}");
-        if (FilterModel.Rating.CurrentRating != 0)
-        {
-            sb.Append($"&minRating={FilterModel.Rating.CurrentRating}");
-        }
 
         NavigationManager.NavigateTo(sb.ToString());
     }
@@ -186,7 +153,7 @@
 
     private void ResetFilterHandler()
     {
-        InitFilterModel();
+        FilterModel.PageNumber = 1;
         PageHasChanged(FilterModel.PageNumber);
     }
 

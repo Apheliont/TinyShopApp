@@ -200,6 +200,7 @@ BEGIN
 				FOR JSON PATH
 			  ) AS Images
 			  FROM #AllProductsTable apt'
+			+ ' ' + @OrderAndFetch
 			+ ' FOR JSON AUTO)'
 			EXECUTE sp_executesql @sqlCommand,
 			N'@ProductsJson NVARCHAR(MAX) OUTPUT,

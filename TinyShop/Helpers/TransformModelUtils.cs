@@ -12,14 +12,23 @@ namespace TinyShop.Helpers;
 
 public static class TransformModelUtils
 {
-    public static DetailsFilterModel CreateDetailsFilter(ExpandoObject obj)
+    public static void FillupFilterModel(ProductMetadataModel metadata, ProductFilterModel filter)
     {
-        if (obj == null)
+        if (metadata is null || filter is null)
         {
-            throw new ArgumentNullException(nameof(obj));
+            throw new ArgumentNullException();
         }
+
+        filter.Price.LowerBound = metadata.Price.LowerBound;
+        filter.Price.UpperBound = metadata.Price.UpperBound;
+        filter.Price.Measurement = metadata.Price.Measurement;
+
+        if (filter.DetailsFilterModel is not null || metadata.Details is null) {
+            return;
+        }
+
         // Getting @string name of what DetailsMetadatamodel to instantiate
-        string modelToInstatiate = (string)obj
+        string modelToInstatiate = (string)metadata.Details
                                     .Where(kvp => kvp.Key == "DetailsFilterModelName")
                                     .First()
                                     .Value;
@@ -28,13 +37,18 @@ public static class TransformModelUtils
         // Creating instance of particulare DetailsMetadatamodel
         DetailsFilterModel DetailsFilterModel = Activator.CreateInstance(objTypeToInstantiate) as DetailsFilterModel;
 
-        var configuration = new MapperConfiguration(cfg => { });
+        var configuration = new MapperConfiguration(cfg => {
+            cfg
+            .CreateMap<object, CheckboxListType>()
+            .ConvertUsing(s => new CheckboxListType(((List<object>)s)
+                .Select(el => el.ToString()).ToList()));
+        });
         var mapper = configuration.CreateMapper();
         // Preparing data source. Data source is an ExpandoObject, but we need strogly typed one
-        var source = (IDictionary<string, object>)obj;
+        var source = (IDictionary<string, object>)metadata.Details;
         // Mapping data from expando object to statically typed one
         var result = mapper.Map(source, DetailsFilterModel, source.GetType(), objTypeToInstantiate);
-        return result as DetailsFilterModel;
+        filter.DetailsFilterModel =  result as DetailsFilterModel;
     }
 
     public static ExpandoObject CreateFilterDto(ProductFilterModel filterModel)

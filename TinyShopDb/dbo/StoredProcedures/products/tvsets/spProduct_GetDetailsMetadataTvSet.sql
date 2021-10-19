@@ -6,7 +6,7 @@ SET NOCOUNT ON
 	BEGIN
 		SELECT @JsonResult = (SELECT
 				'TvSetFilterModel'		AS 'DetailsFilterModelName'
-				,'YearOfManufacture.Names' = 	(JSON_QUERY((SELECT [dbo].sfnToRawJsonArray(
+				,'YearOfManufacture' = 	(JSON_QUERY((SELECT [dbo].sfnToRawJsonArray(
 											(SELECT DISTINCT YearOfManufacture
 											FROM TvSetDetails
 											ORDER BY YearOfManufacture DESC
@@ -14,14 +14,14 @@ SET NOCOUNT ON
 				,MIN(p.ScreenSize)				AS 'ScreenSize.LowerBound'
 				,MAX(p.ScreenSize)				AS 'ScreenSize.UpperBound'
 				,'inch'							AS 'ScreenSize.Measurement'
-				,'ScreenResolution.Names' =	(JSON_QUERY((SELECT [dbo].sfnToRawJsonArray(
+				,'ScreenResolution' =	(JSON_QUERY((SELECT [dbo].sfnToRawJsonArray(
 											(SELECT DISTINCT ScreenResolution
 											 FROM TvSetDetails FOR JSON AUTO),
 											 'ScreenResolution'))))
 				,MIN(p.RefreshRate)				AS 'RefreshRate.LowerBound'
 				,MAX(p.RefreshRate)				AS 'RefreshRate.UpperBound'
 				,'hz'							AS 'RefreshRate.Measurement'
-				,'MatrixType.Names' =			(JSON_QUERY((SELECT [dbo].sfnToRawJsonArray(
+				,'MatrixType' =			(JSON_QUERY((SELECT [dbo].sfnToRawJsonArray(
 											(SELECT DISTINCT MatrixType
 											FROM TvSetDetails
 											ORDER BY MatrixType DESC

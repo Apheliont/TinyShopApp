@@ -67,13 +67,19 @@ export function initializeRatings() {
     $('.ui.rating.product').rating();
 }
 
-export function initializeFilterRating(dotNetObj, ratingElementId) {
+export function initializeRating(dotNetObj, ratingElementId) {
     $(`#${ratingElementId}`).rating({
         onRate: async function(value) {
-            return await dotNetObj.invokeMethodAsync('FilterRatingChanged', value);
+            return await dotNetObj.invokeMethodAsync('RatingChanged', value);
         }
     });
 }
+
+export function resetRating(ratingElementId) {
+    $(`#${ratingElementId}`).rating('clear rating');
+}
+
+
 
 export function setFilterRatingState(ratingElementId, value) {
     $(`#${ratingElementId}`).rating('set rating', value);

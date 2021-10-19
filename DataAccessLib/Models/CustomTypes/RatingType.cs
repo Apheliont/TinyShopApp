@@ -25,5 +25,10 @@ namespace DataAccessLib.Models
 
             }
         }
+
+        public void Reset()
+        {
+            _currentRating = 0;
+        }
     }
 }

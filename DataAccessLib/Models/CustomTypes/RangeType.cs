@@ -13,5 +13,11 @@ namespace DataAccessLib.Models
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int? To {  get; set; }
 
+        public void Reset()
+        {
+            From = null;
+            To = null;
+        }
+
     }
 }

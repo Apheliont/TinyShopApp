@@ -1,74 +1,78 @@
 ﻿@using System.Reflection
+@using TinyShop.Interfaces
 @inject IStringLocalizer<App> Localizer
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
-<div class="ui fluid vertical menu">
-    <div class="ui styled fluid accordion">
-        <div class="active title">
-            <i class="dropdown icon"></i>
-            @Localizer["Price"]
-        </div>
-        <div class="active content">
-            <RangeComponent ComponentUniqueName="Price"
-                            RangeItem="FilterModel.Price"
-                            OnChange="ComponentChanged" />
-        </div>
-
-
-    </div>
-    <div class="item">
-        <RatingComponent ComponentUniqueName="Rating"
-                         Text="Rating from and above"
-                         RatingItem="FilterModel.Rating"
-                         OnChange="ComponentChanged" />
-    </div>
-    @if (FilterModel.DetailsFilterModel is not null)
-    {
-        var details = FilterModel.DetailsFilterModel;
+<CascadingValue Value="@ChildComponentList">
+    <div class="ui fluid vertical menu">
         <div class="ui styled fluid accordion">
-            @foreach (PropertyInfo prop in details.GetType().GetProperties())
-            {
-                <div class="title">
-                    <i class="dropdown icon"></i>
-                    @prop.Name
-                </div>
-                <div class="content">
-                    @switch (prop.PropertyType)
-                    {
-                        case Type t when t == typeof(CheckboxListType):
-                            <CheckboxListComponent ComponentUniqueName="@prop.Name"
-                                    CheckboxListItem="@((CheckboxListType)prop.GetValue(details, null))"
-                                    OnChange="ComponentChanged" />
-                            break;
-                        case Type t when t == typeof(CheckboxType):
-                            <CheckboxComponent ComponentUniqueName="@prop.Name"
-                                    CheckboxItem="@((CheckboxType)prop.GetValue(details, null))"
-                                    OnChange="ComponentChanged" />
-                            break;
-                        case Type t when t == typeof(RangeType):
-                            <RangeComponent ComponentUniqueName="@prop.Name"
-                                    RangeItem="@((RangeType)prop.GetValue(details, null))"
-                                    OnChange="ComponentChanged" />
-                            break;
-                        default:
-                            <p>@prop.Name</p>
-                            break;
-                    }
-                </div>
-            }
-        </div>
-    }
+            <div class="active title">
+                <i class="dropdown icon"></i>
+                @Localizer["Price"]
+            </div>
 
-    <div class="two ui buttons btn__filterblock">
-        <button class="small ui orange button" disabled="@IsApplyDisabled" @onclick="ApplyFilterHandler">
-            @Localizer["Apply"]
-        </button>
-        <button class="small ui red button" disabled="@IsResetDisabled" @onclick="ResetFilterHandler">
-            @Localizer["Reset"]
-        </button>
+            <div class="active content">
+                <RangeComponent ComponentUniqueName="Price"
+                                RangeItem="FilterModel.Price"
+                                OnChange="ComponentChanged" />
+            </div>
+
+
+        </div>
+        <div class="item">
+            <RatingComponent ComponentUniqueName="Rating"
+                             Text="Rating from and above"
+                             RatingItem="FilterModel.Rating"
+                             OnChange="ComponentChanged" />
+        </div>
+        @if (FilterModel.DetailsFilterModel is not null)
+        {
+            var details = FilterModel.DetailsFilterModel;
+            <div class="ui styled fluid accordion">
+                @foreach (PropertyInfo prop in details.GetType().GetProperties())
+                {
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        @Localizer[details.DescriptionAttr(prop.Name)]
+                    </div>
+                    <div class="content">
+                        @switch (prop.PropertyType)
+                        {
+                            case Type t when t == typeof(CheckboxListType):
+                                <CheckboxListComponent ComponentUniqueName="@prop.Name"
+                                       CheckboxListItem="@((CheckboxListType)prop.GetValue(details, null))"
+                                       OnChange="ComponentChanged" />
+                                break;
+                            case Type t when t == typeof(CheckboxType):
+                                <CheckboxComponent ComponentUniqueName="@prop.Name"
+                                   CheckboxItem="@((CheckboxType)prop.GetValue(details, null))"
+                                   OnChange="ComponentChanged" />
+                                break;
+                            case Type t when t == typeof(RangeType):
+                                <RangeComponent ComponentUniqueName="@prop.Name"
+                                RangeItem="@((RangeType)prop.GetValue(details, null))"
+                                OnChange="ComponentChanged" />
+                                break;
+                            default:
+                                <p>@prop.Name</p>
+                                break;
+                        }
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="two ui buttons btn__filterblock">
+            <button class="small ui orange button" disabled="@IsApplyDisabled" @onclick="ApplyFilterHandler">
+                @Localizer["Apply"]
+            </button>
+            <button class="small ui red button" disabled="@IsResetDisabled" @onclick="ResetFilterHandler">
+                @Localizer["Reset"]
+            </button>
+        </div>
     </div>
-</div>
+</CascadingValue>
 
 @code {
     [Parameter]
@@ -80,6 +84,7 @@
     [Parameter]
     public EventCallback OnApplyFilter { get; set; }
 
+    public List<IResetableComponent> ChildComponentList = new();
 
     private bool IsApplyDisabled = true;
     private bool IsResetDisabled = true;
@@ -115,9 +120,7 @@
 
     private async Task ResetFilterHandler()
     {
-        //await moneyRangeComponent.SetState(_lowerBound, _upperBound);
-        //await module.InvokeVoidAsync("setFilterRatingState", filterRatingId, 0);
-
+        ChildComponentList.ForEach(component => component.Reset());
         await OnResetFilter.InvokeAsync();
         IsApplyDisabled = true;
         IsResetDisabled = true;

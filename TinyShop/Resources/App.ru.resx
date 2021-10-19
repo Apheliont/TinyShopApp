@@ -138,11 +138,17 @@
   <data name="Categories" xml:space="preserve">
     <value>Категории</value>
   </data>
+  <data name="cm" xml:space="preserve">
+    <value>см</value>
+  </data>
   <data name="ConfirmPassword" xml:space="preserve">
     <value>Подтверждение пароля</value>
   </data>
   <data name="Contact phone" xml:space="preserve">
     <value>Телефон</value>
+  </data>
+  <data name="Depth" xml:space="preserve">
+    <value>Глубина</value>
   </data>
   <data name="Description" xml:space="preserve">
     <value>Описание</value>
@@ -162,6 +168,9 @@
   <data name="Goods" xml:space="preserve">
     <value>Товары</value>
   </data>
+  <data name="Height" xml:space="preserve">
+    <value>Высота</value>
+  </data>
   <data name="Hello" xml:space="preserve">
     <value>Привет</value>
   </data>
@@ -171,6 +180,15 @@
   <data name="Home" xml:space="preserve">
     <value>Домой</value>
   </data>
+  <data name="hz" xml:space="preserve">
+    <value>гц</value>
+  </data>
+  <data name="inch" xml:space="preserve">
+    <value>дм</value>
+  </data>
+  <data name="kg" xml:space="preserve">
+    <value>кг</value>
+  </data>
   <data name="Language" xml:space="preserve">
     <value>Язык</value>
   </data>
@@ -179,6 +197,9 @@
   </data>
   <data name="Logout" xml:space="preserve">
     <value>Выйти</value>
+  </data>
+  <data name="Matrix type" xml:space="preserve">
+    <value>Тип матрицы</value>
   </data>
   <data name="No picture available" xml:space="preserve">
     <value>Изображение отсутствует</value>
@@ -204,6 +225,9 @@
   <data name="Rating from and above" xml:space="preserve">
     <value>Рейтинг от и выше</value>
   </data>
+  <data name="Refresh rate" xml:space="preserve">
+    <value>Частота обновления</value>
+  </data>
   <data name="Register" xml:space="preserve">
     <value>Регистрация</value>
   </data>
@@ -225,8 +249,17 @@
   <data name="Reviews" xml:space="preserve">
     <value>Отзывы</value>
   </data>
+  <data name="Rub" xml:space="preserve">
+    <value>Руб</value>
+  </data>
   <data name="Sales" xml:space="preserve">
     <value>Скидки</value>
+  </data>
+  <data name="Screen resolution" xml:space="preserve">
+    <value>Разрешение экрана</value>
+  </data>
+  <data name="Screen size" xml:space="preserve">
+    <value>Размер экрана</value>
   </data>
   <data name="Search" xml:space="preserve">
     <value>Искать</value>
@@ -248,6 +281,15 @@
   </data>
   <data name="To" xml:space="preserve">
     <value>До</value>
+  </data>
+  <data name="Weight" xml:space="preserve">
+    <value>Вес</value>
+  </data>
+  <data name="Width" xml:space="preserve">
+    <value>Ширина</value>
+  </data>
+  <data name="Year of manufacture" xml:space="preserve">
+    <value>Год выпуска</value>
   </data>
   <data name="Your location" xml:space="preserve">
     <value>Местоположение</value>
