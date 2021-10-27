@@ -42,7 +42,7 @@
                     }
                     else
                     {
-                        <img src="img/products/product-no-photo-placeholder.jpg" alt="@Localizer["No picture available"]" loading="lazy">
+                        <img src=@JsInteropConstants.ProductNoImgPlaceholderPath alt="@Localizer["No picture available"]" loading="lazy">
                     }
                 </div>
                 <div class="product-list__content-container">
@@ -59,7 +59,10 @@
                         @Math.Round(@product.Price, 2)<span>₽</span>
                     </div>
                     <div class="product-list__buy-to-cart">
-                        <button class="product-list__buy-to-cart-btn" @onclick="async () => { await AddToCartHandler(product.Id); }">@Localizer["Add to cart"]</button>
+                        <button class="product-list__buy-to-cart-btn"
+                                @onclick="async () => { await AddToCartHandler(product.Id); }">
+                                    @Localizer["Add to cart"]
+                        </button>
                     </div>
                 </div>
             </div>
@@ -85,13 +88,13 @@
     {
         if (firstRender)
         {
-            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
-            await module.InvokeVoidAsync("fadeUpItems", productListItemClass);
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
+            await module.InvokeVoidAsync(JsInteropConstants.FadeUpFuncName, productListItemClass);
         }
         if (module is not null)
         {
-            var initRating = module.InvokeVoidAsync("initializeRatings");
-            var makeItemsVisible = module.InvokeVoidAsync("makeItemsVisible", productListItemClass);
+            var initRating = module.InvokeVoidAsync(JsInteropConstants.InitRatingFuncName);
+            var makeItemsVisible = module.InvokeVoidAsync(JsInteropConstants.MakeVisibleFuncName, productListItemClass);
             await Task.WhenAll(makeItemsVisible.AsTask(), initRating.AsTask());
         }
     }
@@ -113,13 +116,13 @@
     {
         if (currentlyOppenedCarousel == carouselId) return;
         currentlyOppenedCarousel = carouselId;
-        await module.InvokeVoidAsync("hideElements", productCarouselClass);
-        await module.InvokeVoidAsync("showElement", carouselId);
+        await module.InvokeVoidAsync(JsInteropConstants.HideElementsFuncName, productCarouselClass);
+        await module.InvokeVoidAsync(JsInteropConstants.ShowElementFuncName, carouselId);
     }
 
     private async Task CloseButtonHandler(string carouselId)
     {
         currentlyOppenedCarousel = "";
-        await module.InvokeVoidAsync("hideElement", carouselId);
+        await module.InvokeVoidAsync(JsInteropConstants.HideElementFuncName, carouselId);
     }
 }

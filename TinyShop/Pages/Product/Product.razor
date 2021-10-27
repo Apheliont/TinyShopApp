@@ -3,7 +3,6 @@
 @inject IStringLocalizer<App> Localizer
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
-@using TinyShop.Helpers
 @inject IUserUtilities userUtilities
 @inject IPurchaseSqlDataService purchaseDataService
 @inject IProductSqlDataService productDataService
@@ -33,7 +32,7 @@
                         }
                         else
                         {
-                            <img src="/img/products/product-no-photo-placeholder.jpg" alt="@Localizer["No picture available"]" />
+                            <img src=@JsInteropConstants.ProductNoImgPlaceholderPath alt="@Localizer["No picture available"]" />
                         }
                     </div>
                 </div>
@@ -112,8 +111,8 @@
     {
         if (firstRender)
         {
-            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
-            await module.InvokeVoidAsync("initializeTab");
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
+            await module.InvokeVoidAsync(JsInteropConstants.InitTabFuncName);
         }
     }
 
@@ -131,12 +130,12 @@
     {
         if (module is not null)
         {
-            await module.InvokeVoidAsync("fadeInOut", "product-image__image");
+            await module.InvokeVoidAsync(JsInteropConstants.FadeInOutFuncName, "product-image__image");
         }
         selectedImage = image;
         if (module is not null)
         {
-            await module.InvokeVoidAsync("fadeInOut", "product-image__image");
+            await module.InvokeVoidAsync(JsInteropConstants.FadeInOutFuncName, "product-image__image");
         }
     }
 

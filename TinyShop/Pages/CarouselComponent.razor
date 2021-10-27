@@ -1,0 +1,50 @@
+﻿@using System.IO
+@using Microsoft.AspNetCore.Hosting;
+@inject IJSRuntime JSRuntime
+@inject IWebHostEnvironment env
+@implements IAsyncDisposable
+
+@if (fileNames is not null)
+{
+    <div id="carousel-viewport">
+        <ul id="carousel-wrapper">
+            @foreach (string fileName in fileNames)
+            {
+                <li class="carousel-item"><img src="@Path.Combine(FolderWithPicturesPath.Replace(',', '/'), fileName)" alt="@fileName" class="carousel-img"></li>
+            }
+        </ul>
+    </div>
+}
+
+
+@code {
+    private IJSObjectReference module;
+
+    [Parameter]
+    public string FolderWithPicturesPath { get; set; }
+
+    private IEnumerable<string> fileNames;
+
+    protected override void OnInitialized()
+    {
+        string imgsPath = Path.Combine(env.WebRootPath, FolderWithPicturesPath.Replace(',', '\\'));
+        fileNames = Directory.GetFiles(imgsPath).Select(path => Path.GetFileName(path));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
+            await module.InvokeVoidAsync(JsInteropConstants.InitCarouselFuncName);
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+}

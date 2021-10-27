@@ -84,3 +84,30 @@ export function resetRating(ratingElementId) {
 export function setFilterRatingState(ratingElementId, value) {
     $(`#${ratingElementId}`).rating('set rating', value);
 }
+
+export function initCarousel() {
+    let slideNow = 1;
+    let translateWidth = 0;
+    var slideInterval = 5000;
+
+    const slideCount = $('#carousel-wrapper').children().length;
+
+    function nextSlide() {
+        if (slideNow == slideCount || slideNow <= 0 || slideNow > slideCount) {
+            $('#carousel-wrapper').css('transform', 'translate(0, 0)');
+            slideNow = 1;
+        } else {
+            translateWidth = -$('#carousel-viewport').width() * (slideNow);
+            $('#carousel-wrapper').css({
+                'transform': 'translate(' + translateWidth + 'px, 0)',
+                '-webkit-transform': 'translate(' + translateWidth + 'px, 0)',
+                '-ms-transform': 'translate(' + translateWidth + 'px, 0)',
+            });
+            slideNow++;
+        }
+    }
+
+    $(document).ready(function () {
+        setInterval(nextSlide, slideInterval);
+    });
+}

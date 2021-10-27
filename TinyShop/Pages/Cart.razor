@@ -1,6 +1,6 @@
 ﻿@page "/cart"
-@using TinyShop.Helpers
 @inject IUserUtilities userUtilities
+@inject IStringLocalizer<App> Localizer
 @inject IPurchaseSqlDataService purchaseDataService
 
 @if (purchases is not null)
@@ -10,10 +10,10 @@
         <table class="ui compact celled definition table">
             <thead class="full-width">
                 <tr>
-                    <th>ProductName</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Action</th>
+                    <th>@Localizer["Product name"]</th>
+                    <th>@Localizer["Price"]</th>
+                    <th>@Localizer["Quantity"]</th>
+                    <th>@Localizer["Action"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,10 +39,10 @@
                     <th></th>
                     <th colspan="4">
                         <div class="ui right floated small primary labeled icon button">
-                            <i class="user icon"></i> Buy
+                            <i class="user icon"></i> @Localizer["Buy"]
                         </div>
                         <div class="ui small  button">
-                            Total:
+                            @Localizer["Total"]:
                         </div>
                     </th>
                 </tr>

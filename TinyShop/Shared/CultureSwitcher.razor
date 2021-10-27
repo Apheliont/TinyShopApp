@@ -1,6 +1,6 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using Microsoft.Extensions.Configuration
+@inject NavigationManager NavigationManager
 @inject IStringLocalizer<App> Localizer
-@using Microsoft.Extensions.Configuration
 @inject IConfiguration config
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
@@ -46,10 +46,10 @@
     {
         if (firstRender)
         {
-            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
         }
 
-        await module.InvokeVoidAsync("initializeDropdownMenu");
+        await module.InvokeVoidAsync(JsInteropConstants.InitDropdownMenuFuncName);
     }
 
     private void RequestChangeCulture(ChangeEventArgs e)

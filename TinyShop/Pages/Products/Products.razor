@@ -1,12 +1,11 @@
-﻿@using TinyShop.Shared.Layouts
+﻿@page "/categories/{categoryId:int}/products"
 @layout ProductsLayout
-@page "/categories/{categoryId:int}/products"
-@inject IProductSqlDataService dataService
+@using TinyShop.Shared.Layouts
 @using System.Text;
 @using TinyShop.Extensions
-@using TinyShop.Helpers
 @using TinyShop.Pages.Products.ProductFilter
 @using DataAccessLib.Enums
+@inject IProductSqlDataService dataService
 @inject NavigationManager NavigationManager
 @inject IPurchaseSqlDataService purchaseDataService
 @inject IUserUtilities userUtilities

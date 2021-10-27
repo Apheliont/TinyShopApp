@@ -1,7 +1,13 @@
-﻿@inject IStringLocalizer<App> Localizer
-@page "/"
+﻿@page "/"
 
-<h1>@Localizer["Hello world"]</h1>
+<section class="ui segment carousel-container">
+    <!-- FolderWithPicturesPath is a path where each directory is comma separated --> 
+    <CarouselComponent FolderWithPicturesPath="img,carousel"/>
+</section>
 <h2>@DateTime.Now.ToShortDateString()</h2>
 <h2>@DateTime.Now.ToLongDateString()</h2>
+
+@code {
+    
+}
 

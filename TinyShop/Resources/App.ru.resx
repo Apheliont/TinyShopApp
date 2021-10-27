@@ -117,11 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Action" xml:space="preserve">
+    <value>Действие</value>
+  </data>
   <data name="Add to cart" xml:space="preserve">
     <value>В корзину</value>
   </data>
   <data name="Apply" xml:space="preserve">
     <value>Применить</value>
+  </data>
+  <data name="By" xml:space="preserve">
+    <value>Купить</value>
   </data>
   <data name="By name" xml:space="preserve">
     <value>По названию</value>
@@ -222,6 +228,12 @@
   <data name="Product Id" xml:space="preserve">
     <value>Артикул товара</value>
   </data>
+  <data name="Product name" xml:space="preserve">
+    <value>Название товара</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>Количество</value>
+  </data>
   <data name="Rating from and above" xml:space="preserve">
     <value>Рейтинг от и выше</value>
   </data>
@@ -281,6 +293,9 @@
   </data>
   <data name="To" xml:space="preserve">
     <value>До</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Всего</value>
   </data>
   <data name="Weight" xml:space="preserve">
     <value>Вес</value>

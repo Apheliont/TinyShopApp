@@ -1,8 +1,7 @@
-﻿@inject IStringLocalizer<App> Localizer
-@inject IJSRuntime JSRuntime
-@using TinyShop.Helpers
-@using TinyShop.Extensions
+﻿@using TinyShop.Extensions
 @using DataAccessLib.Enums
+@inject IStringLocalizer<App> Localizer
+@inject IJSRuntime JSRuntime
 @inject ILocalStorage LocalStorage
 @implements IAsyncDisposable
 
@@ -68,10 +67,10 @@
     {
         if (firstRender)
         {
-            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
         }
 
-        await module.InvokeVoidAsync("initializeDropdownMenu");
+        await module.InvokeVoidAsync(JsInteropConstants.InitDropdownMenuFuncName);
     }
 
     protected override void OnParametersSet()
@@ -111,7 +110,7 @@
         if (Int32.TryParse(args.Value.ToString(), out _orderBy))
         {
             FilterModel.OrderBy = (OrderByEnum)_orderBy;
-            await LocalStorage.SetItemAsync("orderBy", _orderBy);
+            await LocalStorage.SetItemAsync(LocalStorageKeys.OrderByItemName, _orderBy);
             await OnSortChange.InvokeAsync();
         }
     }
@@ -121,7 +120,7 @@
         if (Int32.TryParse(args.Value.ToString(), out _rowsPerPage))
         {
             FilterModel.RowsPerPage = (RowsPerPageEnum)_rowsPerPage;
-            await LocalStorage.SetItemAsync("rowsPerPage", _rowsPerPage);
+            await LocalStorage.SetItemAsync(LocalStorageKeys.RowsPerPageItemName, _rowsPerPage);
             await OnSortChange.InvokeAsync();
         }
     }
@@ -139,7 +138,7 @@
         if (Int32.TryParse(args.Value.ToString(), out _sortOrder))
         {
             FilterModel.SortOrder = (SortOrderEnum)_sortOrder;
-            await LocalStorage.SetItemAsync("sortOrder", _sortOrder);
+            await LocalStorage.SetItemAsync(LocalStorageKeys.SortOrderItemName, _sortOrder);
             await OnSortChange.InvokeAsync();
         }
     }

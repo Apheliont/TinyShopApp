@@ -46,10 +46,10 @@
     {
         if (firstRender)
         {
-            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
             thisObjRef = DotNetObjectReference.Create(this);
-            await module.InvokeVoidAsync("initializeRating", thisObjRef, ComponentUniqueName);
-            await module.InvokeVoidAsync("initializeAccordion");
+            await module.InvokeVoidAsync(JsInteropConstants.InitRatingFuncName, thisObjRef, ComponentUniqueName);
+            await module.InvokeVoidAsync(JsInteropConstants.InitAccordionFuncName);
         }
     }
 
@@ -73,7 +73,7 @@
     {
         if (module is not null)
         {
-            module.InvokeVoidAsync("resetRating", ComponentUniqueName);
+            module.InvokeVoidAsync(JsInteropConstants.ResetRatingFuncName, ComponentUniqueName);
         }
     }
 }

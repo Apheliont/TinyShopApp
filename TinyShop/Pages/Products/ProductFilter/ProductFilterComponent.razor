@@ -96,8 +96,8 @@
     {
         if (firstRender)
         {
-            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
-            await module.InvokeVoidAsync("initializeAccordion");
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
+            await module.InvokeVoidAsync(JsInteropConstants.InitAccordionFuncName);
         }
     }
 
@@ -126,8 +126,7 @@
         IsResetDisabled = true;
     }
 
-    // TODO: Delete this
-    private async Task ComponentChanged()
+    private void ComponentChanged()
     {
         IsApplyDisabled = false;
         IsResetDisabled = false;

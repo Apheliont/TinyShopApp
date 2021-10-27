@@ -86,11 +86,11 @@
     {
         if (firstRender)
         {
-            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scripts.js");
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
             // Инициализируем объект контейнер и передаем ему ссылку на экземляр объекта этой страницы
             // Далее ловим его на стороне JS
             thisObjRef = DotNetObjectReference.Create(this);
-            await module.InvokeVoidAsync("initializeSlider", ComponentUniqueName, thisObjRef, RangeItem.LowerBound, RangeItem.UpperBound, RangeItem.From, RangeItem.To, 1);
+            await module.InvokeVoidAsync(JsInteropConstants.InitSliderFuncName, ComponentUniqueName, thisObjRef, RangeItem.LowerBound, RangeItem.UpperBound, RangeItem.From, RangeItem.To, 1);
             StateHasChanged();
         }
     }
@@ -103,7 +103,7 @@
             {
                 RangeItem.From = from;
                 await OnChange.InvokeAsync();
-                await module.InvokeVoidAsync("setSliderState", ComponentUniqueName, RangeItem.From, RangeItem.To);
+                await module.InvokeVoidAsync(JsInteropConstants.SetSliderFuncName, ComponentUniqueName, RangeItem.From, RangeItem.To);
             }
         }
     }
@@ -116,7 +116,7 @@
             {
                 RangeItem.To = to;
                 await OnChange.InvokeAsync();
-                await module.InvokeVoidAsync("setSliderState", ComponentUniqueName, RangeItem.From, RangeItem.To);
+                await module.InvokeVoidAsync(JsInteropConstants.SetSliderFuncName, ComponentUniqueName, RangeItem.From, RangeItem.To);
             }
         }
     }
@@ -135,7 +135,7 @@
 
         if (module is not null)
         {
-            module.InvokeVoidAsync("setSliderState", ComponentUniqueName, RangeItem.LowerBound, RangeItem.UpperBound);
+            module.InvokeVoidAsync(JsInteropConstants.SetSliderFuncName, ComponentUniqueName, RangeItem.LowerBound, RangeItem.UpperBound);
         }
     }
 }
