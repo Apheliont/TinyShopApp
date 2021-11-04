@@ -28,6 +28,15 @@ namespace DataAccessLib.DataAccess
             }
         }
 
+        public async Task<int> GetScalar<U>(string storedProcedure, U parameters)
+        {
+            using (IDbConnection conn = new SqlConnection(_connectionString))
+            {
+                var result = await conn.ExecuteScalarAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+                return (Int32)result;
+            }
+        }
+
         public string GetJsonText<U>(string storedProcedure, U parameters)
         {
             using (IDbConnection conn = new SqlConnection(_connectionString))

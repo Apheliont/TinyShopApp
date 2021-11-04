@@ -26,6 +26,14 @@ namespace DataAccessLib.Data
             });
         }
 
+        public async Task<int> GetItemsCountInCart(string userId)
+        {
+            return await _dataAccess.GetScalar<dynamic>("spPurchases_GetItemsCountInCart", new
+            {
+                UserId = userId
+            });
+        }
+
         public async Task<List<PurchaseModel>> GetAll(string userId)
         {
             return await _dataAccess.GetData<PurchaseModel, dynamic>("spPurchases_GetAllCartItems", new

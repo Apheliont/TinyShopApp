@@ -1,0 +1,32 @@
+﻿@inject IStringLocalizer<App> Localizer
+@inject IUserUtilities userUtilities
+@inject IPurchaseSqlDataService purchaseDataService
+
+<a class="right item" href="/cart">
+    <i class="shopping cart icon"></i>
+    @Localizer["Cart"]
+    @if (cartItemsCount > 0)
+    {
+        <div class="bottom floating ui green circular label">@cartItemsCount</div>
+    }
+
+</a>
+
+@code {
+    private int cartItemsCount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        cartItemsCount = await GetCartItemsCount();
+    }
+
+    private async Task<int> GetCartItemsCount()
+    {
+        string userId = await userUtilities.GetLoggedInUserId();
+        if (userId is not null)
+        {
+            return await purchaseDataService.GetItemsCountInCart(userId);
+        }
+        return 0;
+    }
+}

@@ -7,7 +7,7 @@
 {
     @if (purchases.Any())
     {
-        <table class="ui compact celled definition table">
+        <table class="ui fixed single line compact celled definition table">
             <thead class="full-width">
                 <tr>
                     <th>@Localizer["Product name"]</th>
@@ -20,29 +20,33 @@
                 @foreach (PurchaseModel purchase in purchases)
                 {
                     <tr>
-                        <td>@purchase.ProductName</td>
-                        <td>@purchase.Price</td>
-                        <td>
+                        <td><span class="text-regular">@purchase.ProductName</span></td>
+                        <td>@Math.Round(purchase.Price, 2)</td>
+                        <td style="text-align: center">
                             <div class="ui input focus">
                                 <input type="number"
-                                       min="1"
-                                       value="@purchase.Quantity"
-                                       @onchange="async (args) => { await ChangeQuantityHandler(purchase.Id, args); }">
+                           min="1"
+                           value="@purchase.Quantity"
+                           @onchange="async (args) => { await ChangeQuantityHandler(purchase.Id, args); }">
                             </div>
                         </td>
-                        <td><i class="trash icon" @onclick="async () => { await DeletePurchaseHandler(purchase.Id); }"></i></td>
+                        <td style="text-align: center">
+                            <i class="trash icon" style="cursor: pointer" @onclick="async () => { await DeletePurchaseHandler(purchase.Id); }"></i>
+                        </td>
                     </tr>
                 }
             </tbody>
             <tfoot class="full-width">
                 <tr>
-                    <th></th>
-                    <th colspan="4">
-                        <div class="ui right floated small primary labeled icon button">
-                            <i class="user icon"></i> @Localizer["Buy"]
-                        </div>
-                        <div class="ui small  button">
-                            @Localizer["Total"]:
+                    <th>
+                        <span class="text-bold">@Localizer["Total"]:</span>
+                    </th>
+                    <th>
+                        <span class="text-bold">@totalPrice</span>
+                    </th>
+                    <th colspan="2">
+                        <div class="ui right floated small primary button">
+                            @Localizer["Buy"]
                         </div>
                     </th>
                 </tr>
@@ -53,14 +57,20 @@
 
 @code {
     private List<PurchaseModel> purchases;
-
+    private decimal totalPrice => Math.Round(purchases.Sum(prod => prod.Price * prod.Quantity), 2);
     protected override async Task OnInitializedAsync()
+    {
+        purchases = await GetPurchases();
+    }
+
+    private async Task<List<PurchaseModel>> GetPurchases()
     {
         string userId = await userUtilities.GetLoggedInUserId();
         if (userId is not null)
         {
-            purchases = await purchaseDataService.GetAll(userId);
+            return await purchaseDataService.GetAll(userId);
         }
+        return new List<PurchaseModel>();
     }
 
     private async Task DeletePurchaseHandler(int purchaseId)
@@ -71,10 +81,10 @@
 
     private async Task ChangeQuantityHandler(int purchaseId, ChangeEventArgs args)
     {
-        int q;
-        if (Int32.TryParse(args.Value.ToString(), out q))
+        if (Int32.TryParse(args.Value.ToString(), out int q))
         {
             await purchaseDataService.Update(purchaseId, q);
         }
+        purchases = await GetPurchases();
     }
 }

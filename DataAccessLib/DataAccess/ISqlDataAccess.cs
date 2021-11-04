@@ -11,5 +11,6 @@ namespace DataAccessLib.DataAccess
         List<T> GetWithNestedListData<T, V, U>(string storedProcedure, string nestedProp, U parameters);
         List<T> GetWithNestedObjectData<T, V, U>(string storedProcedure, string nestedProp, U parameters);
         string GetJsonText<U>(string storedProcedure, U parameters);
+        Task<int> GetScalar<U>(string storedProcedure, U parameters);
     }
 }

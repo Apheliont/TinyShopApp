@@ -126,6 +126,9 @@
   <data name="Apply" xml:space="preserve">
     <value>Применить</value>
   </data>
+  <data name="Buy" xml:space="preserve">
+    <value>Купить</value>
+  </data>
   <data name="By" xml:space="preserve">
     <value>Купить</value>
   </data>
