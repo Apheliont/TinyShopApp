@@ -70,6 +70,8 @@
     <Folder Include="dbo\StoredProcedures\images" />
     <Folder Include="dbo\StoredProcedures\breadcrumbs" />
     <Folder Include="dbo\StoredProcedures\products\tvsets" />
+    <Folder Include="dbo\FullText" />
+    <Folder Include="dbo\Post-Deployment" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Categories.sql" />
@@ -108,6 +110,10 @@
     <Build Include="dbo\StoredProcedures\products\tvsets\spProduct_GetDetailsMetadataTvSet.sql" />
     <Build Include="dbo\StoredProcedures\products\tvsets\spProducts_GetDetailsTvSet.sql" />
     <Build Include="dbo\StoredProcedures\purchases\spPurchases_GetItemsCountInCart.sql" />
+    <Build Include="dbo\StoredProcedures\products\spProducts_Search.sql" />
+    <Build Include="dbo\FullText\FullTextCatalog.sql" />
+    <Build Include="dbo\FullText\ProductsFullTextIndex.sql" />
+    <Build Include="dbo\FullText\ProductStopList.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="TinyShopDb.refactorlog" />
@@ -115,5 +121,8 @@
   <ItemGroup>
     <None Include="Publications\TinyShopDb.publish.xml" />
     <None Include="Publications\TinyShopDbRemote.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="dbo\Post-Deployment\PostDeployment.sql" />
   </ItemGroup>
 </Project>

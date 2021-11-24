@@ -1,0 +1,32 @@
+﻿@page "/search/{searchSentence}"
+@using System.Web;
+@inject IStringLocalizer<App> Localizer
+@inject IProductSqlDataService productDataService
+
+
+<div class="ui grid">
+    <div class="sixteen wide column">
+        @if (products is not null && products.Any())
+        {
+            <ProductListComponent Products="@products" />
+        }
+        else
+        {
+            <h2>@Localizer["Sorry, but nothing was found"]</h2>
+        }
+
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string SearchSentence { get; set; }
+
+    private List<ProductModel> products;
+
+    protected override void OnParametersSet()
+    {
+        string decodedUrlString = HttpUtility.UrlDecode(SearchSentence);
+        products = productDataService.SearchProducts(decodedUrlString, 10);
+    }
+}

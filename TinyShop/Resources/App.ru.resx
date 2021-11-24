@@ -156,6 +156,9 @@
   <data name="Contact phone" xml:space="preserve">
     <value>Телефон</value>
   </data>
+  <data name="Cost" xml:space="preserve">
+    <value>Стоимость</value>
+  </data>
   <data name="Depth" xml:space="preserve">
     <value>Глубина</value>
   </data>
@@ -281,6 +284,9 @@
   </data>
   <data name="Show" xml:space="preserve">
     <value>Показать</value>
+  </data>
+  <data name="Sorry, but nothing was found" xml:space="preserve">
+    <value>Извините, ничего не найдено</value>
   </data>
   <data name="Sorry, there's nothing at this address." xml:space="preserve">
     <value>Извините, ничего не найдено</value>

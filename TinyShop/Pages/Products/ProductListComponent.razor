@@ -1,5 +1,7 @@
 ﻿@inject IStringLocalizer<App> Localizer
 @inject IJSRuntime JSRuntime
+@inject IPurchaseDataService purchaseDataService
+@inject AppState AppState
 @implements IAsyncDisposable
 
 @if (Products is not null)
@@ -60,7 +62,7 @@
                     </div>
                     <div class="product-list__buy-to-cart">
                         <button class="product-list__buy-to-cart-btn"
-                                @onclick="async () => { await AddToCartHandler(product.Id); }">
+                                @onclick="async () => { await AddToCartHandler(product); }">
                                     @Localizer["Add to cart"]
                         </button>
                     </div>
@@ -72,9 +74,6 @@
 }
 
 @code {
-    [Parameter]
-    public EventCallback<int> OnAddToCart { get; set; }
-
     [Parameter]
     public List<ProductModel> Products { get; set; }
 
@@ -107,9 +106,17 @@
         }
     }
 
-    private async Task AddToCartHandler(int productId)
+    private async Task AddToCartHandler(ProductModel product)
     {
-        await OnAddToCart.InvokeAsync(productId);
+        var purchase = new PurchaseModel
+        {
+            Id = product.Id,
+            Price = product.Price,
+            ProductName = product.ProductName,
+            Quantity = 1
+        };
+        await purchaseDataService.AddToCart(purchase);
+        AppState.NotifyCartItemsCountChange();
     }
 
     private async Task ImageClickhandler(string carouselId)

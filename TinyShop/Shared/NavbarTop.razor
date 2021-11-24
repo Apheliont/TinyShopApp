@@ -1,4 +1,5 @@
-﻿@inject IStringLocalizer<App> Localizer
+﻿@using TinyShop.Pages.Products
+@inject IStringLocalizer<App> Localizer
 
 <div class="ui attached stackable menu navbar-top">
     <div class="ui container">
@@ -9,10 +10,7 @@
             @Localizer["Sales"]
         </a>
         <div class="item">
-            <div class="ui icon input">
-                <input type="text" placeholder="@Localizer["Search"]">
-                <i class="search link icon"></i>
-            </div>
+            <SearchComponent />
         </div>
         <CartButton />
     </div>

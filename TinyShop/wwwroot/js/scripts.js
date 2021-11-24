@@ -63,13 +63,27 @@ export function fadeInOut(cssClass) {
     $(`.${cssClass}`).transition('fade');
 }
 
+export function flash(cssClass) {
+    $(`.${cssClass}`).animate({
+        zoom: '150%',
+        opacity: 0.25,
+    },
+    300,
+    function () {
+        $(this).animate({
+            zoom: '100%',
+            opacity: 1,
+        }, 300, function () { })
+    })
+}
+
 export function initializeRatings() {
     $('.ui.rating.product').rating();
 }
 
 export function initializeRating(dotNetObj, ratingElementId) {
     $(`#${ratingElementId}`).rating({
-        onRate: async function(value) {
+        onRate: async function (value) {
             return await dotNetObj.invokeMethodAsync('RatingChanged', value);
         }
     });
@@ -111,3 +125,18 @@ export function initCarousel() {
         setInterval(nextSlide, slideInterval);
     });
 }
+
+export function changeItemWidth(itemId, value) {
+    const originalWidth = Math.round($(`#${itemId}`).width());
+    $(`#${itemId}`).animate({ width: originalWidth + value }, {
+        duration: 450,
+    });
+    return originalWidth;
+}
+
+export function setItemWidth(itemId, value) {
+    $(`#${itemId}`).animate({ width: value }, {
+        duration: 450,
+    });
+}
+

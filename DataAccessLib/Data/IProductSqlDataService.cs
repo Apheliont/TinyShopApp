@@ -9,5 +9,6 @@ namespace DataAccessLib.Data
     {
         ProductsWithMetadataModel GetFilteredWithMetadata(ExpandoObject dynamicFilter);
         DetailedProductModel GetOneDetailed(int productId);
+        List<ProductModel> SearchProducts(string searchSentence, int numberOfRecords);
     }
 }

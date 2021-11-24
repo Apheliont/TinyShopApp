@@ -31,5 +31,16 @@ namespace DataAccessLib.Data
                 .GetJsonText<dynamic>("spProducts_GetOneDetailed", new { ProductId = productId });
             return JsonConvert.DeserializeObject<DetailedProductModel>(jsonText);
         }
+
+        public List<ProductModel> SearchProducts(string searchSentence, int numberOfRecords)
+        {
+
+            string jsonText = _dataAccess
+                        .GetJsonText<dynamic>("spProducts_Search", new { 
+                            SearchSentence = searchSentence,
+                            NumberOfRecords = numberOfRecords
+                        });
+            return JsonConvert.DeserializeObject<List<ProductModel>>(jsonText);
+        }
     }
 }
