@@ -30,7 +30,7 @@ BEGIN
 	SELECT 
 		 p.Id
 		,p.ProductName
-		,p.Description
+		,p.[Description]
 		,p.Price
 
 	FROM Products p

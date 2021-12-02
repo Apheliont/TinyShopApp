@@ -1,6 +1,7 @@
 ﻿@inject IStringLocalizer<App> Localizer
 @inject IJSRuntime JSRuntime
 @inject IPurchaseDataService purchaseDataService
+@inject IStringLocalizer<App> Localizer
 @inject AppState AppState
 @implements IAsyncDisposable
 
@@ -15,7 +16,7 @@
             {
                 <div id="@carouselId" class="@productCarouselClass">
                     <button @onclick="() => CloseButtonHandler(carouselId)"
-                            class="product-list__carousel-close-btn">
+                class="product-list__carousel-close-btn">
                         <i class="big times circle outline icon"></i>
                     </button>
                     <div class="product-list__carousel-container">
@@ -61,10 +62,22 @@
                         @Math.Round(@product.Price, 2)<span>₽</span>
                     </div>
                     <div class="product-list__buy-to-cart">
-                        <button class="product-list__buy-to-cart-btn"
-                                @onclick="async () => { await AddToCartHandler(product); }">
+                        @if (Purchases is not null)
+                        {
+                            var foundPurchase = Purchases.Find(item => item.ProductId == product.Id);
+                            if (foundPurchase is not null)
+                            {
+                                <InputNumberComponent Value="@foundPurchase.Quantity"
+                                      OnValueChange=@(async (quantity) => await OnPurchaseQuantityChange(foundPurchase.Id, quantity)) />
+                            }
+                            else
+                            {
+                                <button class="product-list__buy-to-cart-btn"
+                                    @onclick="async () => { await AddToCartHandler(product); }">
                                     @Localizer["Add to cart"]
-                        </button>
+                                </button>
+                            }
+                        }
                     </div>
                 </div>
             </div>
@@ -77,6 +90,7 @@
     [Parameter]
     public List<ProductModel> Products { get; set; }
 
+    private List<PurchaseModel> Purchases;
     private IJSObjectReference module;
     private string currentlyOppenedCarousel = "";
     private string productListItemClass = "product-list__list-item";
@@ -89,12 +103,13 @@
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
             await module.InvokeVoidAsync(JsInteropConstants.FadeUpFuncName, productListItemClass);
+            Purchases = await purchaseDataService.GetAll();
+            StateHasChanged();
         }
         if (module is not null)
         {
-            var initRating = module.InvokeVoidAsync(JsInteropConstants.InitRatingFuncName);
-            var makeItemsVisible = module.InvokeVoidAsync(JsInteropConstants.MakeVisibleFuncName, productListItemClass);
-            await Task.WhenAll(makeItemsVisible.AsTask(), initRating.AsTask());
+            await module.InvokeVoidAsync(JsInteropConstants.InitRatingFuncName);
+            await module.InvokeVoidAsync(JsInteropConstants.MakeVisibleFuncName, productListItemClass);
         }
     }
 
@@ -106,15 +121,33 @@
         }
     }
 
+    private async Task OnPurchaseQuantityChange(int purchaseId, int quantity)
+    {
+        if (quantity > 0)
+        {
+            Purchases.FirstOrDefault(item => item.Id == purchaseId).Quantity = quantity;
+            await purchaseDataService.Update(purchaseId, quantity);
+        }
+        else
+        {
+            Purchases.Remove(Purchases.Single(item => item.Id == purchaseId));
+            await purchaseDataService.Delete(purchaseId);
+            StateHasChanged();
+        }
+        AppState.NotifyCartItemsCountChange();
+    }
+
     private async Task AddToCartHandler(ProductModel product)
     {
         var purchase = new PurchaseModel
-        {
-            Id = product.Id,
-            Price = product.Price,
-            ProductName = product.ProductName,
-            Quantity = 1
-        };
+            {
+                Id = product.Id, // we set Id only for localStorage, when user is logged in this field will be ignored
+                ProductId = product.Id,
+                Price = product.Price,
+                ProductName = product.ProductName,
+                Quantity = 1
+            };
+        Purchases?.Add(purchase);
         await purchaseDataService.AddToCart(purchase);
         AppState.NotifyCartItemsCountChange();
     }

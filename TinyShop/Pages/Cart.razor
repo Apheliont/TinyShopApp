@@ -21,19 +21,22 @@
             <tbody>
                 @foreach (PurchaseModel purchase in purchases)
                 {
+                    var productUrl = $"/products/{purchase.Id}";
                     <tr>
-                        <td><span class="text-regular">@purchase.ProductName</span></td>
-                        <td>@Math.Round(purchase.Price, 2)</td>
-                        <td style="text-align: center">
-                            <div class="ui input focus">
-                                <input type="number"
-                           min="1"
-                           value="@purchase.Quantity"
-                           @onchange="async (args) => { await ChangeQuantityHandler(purchase.Id, args); }">
+                        <td>
+                            <NavLink href="@productUrl" class="text-regular">@purchase.ProductName</NavLink>
+                        </td>
+                        <td>@Math.Round(purchase.Price, 2)<span> ₽ </span></td>
+                        <td style="text-align: center;">
+                            <div style="width: 80%; margin: 0 auto;">
+                                <InputNumberComponent Value="@purchase.Quantity"
+                                          MinValue="1"
+                                          OnValueChange="@(async (quantity) => { await ChangeQuantityHandler(purchase.Id, quantity); })" />
+
                             </div>
                         </td>
                         <td style="text-align: center">
-                            @Math.Round(purchase.Price * purchase.Quantity, 2)
+                            @Math.Round(purchase.Price * purchase.Quantity, 2)<span> ₽ </span>
                         </td>
                         <td style="text-align: center">
                             <i class="trash icon" style="cursor: pointer" @onclick="async () => { await DeletePurchaseHandler(purchase.Id); }"></i>
@@ -47,7 +50,7 @@
                         <span class="text-bold">@Localizer["Total"]:</span>
                     </th>
                     <th>
-                        <span class="text-bold">@totalPrice</span>
+                        <span class="text-bold">@totalPrice</span><span> ₽ </span>
                     </th>
                     <th colspan="3">
                         <div class="ui right floated small primary button">
@@ -87,18 +90,15 @@
         }
     }
 
-    private async Task ChangeQuantityHandler(int purchaseId, ChangeEventArgs args)
+    private async Task ChangeQuantityHandler(int purchaseId, int quantity)
     {
-        if (Int32.TryParse(args.Value.ToString(), out int q))
+        if (await purchaseDataService.Update(purchaseId, quantity))
         {
-            if (await purchaseDataService.Update(purchaseId, q))
+            PurchaseModel purchase = purchases.Find(p => p.Id == purchaseId);
+            if (purchase is not null)
             {
-                PurchaseModel purchase = purchases.Find(p => p.Id == purchaseId);
-                if (purchase is not null)
-                {
-                    purchase.Quantity = q;
-                    AppState.NotifyCartItemsCountChange();
-                }
+                purchase.Quantity = quantity;
+                AppState.NotifyCartItemsCountChange();
             }
         }
     }

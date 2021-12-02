@@ -116,6 +116,22 @@ namespace TinyShop.Helpers
             return 0;
         }
 
+        public async Task<int> GetPurchaseQuantityInCart(int purchaseId)
+        {
+            if (await _localStorage.ContainKeyAsync("shoppingCart"))
+            {
+                string cartStringData = await _localStorage.GetItemAsync<string>("shoppingCart");
+                List<PurchaseModel> shoppingCart = JsonConvert.DeserializeObject<List<PurchaseModel>>(cartStringData);
+                var purchase = shoppingCart.Where(p => p.Id == purchaseId).FirstOrDefault();
+                if (purchase is null)
+                {
+                    return 0;
+                }
+                return purchase.Quantity;
+            }
+            return 0;
+        }
+
         public async Task SetItemAsync<T>(string name, T value)
         {
             await _localStorage.SetItemAsync(name, value);

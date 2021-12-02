@@ -6,8 +6,9 @@ BEGIN
 
 
 	SELECT	 p.Id
+			,pr.Id AS [ProductId]
 			,pr.ProductName
-			,p.Price
+			,pr.Price
 			,p.Quantity
 	FROM	CartPurchases cp
 			INNER JOIN Purchases p

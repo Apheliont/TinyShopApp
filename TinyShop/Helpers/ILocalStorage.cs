@@ -9,6 +9,7 @@ namespace TinyShop.Helpers
         Task AddToCart(PurchaseModel purchase);
         Task<bool> DeletePurchase(int purchaseId);
         Task<int> GetItemsCountInCart();
+        Task<int> GetPurchaseQuantityInCart(int purchaseId);
         Task<List<PurchaseModel>> GetPurchases();
         Task<string> ReadSortingParameters();
         Task SetItemAsync<T>(string name, T value);

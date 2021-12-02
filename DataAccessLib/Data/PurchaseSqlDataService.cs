@@ -34,6 +34,7 @@ namespace DataAccessLib.Data
             });
         }
 
+
         public async Task<List<PurchaseModel>> GetAll(string userId)
         {
             return await _dataAccess.GetData<PurchaseModel, dynamic>("spPurchases_GetAllCartItems", new
@@ -42,16 +43,21 @@ namespace DataAccessLib.Data
             });
         }
 
-        public async Task Delete(int purchaseId)
+        public async Task Delete(string userId, int purchaseId)
         {
-            await _dataAccess.SaveData<dynamic>("spPurchases_Delete", new { PurchaseId = purchaseId });
+            await _dataAccess.SaveData<dynamic>("spPurchases_Delete",
+                new { 
+                    PurchaseId = purchaseId,
+                    UserId = userId
+                });
         }
 
-        public async Task Update(int purchaseId, int quantity)
+        public async Task Update(string userId, int purchaseId, int quantity)
         {
             await _dataAccess.SaveData<dynamic>("spPurchases_Update",
             new
             {
+                UserId = userId,
                 PurchaseId = purchaseId,
                 Quantity = quantity > 0 ? quantity : 1
             });

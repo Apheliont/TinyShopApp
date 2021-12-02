@@ -4,13 +4,9 @@ AS
 BEGIN
 	SET NOCOUNT ON
 
-	SELECT SUM(p.Quantity)
-	FROM	CartPurchases cp
-			INNER JOIN Purchases p
-			ON p.Id = cp.PurchaseId
-	WHERE	cp.CartId = (
-			SELECT CartId
-			FROM UserCarts c
-			WHERE c.UserId = @UserId
-			) AND p.CheckoutDate IS NULL
+	DECLARE @CartId INT = (SELECT CartId FROM UserCarts WHERE UserId = @UserId)
+
+	SELECT ItemQuantity
+	FROM Carts
+	WHERE Id = @CartId
 END

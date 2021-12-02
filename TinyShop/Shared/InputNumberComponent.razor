@@ -1,0 +1,31 @@
+﻿<span class="input-number__container">
+    <button class="input-number__minus-btn" @onclick="@(async () => await ChangeValue("minus"))">-</button>
+    <span class="input-number__display">@Value</span>
+    <button class="input-number__plus-btn" @onclick="@(async () => await ChangeValue("plus"))">+</button>
+</span>
+
+
+@code {
+    [Parameter]
+    public int Value { get; set; }
+
+    [Parameter]
+    public int MinValue { get; set; } = 0;
+
+    [Parameter]
+    public EventCallback<int> OnValueChange { get; set; }
+
+    public async Task ChangeValue(string btnName)
+    {
+        var oldVal = Value;
+        switch (btnName)
+        {
+            case "plus": Value++; break;
+            case "minus": Value = (Value - 1) >= MinValue ? Value - 1 : MinValue; break;
+        }
+        if (Value != oldVal)
+        {
+            await OnValueChange.InvokeAsync(Value);
+        }
+    }
+}

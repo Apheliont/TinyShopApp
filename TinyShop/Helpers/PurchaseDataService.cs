@@ -37,14 +37,15 @@ namespace TinyShop.Helpers
             string userId = await _userUtilities.GetLoggedInUserId();
             if (userId is not null)
             {
-                // We have to ensure that this particular purchase is indeed belong current user
-                // Don't let client side ability to arbitrary delete any purchase 
+                // We have to ensure that this particular purchase is indeed belong to the current user
+                // Don't let client side ability to arbitrary delete any purchases 
                 List<PurchaseModel> purchases = await _purchaseSqlDataService.GetAll(userId);
                 if (purchases.Exists(p => p.Id == purchaseId))
                 {
-                    await _purchaseSqlDataService.Delete(purchaseId);
+                    await _purchaseSqlDataService.Delete(userId, purchaseId);
                     return true;
                 }
+                return false;
             }
             return await _localStorage.DeletePurchase(purchaseId);
         }
@@ -77,14 +78,15 @@ namespace TinyShop.Helpers
             string userId = await _userUtilities.GetLoggedInUserId();
             if (userId is not null)
             {
-                // We have to ensure that this particular purchase is indeed belong current user
-                // Don't let client side ability to arbitrary update any purchase 
+                // We have to ensure that this particular purchase is indeed belong to the current user
+                // Don't let client side ability to arbitrary delete any purchases 
                 List<PurchaseModel> purchases = await _purchaseSqlDataService.GetAll(userId);
                 if (purchases.Exists(p => p.Id == purchaseId))
                 {
-                    await _purchaseSqlDataService.Update(purchaseId, quantity);
+                    await _purchaseSqlDataService.Update(userId, purchaseId, quantity);
                     return true;
                 }
+                return false;
             }
             return await _localStorage.UpdatePurchase(purchaseId, quantity);
         }

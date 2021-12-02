@@ -16,7 +16,7 @@
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetLanguage>CS</TargetLanguage>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <SqlServerVerification>False</SqlServerVerification>
@@ -114,6 +114,7 @@
     <Build Include="dbo\FullText\FullTextCatalog.sql" />
     <Build Include="dbo\FullText\ProductsFullTextIndex.sql" />
     <Build Include="dbo\FullText\ProductStopList.sql" />
+    <Build Include="dbo\Triggers\OnCartDelete.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="TinyShopDb.refactorlog" />

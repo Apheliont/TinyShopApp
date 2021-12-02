@@ -1,0 +1,36 @@
+﻿.input-number__container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    height: 35px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    background: white;
+}
+
+.input-number__plus-btn {
+    flex-grow: 1;
+    width: 20%;
+    font-size: 26px;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+.input-number__display {
+    flex-grow: 2;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-number__minus-btn {
+    flex-grow: 1;
+    width: 20%;
+    font-size: 26px;
+    border: none;
+    border-radius: 5px 0 0 5px;
+    cursor: pointer;
+}

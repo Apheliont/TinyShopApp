@@ -19,7 +19,7 @@
     private int cartItemsCount;
     private IJSObjectReference module;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         AppState.OnCartItemsCountChange += OnCartItemsCountChange;
     }
@@ -29,8 +29,8 @@
         if (firstRender)
         {
             cartItemsCount = await purchaseDataService.GetItemsCountInCart();
-            StateHasChanged();
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
+            StateHasChanged();
         }
     }
 
@@ -38,11 +38,11 @@
     private async void OnCartItemsCountChange()
     {
         cartItemsCount = await purchaseDataService.GetItemsCountInCart();
-        StateHasChanged();
         if (module is not null)
         {
             await module.InvokeVoidAsync(JsInteropConstants.FlashFuncName, CartButtonClass);
         }
+        StateHasChanged();
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
