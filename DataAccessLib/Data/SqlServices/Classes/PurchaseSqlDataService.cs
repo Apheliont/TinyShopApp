@@ -16,13 +16,12 @@ namespace DataAccessLib.Data
             _dataAccess = dataAccess;
         }
 
-        public async Task AddToCart(string userId, int productId, int quantity)
+        public async Task<int> AddToCart(string userId, int productId)
         {
-            await _dataAccess.SaveData<dynamic>("spPurchases_Add", new
+            return await _dataAccess.GetScalar<dynamic>("spPurchases_Add", new
             {
                 UserId = userId,
-                ProductId = productId,
-                Quantity = quantity > 0 ? quantity : 1
+                ProductId = productId
             });
         }
 

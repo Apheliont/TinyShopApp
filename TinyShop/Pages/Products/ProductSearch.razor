@@ -1,7 +1,7 @@
 ﻿@page "/search/{searchSentence}"
 @using System.Web;
 @inject IStringLocalizer<App> Localizer
-@inject IProductSqlDataService productDataService
+@inject IProductDataService productDataService
 
 
 <div class="ui grid">
@@ -10,9 +10,13 @@
         {
             <ProductListComponent Products="@products" />
         }
-        else
+        else if (products is not null && !products.Any())
         {
             <h2>@Localizer["Sorry, but nothing was found"]</h2>
+        }
+        else
+        {
+            <h2>@Localizer["Please wait, search in progress"]...</h2>
         }
 
     </div>
@@ -24,9 +28,9 @@
 
     private List<ProductModel> products;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         string decodedUrlString = HttpUtility.UrlDecode(SearchSentence);
-        products = productDataService.SearchProducts(decodedUrlString, 10);
+        products = await productDataService.SearchProducts(decodedUrlString, 10);
     }
 }

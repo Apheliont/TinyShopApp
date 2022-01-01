@@ -25,22 +25,21 @@ namespace DataAccessLib.Data
                 return JsonConvert.DeserializeObject<ProductsWithMetadataModel>(jsonText);
         }
 
+        public List<ProductModel> GetManyByIds(List<int> ids)
+        {
+            string jsonText = _dataAccess
+                        .GetJsonText<dynamic>("spProducts_GetManyByIds", new
+                        {
+                            Ids = String.Join(",", ids)
+                        });
+            return JsonConvert.DeserializeObject<List<ProductModel>>(jsonText);
+        }
+
         public DetailedProductModel GetOneDetailed(int productId)
         {
             string jsonText = _dataAccess
                 .GetJsonText<dynamic>("spProducts_GetOneDetailed", new { ProductId = productId });
             return JsonConvert.DeserializeObject<DetailedProductModel>(jsonText);
-        }
-
-        public List<ProductModel> SearchProducts(string searchSentence, int numberOfRecords)
-        {
-
-            string jsonText = _dataAccess
-                        .GetJsonText<dynamic>("spProducts_Search", new { 
-                            SearchSentence = searchSentence,
-                            NumberOfRecords = numberOfRecords
-                        });
-            return JsonConvert.DeserializeObject<List<ProductModel>>(jsonText);
         }
     }
 }

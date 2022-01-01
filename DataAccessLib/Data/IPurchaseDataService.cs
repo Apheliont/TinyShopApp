@@ -6,7 +6,7 @@ namespace TinyShop.Helpers
 {
     public interface IPurchaseDataService
     {
-        Task AddToCart(PurchaseModel purchase);
+        Task<int> AddToCart(PurchaseModel purchase);
         Task<bool> Delete(int purchaseId);
         Task<List<PurchaseModel>> GetAll();
         Task<int> GetItemsCountInCart();

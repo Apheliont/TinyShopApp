@@ -24,7 +24,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection")));
+                    builder.Configuration.GetConnectionString("SqlDefaultConnection")));
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
@@ -33,7 +33,10 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllers();
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-builder.Services.AddSingleton<ISqlDataAccess>(x => new SqlDataAccess(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddSingleton<ISqlDataAccess>(x => new SqlDataAccess(builder.Configuration.GetConnectionString("SqlDefaultConnection")));
+builder.Services.AddSingleton<IElasticDataAccess>(x => new ElasticDataAccess(builder.Configuration.GetConnectionString("ElasticDefaultConnection")));
+builder.Services.AddScoped<IProductDataService, ProductDataService>();
+builder.Services.AddScoped<IProductElasticService, ProductElasticService>();
 builder.Services.AddScoped<IProductSqlDataService, ProductSqlDataService>();
 builder.Services.AddScoped<IBreadcrumbSqlDataService, BreadcrumbSqlDataService>();
 builder.Services.AddScoped<ICategorySqlDataService, CategorySqlDataService>();

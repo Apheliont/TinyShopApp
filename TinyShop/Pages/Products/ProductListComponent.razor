@@ -12,7 +12,7 @@
         {
             var carouselId = $"carousel-{product.Id}";
             var productUrl = $"/products/{product.Id}";
-            @if (product.Images is not null && product.Images.Count > 1)
+            @if (product.Images is not null && product.Images.Count >= 1)
             {
                 <div id="@carouselId" class="@productCarouselClass">
                     <button @onclick="() => CloseButtonHandler(carouselId)"
@@ -139,16 +139,17 @@
 
     private async Task AddToCartHandler(ProductModel product)
     {
+        // we skip Id field as it will be set next after adding to cart
         var purchase = new PurchaseModel
             {
-                Id = product.Id, // we set Id only for localStorage, when user is logged in this field will be ignored
                 ProductId = product.Id,
                 Price = product.Price,
                 ProductName = product.ProductName,
                 Quantity = 1
             };
+
+        purchase.Id = await purchaseDataService.AddToCart(purchase);
         Purchases?.Add(purchase);
-        await purchaseDataService.AddToCart(purchase);
         AppState.NotifyCartItemsCountChange();
     }
 

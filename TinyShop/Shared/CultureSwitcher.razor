@@ -47,9 +47,8 @@
         if (firstRender)
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
+            await module.InvokeVoidAsync(JsInteropConstants.InitDropdownMenuFuncName);
         }
-
-        await module.InvokeVoidAsync(JsInteropConstants.InitDropdownMenuFuncName);
     }
 
     private void RequestChangeCulture(ChangeEventArgs e)

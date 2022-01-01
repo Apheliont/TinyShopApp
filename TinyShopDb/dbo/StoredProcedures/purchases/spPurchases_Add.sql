@@ -1,7 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[spPurchases_Add]
 	@UserId NVARCHAR(450),
-	@ProductId INT,
-	@Quantity INT
+	@ProductId INT
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -15,15 +14,17 @@ BEGIN
 		WHERE cp.CartId = @CartId AND p.ProductId = @ProductId)
 
 
-	IF (@PurchaseId IS NOT NULL)
-		UPDATE Purchases SET Quantity = (Quantity + 1) WHERE ProductId = @ProductId AND Id = @PurchaseId
-	ELSE
+	IF (@PurchaseId IS NULL)
 		BEGIN
 			INSERT INTO Purchases(ProductId, Quantity)
-			VALUES (@ProductId, @Quantity);
+			VALUES (@ProductId, 1);
+
+			SET @PurchaseId = (SELECT SCOPE_IDENTITY())
 
 			INSERT INTO CartPurchases(CartId, PurchaseId) 
-			VALUES (@CartId, (SELECT SCOPE_IDENTITY()));
+			VALUES (@CartId, @PurchaseId);
+
+			UPDATE Carts SET ItemQuantity = (ItemQuantity + 1), UpdatedAt = GETUTCDATE() WHERE Id = @CartId
 		END
-	UPDATE Carts SET ItemQuantity = (ItemQuantity + @Quantity), UpdatedAt = GETUTCDATE() WHERE Id = @CartId
+	SELECT @PurchaseId
 END

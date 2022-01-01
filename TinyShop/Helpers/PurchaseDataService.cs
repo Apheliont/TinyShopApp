@@ -19,16 +19,19 @@ namespace TinyShop.Helpers
             _userUtilities = userUtilities;
             _localStorage = localStorage;
         }
-        public async Task AddToCart(PurchaseModel purchase)
+        public async Task<int> AddToCart(PurchaseModel purchase)
         {
             string userId = await _userUtilities.GetLoggedInUserId();
             if (userId is not null)
             {
-                await _purchaseSqlDataService.AddToCart(userId, purchase.Id, 1);
+                return await _purchaseSqlDataService.AddToCart(userId, purchase.ProductId);
             }
             else
             {
+                // as we use localStorage we must set purchase.Id to some value
+                purchase.Id = purchase.ProductId;
                 await _localStorage.AddToCart(purchase);
+                return purchase.ProductId;
             }
         }
 
