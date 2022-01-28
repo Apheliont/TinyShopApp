@@ -291,6 +291,9 @@
   <data name="Sorry, but nothing was found" xml:space="preserve">
     <value>Извините, ничего не найдено</value>
   </data>
+  <data name="Sorry, search service isn't operate right now. Try again later" xml:space="preserve">
+    <value>Извините, поисковый сервис в данный момент недоступен. Попробуйте позже</value>
+  </data>
   <data name="Sorry, there's nothing at this address." xml:space="preserve">
     <value>Извините, ничего не найдено</value>
   </data>

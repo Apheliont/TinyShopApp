@@ -1,9 +1,7 @@
 ﻿using DataAccessLib.Models;
-using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataAccessLib.Data
@@ -12,7 +10,6 @@ namespace DataAccessLib.Data
     {
         ProductsWithMetadataModel GetFilteredWithMetadata(ExpandoObject dynamicFilter);
         DetailedProductModel GetOneDetailed(int productId);
-        Task<List<ProductModel>> SearchProducts(string searchSentence, int numberOfRecords);
-
+        Task<List<ProductModel>> SearchProducts(ProductSearchRequestModel requestModel, CancellationToken token);
     }
 }

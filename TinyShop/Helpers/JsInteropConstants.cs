@@ -14,6 +14,7 @@
         public const string InitAccordionFuncName = "initializeAccordion";
         public const string InitSliderFuncName = "initializeSlider";
         public const string InitRatingFuncName = "initializeRatings";
+        public const string InitRatingFilterFuncName = "initializeRatingFilter";
         public const string InitTabFuncName = "initializeTab";
         public const string InitDropdownMenuFuncName = "initializeDropdownMenu";
         public const string InitCarouselFuncName = "initCarousel";

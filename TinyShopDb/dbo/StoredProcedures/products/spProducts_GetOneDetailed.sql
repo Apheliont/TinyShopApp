@@ -4,7 +4,7 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	DECLARE @GetProductMinimalInfo NVARCHAR(MAX)
+	DECLARE @ProductMinimalInfo NVARCHAR(MAX)
 	DECLARE @ProductDetailsSPName VARCHAR(100)
 
 	SET @ProductDetailsSPName = (
@@ -15,7 +15,7 @@ BEGIN
 		WHERE pc.ProductId = @ProductId)
 
 
-	SET @GetProductMinimalInfo = (SELECT 
+	SET @ProductMinimalInfo = (SELECT 
 		 p.Id
 		,p.ProductName
 		,p.[Description]
@@ -40,13 +40,13 @@ BEGIN
 				DECLARE @JsonResult NVARCHAR(MAX)
 				EXEC @ProductDetailsSPName @ProductId, @JsonResult = @JsonResult OUTPUT
 				SELECT
-					JSON_QUERY(@GetProductMinimalInfo) AS [ProductInfo],
+					JSON_QUERY(@ProductMinimalInfo) AS [ProductInfo],
 					JSON_QUERY(@JsonResult) AS [ProductDetails]
 					FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
 			END
 		ELSE
 			BEGIN
-				SELECT JSON_QUERY(@GetProductMinimalInfo) AS [ProductInfo]
+				SELECT JSON_QUERY(@ProductMinimalInfo) AS [ProductInfo]
 				FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
 			END
 END

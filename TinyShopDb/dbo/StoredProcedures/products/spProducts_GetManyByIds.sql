@@ -14,6 +14,12 @@ BEGIN
 		,p.ProductName
 		,p.[Description]
 		,p.Price
+		,(
+			SELECT AVG(pr.Rating)
+			FROM ProductRatings pr
+			WHERE ids.Id = pr.ProductId
+			GROUP BY pr.ProductId
+		) AS Rating
 		,Images.Id
 		,Images.Caption
 		,Images.IsMain

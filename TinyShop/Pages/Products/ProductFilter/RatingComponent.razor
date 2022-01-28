@@ -48,7 +48,7 @@
         {
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
             thisObjRef = DotNetObjectReference.Create(this);
-            await module.InvokeVoidAsync(JsInteropConstants.InitRatingFuncName, thisObjRef, ComponentUniqueName);
+            await module.InvokeVoidAsync(JsInteropConstants.InitRatingFilterFuncName, thisObjRef, ComponentUniqueName);
             await module.InvokeVoidAsync(JsInteropConstants.InitAccordionFuncName);
         }
     }

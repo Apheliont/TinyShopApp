@@ -81,7 +81,7 @@ export function initializeRatings() {
     $('.ui.rating.product').rating();
 }
 
-export function initializeRating(dotNetObj, ratingElementId) {
+export function initializeRatingFilter(dotNetObj, ratingElementId) {
     $(`#${ratingElementId}`).rating({
         onRate: async function (value) {
             return await dotNetObj.invokeMethodAsync('RatingChanged', value);

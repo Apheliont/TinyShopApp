@@ -1,12 +1,7 @@
-﻿using DataAccessLib.Models.ElasticModel;
-using Nest;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Nest;
+using ProductSearchMicroservice.Models;
 
-namespace DataAccessLib.DataAccess
+namespace ProductSearchMicroservice.DataAccess
 {
     public class ElasticDataAccess : IElasticDataAccess
     {
@@ -16,7 +11,7 @@ namespace DataAccessLib.DataAccess
         {
             Uri uri = new Uri(connectionString);
             ConnectionSettings connectionSettings = new ConnectionSettings(uri)
-                    .DefaultMappingFor<ProductModel>(x => x.IndexName("products"));
+                    .DefaultMappingFor<ElasticProductModel>(x => x.IndexName("products"));
             ElasticClient = new ElasticClient(connectionSettings);
         }
     }

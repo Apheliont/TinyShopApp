@@ -1,12 +1,19 @@
 ﻿@page "/search/{searchSentence}"
 @using System.Web;
+@using System.Threading
+@using MassTransit
 @inject IStringLocalizer<App> Localizer
 @inject IProductDataService productDataService
+@implements IDisposable
 
 
 <div class="ui grid">
     <div class="sixteen wide column">
-        @if (products is not null && products.Any())
+        @if (exception is not null)
+        {
+            <h2 class="text-red">@Localizer["Sorry, search service isn't operate right now. Try again later"]</h2>
+        }
+        else if (products is not null && products.Any())
         {
             <ProductListComponent Products="@products" />
         }
@@ -27,10 +34,30 @@
     public string SearchSentence { get; set; }
 
     private List<ProductModel> products;
+    private CancellationTokenSource source = new CancellationTokenSource();
+    private TimeoutException exception;
 
     protected override async Task OnParametersSetAsync()
     {
         string decodedUrlString = HttpUtility.UrlDecode(SearchSentence);
-        products = await productDataService.SearchProducts(decodedUrlString, 10);
+        try
+        {
+            products = await productDataService.SearchProducts(
+            new ProductSearchRequestModel
+            {
+                SearchSentence = decodedUrlString,
+                NumberOfRecords = 10
+            }, source.Token);
+        }
+        catch (RequestTimeoutException)
+        {
+            exception = new TimeoutException();
+        }
+
+    }
+
+    void IDisposable.Dispose()
+    {
+        source.Cancel();
     }
 }

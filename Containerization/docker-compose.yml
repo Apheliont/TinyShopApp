@@ -4,7 +4,7 @@ services:
         mssql:
             image: mcr.microsoft.com/mssql/server:2019-CU14-ubuntu-20.04
             container_name: mssql
-            restart: always
+            restart: on-failure
             user: root
             deploy:
                 resources:
@@ -20,7 +20,22 @@ services:
                 - microsoftSQL
             volumes:
                 - db-data:/var/opt/mssql/data
-                
+        
+        rabbitmq:
+            image: rabbitmq:3-management
+            container_name: rabbitmq
+            deploy:
+                resources:
+                    limits:
+                        cpus: "0.5"
+                        memory: 512M
+            restart: on-failure
+            ports:
+                - 5672:5672
+                - 15672:15672
+            networks:
+                - microsoftSQL
+
         elasticsearch:
             image: docker.elastic.co/elasticsearch/elasticsearch:7.16.0
             container_name: elasticsearch
@@ -33,7 +48,7 @@ services:
                 - discovery.type=single-node
             volumes:
                 - esdata1:/usr/share/elasticsearch/data
-            restart: always
+            restart: on-failure
             ports:
                 - 9200:9200
                 - 9300:9300
@@ -56,7 +71,7 @@ services:
             ports:
                 - '5001:5001'
             container_name: logstash
-            restart: always
+            restart: on-failure
             networks:
                 - microsoftSQL
             links:
@@ -71,7 +86,7 @@ services:
                 resources:
                     limits:
                         cpus: "0.5"
-            restart: always
+            restart: on-failure
             ports:
                 - 5601:5601
             environment:
