@@ -1,5 +1,5 @@
 ﻿@page "/"
-
+@inject AuthenticationStateProvider AuthenticationStateProvider
 <section class="ui segment carousel-container">
     <!-- FolderWithPicturesPath is a path where each directory is comma separated --> 
     <CarouselComponent FolderWithPicturesPath="img,carousel"/>
@@ -7,7 +7,31 @@
 <h2>@DateTime.Now.ToShortDateString()</h2>
 <h2>@DateTime.Now.ToLongDateString()</h2>
 
+<AuthorizeView>
+    <Authorized>
+        <h2>You are authorized!</h2>
+    </Authorized>
+    <NotAuthorized>
+        <h2>You are not authorized!</h2>
+    </NotAuthorized>
+</AuthorizeView>
+
+<button @onclick="@LogUsername">Write user info to console</button>
+
 @code {
-    
+    private async Task LogUsername()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            Console.WriteLine($"{user.Identity.Name} is authenticated.");
+        }
+        else
+        {
+            Console.WriteLine("The user is NOT authenticated.");
+        }
+    }
 }
 

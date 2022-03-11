@@ -27,7 +27,7 @@ namespace DataAccessLib.DataAccess
                 return data.ToList();
             }
         }
-
+        //TODO: this piece know nothing about user id. We need to decouple it!
         public async Task<int> GetScalar<U>(string storedProcedure, U parameters)
         {
             using (IDbConnection conn = new SqlConnection(_connectionString))

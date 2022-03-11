@@ -4,3 +4,8 @@
     min-height: calc(100vh - (54px + 48px));
     background: linear-gradient(to bottom, $gradient-main-from 1%, $gradient-main-to 10%);
 }
+
+.center-content {
+    margin-left: auto;
+    margin-right: auto;
+}

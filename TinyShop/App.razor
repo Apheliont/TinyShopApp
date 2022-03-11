@@ -1,9 +1,24 @@
 ﻿@using TinyShop.Shared.Layouts
 @inject IStringLocalizer<App> Localizer
+@inject NavigationManager NavigationManager
+
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
         <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(IndexLayout)" />
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(IndexLayout)">
+                <NotAuthorized>
+                    @{
+                        var returnUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+
+                        NavigationManager.NavigateTo($"/account/login?redirectUri={returnUrl}", forceLoad: true);
+
+                    }
+
+                </NotAuthorized>
+                <Authorizing>
+                    Wait...
+                </Authorizing>
+            </AuthorizeRouteView>
         </Found>
         <NotFound>
             <LayoutView Layout="@typeof(IndexLayout)">
