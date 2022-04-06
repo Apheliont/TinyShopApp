@@ -1,0 +1,79 @@
+﻿@page "/account/register"
+@using System.Text
+@using TinyShop.DTOs.Account
+@using TinyShop.Web.Pages.Shared.Layouts
+@using Microsoft.Extensions.Localization
+@using TinyShop.Models.Account
+@using Microsoft.Extensions.Configuration
+@using System.Text.Json
+@using System.Net.Http.Json
+@layout HeaderFooterLayout
+@inject IStringLocalizer<App> Localizor
+@inject IHttpClientFactory clientFactory
+@inject IConfiguration Configuration
+@inject NavigationManager navigationManager
+
+<div class="center-content">
+    @if (registerErrorMessage is not null)
+    {
+        <h2>@registerErrorMessage</h2>
+    }
+    <div class="ui placeholder segment">
+        <div class="ui one column very relaxed stackable grid">
+            <div class="centered row">
+                <h1 class="two wide left" style="padding: 0px">
+                    @Localizor["Register"]
+                </h1>
+            </div>
+            <div class="row">
+                <div class="column">
+                    <EditForm Model=@registerUserModel OnValidSubmit="@HandleValidSubmit" class="ui form">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <InputText id="email" @bind-Value="registerUserModel.Email" placeholder="@Localizor["Email"]" />
+                                <i class="user icon"></i>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <InputText type="password" @bind-Value="registerUserModel.Password" placeholder="@Localizor["Password"]" />
+                                <i class="lock icon"></i>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <InputText type="password" @bind-Value="registerUserModel.ConfirmPassword" placeholder="@Localizor["ConfirmPassword"]" />
+                                <i class="lock icon"></i>
+                            </div>
+                        </div>
+                        <button class="ui button" type="submit">@Localizor["Register"]</button>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterUserModel registerUserModel = new();
+    private string registerErrorMessage = null;
+
+    private async Task HandleValidSubmit()
+    {
+        var newUser = new RegisterUserDto { UserName = registerUserModel.Email, Password = registerUserModel.Password };
+        var httpClient = clientFactory.CreateClient();
+
+        var url = $"{Configuration.GetConnectionString("IdentityServer")}/api/authentication/register";
+
+        var response = await httpClient.PostAsJsonAsync<RegisterUserDto>(url, newUser);
+        if (response.IsSuccessStatusCode)
+        {
+            navigationManager.NavigateTo("/Account/Login");
+        } else
+        {
+            registerErrorMessage = await response.Content.ReadAsStringAsync();
+        }
+    }
+}

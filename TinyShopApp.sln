@@ -3,15 +3,28 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyShop", "TinyShop\TinyShop.csproj", "{A2EB99DD-6A25-4B95-BC2B-4956425B052B}"
-EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "TinyShopDb", "TinyShopDb\TinyShopDb.sqlproj", "{29DEA4A0-4E8C-4289-973B-4FCEE7293883}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLib", "DataAccessLib\DataAccessLib.csproj", "{C843EC2D-8448-475F-B19A-016F662F331F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductSearchMicroservice", "ProductSearchMicroservice\ProductSearchMicroservice.csproj", "{44C3334A-FE39-460B-A0F8-ED70F70F8D02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyShop.ProductSearch", "TinyShop.ProductSearch\TinyShop.ProductSearch.csproj", "{44C3334A-FE39-460B-A0F8-ED70F70F8D02}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{762E4A90-5FE0-4C41-B599-811B84666F61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyShop.Identity", "TinyShop.Identity\TinyShop.Identity.csproj", "{762E4A90-5FE0-4C41-B599-811B84666F61}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyShop.Cart", "TinyShop.Cart\TinyShop.Cart.csproj", "{79749362-47E4-4751-8E62-3D0390FD77B2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{57D7C301-E251-42F7-8065-5F446E04391D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FrontEnd", "FrontEnd", "{598319A0-F4B2-484B-BDAE-B49EE577E056}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyShop.Catalog", "TinyShop.Catalog\TinyShop.Catalog.csproj", "{9CC3D1C0-58B9-4753-9547-C684AE297EBB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{2B2A3C84-CC3F-40DD-933D-285001B41D3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyShop.Catalog.Tests", "TinyShop.Catalog.Tests\TinyShop.Catalog.Tests.csproj", "{46783D59-826C-4438-AB1D-937CA798B0C8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyShop.Web", "TinyShop.Web\TinyShop.Web.csproj", "{B1A78831-404F-4644-97A3-4B61EF9B9984}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9CC3D1C0-58B9-4753-9547-C684AE297EBB} = {9CC3D1C0-58B9-4753-9547-C684AE297EBB}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,16 +32,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A2EB99DD-6A25-4B95-BC2B-4956425B052B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A2EB99DD-6A25-4B95-BC2B-4956425B052B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A2EB99DD-6A25-4B95-BC2B-4956425B052B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A2EB99DD-6A25-4B95-BC2B-4956425B052B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{29DEA4A0-4E8C-4289-973B-4FCEE7293883}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{29DEA4A0-4E8C-4289-973B-4FCEE7293883}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{29DEA4A0-4E8C-4289-973B-4FCEE7293883}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{29DEA4A0-4E8C-4289-973B-4FCEE7293883}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{29DEA4A0-4E8C-4289-973B-4FCEE7293883}.Release|Any CPU.Build.0 = Release|Any CPU
-		{29DEA4A0-4E8C-4289-973B-4FCEE7293883}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{C843EC2D-8448-475F-B19A-016F662F331F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C843EC2D-8448-475F-B19A-016F662F331F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C843EC2D-8448-475F-B19A-016F662F331F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -41,9 +44,33 @@ Global
 		{762E4A90-5FE0-4C41-B599-811B84666F61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{762E4A90-5FE0-4C41-B599-811B84666F61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{762E4A90-5FE0-4C41-B599-811B84666F61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79749362-47E4-4751-8E62-3D0390FD77B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79749362-47E4-4751-8E62-3D0390FD77B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79749362-47E4-4751-8E62-3D0390FD77B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79749362-47E4-4751-8E62-3D0390FD77B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CC3D1C0-58B9-4753-9547-C684AE297EBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CC3D1C0-58B9-4753-9547-C684AE297EBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CC3D1C0-58B9-4753-9547-C684AE297EBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CC3D1C0-58B9-4753-9547-C684AE297EBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46783D59-826C-4438-AB1D-937CA798B0C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46783D59-826C-4438-AB1D-937CA798B0C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46783D59-826C-4438-AB1D-937CA798B0C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46783D59-826C-4438-AB1D-937CA798B0C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1A78831-404F-4644-97A3-4B61EF9B9984}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1A78831-404F-4644-97A3-4B61EF9B9984}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1A78831-404F-4644-97A3-4B61EF9B9984}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1A78831-404F-4644-97A3-4B61EF9B9984}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{44C3334A-FE39-460B-A0F8-ED70F70F8D02} = {57D7C301-E251-42F7-8065-5F446E04391D}
+		{762E4A90-5FE0-4C41-B599-811B84666F61} = {57D7C301-E251-42F7-8065-5F446E04391D}
+		{79749362-47E4-4751-8E62-3D0390FD77B2} = {57D7C301-E251-42F7-8065-5F446E04391D}
+		{9CC3D1C0-58B9-4753-9547-C684AE297EBB} = {57D7C301-E251-42F7-8065-5F446E04391D}
+		{46783D59-826C-4438-AB1D-937CA798B0C8} = {2B2A3C84-CC3F-40DD-933D-285001B41D3A}
+		{B1A78831-404F-4644-97A3-4B61EF9B9984} = {598319A0-F4B2-484B-BDAE-B49EE577E056}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {86EA6286-A53F-4E29-8CC0-4BEF8BC098BC}

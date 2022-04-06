@@ -1,0 +1,57 @@
+﻿@using TinyShop.Web.Models
+@using TinyShop.Web.Services
+@inject IStringLocalizer<App> Localizer
+@inject NavigationManager NavigationManager
+@inject IUriService UriService
+@implements IDisposable
+
+<div class="ui small breadcrumb breadcrumb__container">
+    <a class="section" href="/">@Localizer["Home"]</a>
+    @if (breadcrumbs is not null)
+    {
+        @foreach (BreadcrumbModel breadcrumb in breadcrumbs)
+        {
+            <i class="right chevron icon divider"></i>
+            if (!String.IsNullOrEmpty(breadcrumb.Uri))
+            {
+                <a class="section" href="@breadcrumb.Uri">@breadcrumb.ItemName</a>
+            }
+            else
+            {
+                <div class="active section">@breadcrumb.ItemName</div>
+            }
+        }
+    }
+
+</div>
+
+@code {
+    private List<BreadcrumbModel> breadcrumbs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.LocationChanged += HandleLocationChanged;
+        // We need get breadcrumbs twice. On every initialization and every time url change
+        await GetBreadcrumbs();
+    }
+
+    private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        base.InvokeAsync(async () =>
+        {
+            await GetBreadcrumbs();
+            StateHasChanged();
+        });
+    }
+
+    void IDisposable.Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+
+    private async Task GetBreadcrumbs()
+    {
+        string uri = NavigationManager.Uri;
+        breadcrumbs = await UriService.GetBreadcrumbs(uri);
+    }
+}

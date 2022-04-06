@@ -1,4 +1,4 @@
-﻿namespace DataAccessLib.Models
+﻿namespace TinyShop.Web.Models
 {
     public record PurchaseModel
     {

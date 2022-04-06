@@ -1,6 +1,6 @@
-﻿namespace DataAccessLib.Models
+﻿namespace TinyShop.Web.DTOs
 {
-    public record PurchaseModel
+    public record PurchaseDto
     {
         public int Id { get; set; }
         public int ProductId { get; set; }

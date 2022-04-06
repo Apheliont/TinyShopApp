@@ -1,0 +1,20 @@
+﻿@using TinyShop.Web.Services
+@inherits LayoutComponentBase
+@layout HeaderFooterLayout
+@inject NavigationManager NavigationManager
+@inject IUriService UriUtils 
+
+<div class="sexteen wide column">
+    <Breadcrumb />
+    <div class="ui grid">
+        <div class="row">
+            <div class="four wide column">
+                <CategoryMenu IsMenuOpened="true" />
+            </div>
+            <div class="twelve wide column">
+                @Body
+            </div>
+        </div>
+    </div>
+</div>
+

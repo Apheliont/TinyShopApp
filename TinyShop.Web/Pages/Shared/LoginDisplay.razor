@@ -1,0 +1,43 @@
+﻿@inject IStringLocalizer<App> Localizer
+@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized>
+        <div class="ui small buttons">
+            <button class="ui inverted basic button" style="margin-right: 5px;" @onclick="OnUserManageHandler">@Localizer["Hello"], @context.User.Identity.Name!</button>
+            <button class="ui inverted basic button" @onclick="OnLogOutHandler">
+                <i class="door open icon"></i>@Localizer["Logout"]
+            </button>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="ui small buttons">
+            <button class="ui inverted basic button" style="margin-right: 5px;" @onclick="OnLoginHandler"><i class="sign in alternate icon"></i>@Localizer["Login"]</button>
+            <button class="ui inverted basic button" @onclick="OnRegisterHandler"><i class="user plus icon"></i>@Localizer["Register"]</button>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private void OnRegisterHandler()
+    {
+        NavigationManager.NavigateTo("/account/register", true);
+    }
+
+    private void OnLoginHandler()
+    {
+        NavigationManager.NavigateTo("/account/login?redirectUri=/", true);
+    }
+
+    private void OnLogOutHandler()
+    {
+        NavigationManager.NavigateTo("/account/logout", true);
+    }
+
+    private void OnUserManageHandler()
+    {
+        NavigationManager.NavigateTo("/account/manage", true);
+    }
+}
+
+

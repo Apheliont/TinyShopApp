@@ -1,0 +1,54 @@
+﻿@using TinyShop.Web.CustomTypes
+@using TinyShop.Web.Models
+@implements IResetableComponent
+
+@if (CheckboxListItem is not null)
+{
+    <div class="list">
+        @foreach (string name in CheckboxListItem.ItemNames)
+        {
+            <div class="item">
+                <div class="ui child checkbox">
+                    <input type="checkbox" @onchange="async () => await ChangeCheckboxState(name)"
+                         checked=@CheckboxListItem.IsChecked(name)>
+                    <label>@name</label>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    public List<IResetableComponent> ChildComponentList { get; set; }
+
+    [Parameter]
+    public CheckboxListModel CheckboxListItem { get; set; }
+
+    [Parameter]
+    public String ComponentUniqueName { get; init; }
+
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ChildComponentList.Add(this);
+    }
+
+
+    private async Task ChangeCheckboxState(string name)
+    {
+        if (CheckboxListItem.ChangeCheckboxState(name))
+        {
+            await OnChange
+            .InvokeAsync();
+        }
+    }
+
+    public void Reset()
+    {
+        CheckboxListItem.Reset();
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,36 @@
+﻿@using TinyShop.Web.Services
+@inherits LayoutComponentBase
+@layout HeaderFooterLayout
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localizer
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<div class="four wide column">
+    <CategoryMenu IsMenuOpened="true" />
+</div>
+<div class="twelve wide column">
+    @Body
+</div>
+
+
+@code {
+    private IJSObjectReference module;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
+            await module.InvokeVoidAsync(JsInteropConstants.InitAccordionFuncName);
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+}
+

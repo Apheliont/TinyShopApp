@@ -1,0 +1,127 @@
+﻿@page "/categories/{categoryId:int}/products"
+@layout ProductsLayout
+@using TinyShop.Web.CustomTypes
+@using TinyShop.Web.Models
+@using TinyShop.Web.Services
+@using TinyShop.Web.Pages.Shared
+@using TinyShop.Web.Pages.Shared.Layouts
+@using System.Text;
+@using TinyShop.Web.Extensions
+@using TinyShop.Web.Pages.Products.ProductFilter
+@inject IProductService productService
+@inject NavigationManager NavigationManager
+@inject IUserService userService
+@inject IStringLocalizer<App> Localizer
+@inject IMapModelService mapModelService
+@implements IDisposable
+
+<div class="ui grid">
+    <div class="row">
+        <div class="four wide column">
+        </div>
+        <div class="twelve wide column">
+            <SortPannelComponent MetadataModel="@ProductsInfo.Metadata"
+                                 FilterModel="@FilterModel"
+                                 OnSortChange="() => PageHasChanged(1)" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="four wide column">
+            <CategoryMenu AccordionCssString="categories-menu" />
+            <ProductFilterComponent FilterModel="@FilterModel"
+                                    OnApplyFilter="() => PageHasChanged(1)"
+                                    OnResetFilter="() => PageHasChanged(1)" />
+        </div>
+        <div class="twelve wide column">
+            <ProductListComponent Products="@ProductsInfo.Products" />
+            <Paginator NumberOfPages="@numberOfPages" CurrentPage="@FilterModel.PageNumber" OnPageChanged="PageHasChanged" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int CategoryId { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? PageNumber { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? OrderBy { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? SortOrder { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? RowsPerPage { get; set; }
+
+    public ProductsInfoModel ProductsInfo { get; set; } = new();
+
+    public ProductFilterModel FilterModel { get; set; }
+
+    private int numberOfPages;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        FilterModel = new ProductFilterModel { CategoryId = CategoryId };
+        FilterModel.PageNumber = PageNumber ?? 1;
+        FilterModel.OrderBy = OrderBy is null ? OrderByEnum.ProductName : (OrderByEnum)OrderBy;
+        FilterModel.SortOrder = SortOrder is null ? SortOrderEnum.ASC : (SortOrderEnum)SortOrder;
+        FilterModel.RowsPerPage = RowsPerPage is null ? RowsPerPageEnum._25 : (RowsPerPageEnum)RowsPerPage;
+
+        await InitializeData();
+    }
+
+
+    private async Task InitializeData()
+    {
+        var filter = mapModelService.CreateFilterDto(FilterModel);
+        ProductsInfo = await productService.FilterProducts(filter);
+
+        if (ProductsInfo is not null)
+        {
+            mapModelService.FillupFilterModel(ProductsInfo.Metadata, FilterModel);
+            numberOfPages = (int)(Math.Ceiling((double)ProductsInfo.Metadata.FoundRecords / (int)FilterModel.RowsPerPage));
+        }
+
+    }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += HandleLocationChanged;
+    }
+
+    private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        base.InvokeAsync(async () =>
+        {
+            await InitializeData();
+            StateHasChanged();
+        });
+    }
+
+
+
+    void IDisposable.Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+
+    private void PageHasChanged(int page)
+    {
+        FilterModel.PageNumber = page;
+        var address = NavigationManager.GetUriWithQueryParameters(
+        new Dictionary<string, object>
+                        {
+                    { nameof(PageNumber), FilterModel.PageNumber },
+                    { nameof(OrderBy), (int)FilterModel.OrderBy },
+                    { nameof(SortOrder), (int)FilterModel.SortOrder },
+                    { nameof(RowsPerPage), (int)FilterModel.RowsPerPage },
+                        });
+        NavigationManager.NavigateTo(address);
+    }
+}

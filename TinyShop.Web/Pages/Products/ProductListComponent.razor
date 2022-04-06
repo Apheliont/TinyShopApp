@@ -1,0 +1,172 @@
+﻿@using TinyShop.Web.Models
+@using TinyShop.Web.Services
+@using TinyShop.Web.Pages.Shared
+@inject IStringLocalizer<App> Localizer
+@inject IJSRuntime JSRuntime
+@inject IPurchaseService purchaseService
+@inject IStringLocalizer<App> Localizer
+@inject AppState AppState
+@implements IAsyncDisposable
+
+@if (Products is not null)
+{
+    <div class="product-list">
+        @foreach (ProductModel product in Products)
+        {
+            var carouselId = $"carousel-{product.Id}";
+            var productUrl = $"/products/{product.Id}";
+            @if (product.Images is not null && product.Images.Count >= 1)
+            {
+                <div id="@carouselId" class="@productCarouselClass">
+                    <button @onclick="() => CloseButtonHandler(carouselId)"
+                class="product-list__carousel-close-btn">
+                        <i class="big times circle outline icon"></i>
+                    </button>
+                    <div class="product-list__carousel-container">
+                        @foreach (ImageModel image in product.Images)
+                        {
+                            <img src="@image.UriSizeM" alt="@image.Caption" loading="lazy">
+                        }
+                    </div>
+                </div>
+            }
+            <div class="@productListItemClass">
+                <div class="product-list__image-container">
+                    @if (product.Images is not null && product.Images.Count > 1)
+                    {
+                        <i class="huge search plus icon" @onclick="() => ImageClickhandler(carouselId)"></i>
+
+                        var mainImage = product.Images.Where(i => i.IsMain).FirstOrDefault();
+                        if (mainImage is null)
+                        {
+                            mainImage = product.Images[0];
+                        }
+
+                        var mainImageUri = mainImage.UriSizeS is not null ? mainImage.UriSizeS : mainImage.UriSizeM;
+
+                        <img src="@mainImageUri" alt="@mainImage.Caption" loading="lazy" />
+                    }
+                    else
+                    {
+                        <img src=@JsInteropConstants.ProductNoImgPlaceholderPath alt="@Localizer["No picture available"]" loading="lazy">
+                    }
+                </div>
+                <div class="product-list__content-container">
+                    <a class="product-list__content-header" href="@productUrl">@product.ProductName</a>
+                    <p class="product-list__content-description">
+                        @product.Description
+                    </p>
+                    <div>
+                        <div class="ui yellow disabled rating product" data-icon="star" data-rating="@product.Rating" data-max-rating="5"></div>
+                    </div>
+                </div>
+                <div class="product-list__buy-container">
+                    <div class="product-list__buy-price">
+                        @Math.Round(@product.Price, 2)<span>₽</span>
+                    </div>
+                    <div class="product-list__buy-to-cart">
+                        @if (Purchases is not null)
+                        {
+                            var foundPurchase = Purchases.Find(item => item.ProductId == product.Id);
+                            if (foundPurchase is not null)
+                            {
+                                <InputNumberComponent Value="@foundPurchase.Quantity"
+                                      OnValueChange=@(async (quantity) => await OnPurchaseQuantityChange(foundPurchase.Id, quantity)) />
+                            }
+                            else
+                            {
+                                <button class="product-list__buy-to-cart-btn"
+                                    @onclick="async () => { await AddToCartHandler(product); }">
+                                    @Localizer["Add to cart"]
+                                </button>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<ProductModel> Products { get; set; }
+
+    private List<PurchaseModel> Purchases;
+    private IJSObjectReference module;
+    private string currentlyOppenedCarousel = "";
+    private string productListItemClass = "product-list__list-item";
+    private string productCarouselClass = "product-list__carousel";
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
+            await module.InvokeVoidAsync(JsInteropConstants.FadeUpFuncName, productListItemClass);
+            Purchases = await purchaseService.GetAll();
+            StateHasChanged();
+        }
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync(JsInteropConstants.InitRatingFuncName);
+            await module.InvokeVoidAsync(JsInteropConstants.MakeVisibleFuncName, productListItemClass);
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+
+    private async Task OnPurchaseQuantityChange(int purchaseId, int quantity)
+    {
+        if (quantity > 0)
+        {
+            Purchases.FirstOrDefault(item => item.Id == purchaseId).Quantity = quantity;
+            await purchaseService.Update(purchaseId, quantity);
+        }
+        else
+        {
+            Purchases.Remove(Purchases.Single(item => item.Id == purchaseId));
+            await purchaseService.Delete(purchaseId);
+            StateHasChanged();
+        }
+        AppState.NotifyCartItemsCountChange();
+    }
+
+    private async Task AddToCartHandler(ProductModel product)
+    {
+        // we skip Id field as it will be set next after adding to cart
+        var purchase = new PurchaseModel
+            {
+                ProductId = product.Id,
+                Price = product.Price,
+                ProductName = product.ProductName,
+                Quantity = 1
+            };
+
+        purchase.Id = await purchaseService.AddToCart(purchase);
+        Purchases?.Add(purchase);
+        AppState.NotifyCartItemsCountChange();
+    }
+
+    private async Task ImageClickhandler(string carouselId)
+    {
+        if (currentlyOppenedCarousel == carouselId) return;
+        currentlyOppenedCarousel = carouselId;
+        await module.InvokeVoidAsync(JsInteropConstants.HideElementsFuncName, productCarouselClass);
+        await module.InvokeVoidAsync(JsInteropConstants.ShowElementFuncName, carouselId);
+    }
+
+    private async Task CloseButtonHandler(string carouselId)
+    {
+        currentlyOppenedCarousel = "";
+        await module.InvokeVoidAsync(JsInteropConstants.HideElementFuncName, carouselId);
+    }
+}

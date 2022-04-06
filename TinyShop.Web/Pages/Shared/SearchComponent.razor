@@ -1,0 +1,84 @@
+﻿@using System.Web
+@inject IStringLocalizer<App> Localizer
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<div class="ui icon input">
+    <input type="text"
+    class="search-input"
+    id="@UniqueInputId"
+    placeholder="@Localizer["Search"]"
+    @bind="@searchSentance" @bind:event="oninput"
+    @onkeydown="@Enter"
+    onfocus="@EnglargeInput()"
+    onblur="@GetInputWidthBack()"
+    >
+    <i class="search link icon" @onclick="Search"></i>
+</div>
+
+
+@code {
+    private readonly char[] delimiterChars = { ' ', ',', '.', ':', '\t', '?', '&', '+', '!', '*', '(', '#', ')', '@', '$', ';' };
+    private string searchSentance;
+    private IJSObjectReference module;
+    private string UniqueInputId = "search-input";
+    private int? OriginalWidth;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
+        }
+    }
+
+    private void Enter(KeyboardEventArgs keyboardEvent)
+    {
+        if (keyboardEvent.Code == "Enter" || keyboardEvent.Code == "NumpadEnter")
+        {
+            Search();
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+
+    private void Search()
+    {
+        if (!String.IsNullOrEmpty(searchSentance))
+        {
+            IEnumerable<string> words = searchSentance
+                                        .Trim()
+                                        .Split(delimiterChars)
+                                        .Where(w => !String.IsNullOrWhiteSpace(w) && w.ToLower() != "and");
+            string searchFormattedString = String.Join(" AND ", words);
+            NavigationManager.NavigateTo($"/search/{HttpUtility.UrlEncode(searchFormattedString)}");
+        }
+    }
+
+    private async Task EnglargeInput()
+    {
+        if (module is not null)
+        {
+            var origVal = await module.InvokeAsync<int>(JsInteropConstants.ChangeItemWidthFuncName, UniqueInputId, 300);
+            if (OriginalWidth is null)
+            {
+                OriginalWidth = origVal + 50;
+            }
+        }
+    }
+
+    private async Task GetInputWidthBack()
+    {
+        if (module is not null && OriginalWidth is not null)
+        {
+            await module.InvokeVoidAsync(JsInteropConstants.SetItemWidthFuncName, UniqueInputId, OriginalWidth);
+        }
+    }
+}

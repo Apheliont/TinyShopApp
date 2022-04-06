@@ -1,0 +1,62 @@
+﻿@page "/search/{searchSentence}"
+@using System.Web
+@using System.Threading
+@using TinyShop.Web.Models
+@using TinyShop.Web.Services
+@inject IStringLocalizer<App> Localizer
+@inject IProductService productService
+@implements IDisposable
+
+
+<div class="ui grid">
+    <div class="sixteen wide column">
+        @if (!String.IsNullOrEmpty(exceptionMessage))
+        {
+            <h2 class="text-red">@Localizer["Sorry, search service isn't operate right now. Try again later"]</h2>
+        }
+        else if (products is not null && products.Any())
+        {
+            <ProductListComponent Products="@products" />
+        }
+        else if (products is not null && !products.Any())
+        {
+            <h2>@Localizer["Sorry, but nothing was found"]</h2>
+        }
+        else
+        {
+            <h2>@Localizer["Please wait, search in progress"]...</h2>
+        }
+
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string SearchSentence { get; set; }
+
+    private List<ProductModel> products;
+    private CancellationTokenSource source = new CancellationTokenSource();
+    private string exceptionMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        string decodedUrlString = HttpUtility.UrlDecode(SearchSentence);
+        try
+        {
+            products = await productService.SearchProducts(
+                searchSentence: decodedUrlString,
+                numberOfRecords: 10,
+                source.Token);
+        }
+        catch (Exception ex)
+        {
+            exceptionMessage = ex.Message;
+        }
+
+    }
+
+    void IDisposable.Dispose()
+    {
+        source.Cancel();
+    }
+}

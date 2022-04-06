@@ -1,0 +1,57 @@
+﻿@using TinyShop.Web.Services
+@inject IStringLocalizer<App> Localizer
+@inject IUserService userService
+@inject IPurchaseService purchaseService
+@inject AppState AppState
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<a class="right item" href="/cart">
+    <i class="shopping cart icon"></i>
+    @Localizer["Cart"]
+    @if (cartItemsCount > 0)
+    {
+        <div class="bottom floating ui blue circular label @CartButtonClass">@cartItemsCount</div>
+    }
+</a>
+
+@code {
+    private const string CartButtonClass = "cartButton";
+    private int cartItemsCount;
+    private IJSObjectReference module;
+
+    protected override void OnInitialized()
+    {
+        AppState.OnCartItemsCountChange += OnCartItemsCountChange;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            //cartItemsCount = await purchaseService.GetItemsCountInCart();
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
+            StateHasChanged();
+        }
+    }
+
+
+    private async void OnCartItemsCountChange()
+    {
+        //cartItemsCount = await purchaseService.GetItemsCountInCart();
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync(JsInteropConstants.FlashFuncName, CartButtonClass);
+        }
+        StateHasChanged();
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        AppState.OnCartItemsCountChange -= OnCartItemsCountChange;
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+}

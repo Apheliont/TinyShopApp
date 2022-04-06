@@ -1,0 +1,62 @@
+﻿@using Microsoft.AspNetCore.Hosting
+@using Microsoft.AspNetCore.Mvc.ViewEngines
+@using Microsoft.Extensions.Localization
+@using TinyShop.Web
+@inject IStringLocalizer<App> Localizer
+@inject IWebHostEnvironment Environment
+@inject ICompositeViewEngine Engine
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TinyShop</title>
+    <base href="~/" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="~/css/semantic.min.css" rel="stylesheet" />
+</head>
+<body>
+    <header>
+        <div class="ui attached secondary inverted stackable small menu info__stripe">
+            <div class="ui container">
+                <a class="item" href="/">
+                    @Localizer["Home"]
+                </a>
+                <a class="item">
+                    @Localizer["Our shops"]
+                </a>
+                <a class="item">
+                    @Localizer["Contact phone"]: 888-999-000-111
+                </a>
+                <div class="right menu">
+                    <CultureSwitcher />
+                    <div class="item">
+                        @{
+                            var result = Engine.FindView(ViewContext, "_LoginPartial", isMainPage: false);
+                        }
+                        @if (result.Success)
+                        {
+                            await Html.RenderPartialAsync("_LoginPartial");
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("The default Identity UI layout requires a partial view '_LoginPartial' " +
+                                "usually located at '/Pages/_LoginPartial' or at '/Views/Shared/_LoginPartial' to work. Based on your configuration " +
+                                $"we have looked at it in the following locations: {System.Environment.NewLine}{string.Join(System.Environment.NewLine, result.SearchedLocations)}.");
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+        <main role="main" class="ui centered grid identity__main-container">
+            @RenderBody()
+        </main>
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/semantic.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

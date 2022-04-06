@@ -1,0 +1,71 @@
+﻿@using TinyShop.Web.Models
+@using TinyShop.Web.Services
+@using TinyShop.Web.Pages.Shared.Layouts
+@layout CategoriesLayout
+@page "/categories/{CategoryId:int}"
+@inject ICategoryService categoryService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localizer
+@inject ILocalStorageService LocalStorage
+
+@if (categories is not null)
+{
+    <div class="ui grid">
+        @foreach (CategoryModel category in categories)
+        {
+            <div class="four wide column">
+                <div class="ui fluid raised link card category__card" @onclick="async () => await CategoryClickHandler(category)">
+
+                    <div class="image category__card-image-container">
+                        @if (category.Image is not null)
+                        {
+                            var categoryImageUrl = category.Image.UriSizeS is not null ? category.Image.UriSizeS : category.Image.UriSizeM;
+                            <img src="@categoryImageUrl" alt="@category.Image.Caption" loading="lazy">
+                        }
+                        else
+                        {
+                            <img src="img/products/product-no-photo-placeholder.jpg" alt="@Localizer["No picture available"]" loading="lazy">
+                        }
+                    </div>
+                    <div class="content">
+                        <div class="header">@category.CategoryName</div>
+                        <div class="description">
+                            @category.Description
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int CategoryId { get; set; }
+
+    private List<CategoryModel> categories;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        categories = await categoryService.GetSubcategories(CategoryId);
+    }
+
+    private async Task CategoryClickHandler(CategoryModel category)
+    {
+        var url = $"/categories/{category.Id.ToString()}";
+        if (!category.IsParent)
+        {
+            string parameters = await LocalStorage.ReadSortingParameters();
+            if (parameters.Length > 0)
+            {
+                url += $"/products?{parameters}";
+            }
+            else
+            {
+                url += "/products";
+            }
+        }
+
+        NavigationManager.NavigateTo(url, false);
+    }
+}
