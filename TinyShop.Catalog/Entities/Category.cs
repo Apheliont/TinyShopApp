@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Dynamic;
+using TinyShop.Catalog.DTOs;
 
 namespace TinyShop.Catalog.Entities
 {
@@ -20,8 +18,8 @@ namespace TinyShop.Catalog.Entities
         public Image? Image { get; set; }
         public int? ParentId { get; set; }
         public Category? ParentNode { get; set; }
-        public List<Category> SubCategories { get; set; } = new();
-        public List<Product> Products { get; set; } = new();
-        public List<CategoriesProducts> CategoriesProducts { get; set; } = new();
+        public List<CategoryFilter>? CategoryFilters { get; set; }
+        public List<Category>? SubCategories { get; set; }
+        public List<Product>? Products { get; set; }
     }
 }

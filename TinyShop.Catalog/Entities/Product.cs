@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 
 namespace TinyShop.Catalog.Entities
 {
-    public class Product
+    public class Product : IDisposable
     {
         [Key]
         public int Id { get; set; }
@@ -19,8 +17,10 @@ namespace TinyShop.Catalog.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public List<Image> Images { get; set; } = new();
-        public List<Category> Categories { get; set; } = new();
-        public List<CategoriesProducts> CategoriesProducts { get; set; } = new(); 
-        public List<ProductsImages> ProductsImages { get; set; } = new(); 
+        public Category Category { get; set; } = null!;
+        public List<ProductsImages> ProductsImages { get; set; } = new();
+        [Column(TypeName = "jsonb")]
+        public JsonDocument? Details { get; set; }
+        public void Dispose() => Details?.Dispose();
     }
 }

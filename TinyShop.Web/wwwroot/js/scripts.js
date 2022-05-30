@@ -2,6 +2,26 @@
     $('.ui.dropdown').dropdown();
 }
 
+export function showNag(nagId) {
+    $(`#${nagId}`)
+        .nag({
+            persist: true
+        });
+}
+
+
+export function showToast(title, message, color, displayTime) {
+    $('body')
+        .toast({
+            displayTime,
+            title,
+            message,
+            class: color,
+            className: {
+                toast: 'ui message'
+            }
+        });
+}
 
 export function initializeSlider(sliderElementId, dotNetObj, lowerBound, upperBound, lowerValue, upperValue, step) {
     $(`#${sliderElementId}`)

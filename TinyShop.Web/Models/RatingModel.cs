@@ -1,6 +1,6 @@
 ﻿namespace TinyShop.Web.Models
 {
-    public record RatingModel
+    public class RatingModel
     {
         private int _currentRating = 0;
         public int UpperBound { get; set; } = 5;

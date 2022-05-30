@@ -1,5 +1,8 @@
-﻿@using TinyShop.Web.CustomTypes
+﻿@using System.ComponentModel
+@using System.Globalization
+@using TinyShop.Web.CustomTypes
 @using TinyShop.Web.Models
+@typeparam TRange
 @inject IJSRuntime JSRuntime
 @inject IStringLocalizer<App> Localizer
 @implements IAsyncDisposable
@@ -10,25 +13,27 @@
     <div class="row">
         <div class="column">
             <div class="ui fluid right small labeled input">
-                <label for="range-component__lower-bound" class="ui label">@Localizer[RangeItem.Measurement??"-"]</label>
+                <label for="range-component__lower-bound" class="ui label">@Localizer[Measurement ?? "-"]</label>
                 <input type="number"
+                       step="@step"
                        id="range-component__lower-bound"
                        class="spinners--disable"
-                       min="@RangeItem.LowerBound"
-                       max="@RangeItem.UpperBound"
-                       value="@RangeItem.From"
+                       min="@RangeModel.LowerBound"
+                       max="@RangeModel.UpperBound"
+                       value="@RangeModel.FromAsString"
                        @onchange="FromHandler">
             </div>
         </div>
         <div class="column">
             <div class="ui fluid right small labeled input">
-                <label for="range-component__upper-bound" class="ui label">@Localizer[RangeItem.Measurement??"-"]</label>
+                <label for="range-component__upper-bound" class="ui label">@Localizer[Measurement ?? "-"]</label>
                 <input type="number"
+                       step="@step"
                        id="range-component__upper-bound"
                        class="spinners--disable"
-                       min="@RangeItem.LowerBound"
-                       max="@RangeItem.UpperBound"
-                       value="@RangeItem.To"
+                       min="@RangeModel.LowerBound"
+                       max="@RangeModel.UpperBound"
+                       value="@RangeModel.ToAsString"
                        @onchange="ToHandler">
             </div>
         </div>
@@ -37,45 +42,33 @@
 
 @code {
     [CascadingParameter]
-    public List<IResetableComponent> ChildComponentList { get; set; }
+    public List<IResetableComponent> ChildComponentList { get; set; } = null!;
 
     [Parameter]
-    public RangeModel RangeItem { get; set; }
+    public RangeModel<TRange> RangeModel { get; set; } = null!;
 
     [Parameter]
-    public String ComponentUniqueName
-    {
-        get => _componentUniqueName; set
-        {
-            if (!String.IsNullOrWhiteSpace(value))
-            {
-                _componentUniqueName = value.ToLower();
-            }
-        }
-    }
+    public string? Measurement { get; set; }
+
+    [Parameter]
+    public string ComponentUniqueName { get; set; } = null!;
 
     [Parameter]
     public EventCallback OnChange { get; set; }
 
-    private string _componentUniqueName = "";
-    private IJSObjectReference module;
+    double step = typeof(TRange) == typeof(double) ? 0.1 : 1.0;
+
+    private IJSObjectReference? module;
     // Создаем объект который будет хранить ссылку на экземпляр этой страницы
     // Далее этот объект будет передан на JS строну
-    private DotNetObjectReference<RangeComponent> thisObjRef;
+    private DotNetObjectReference<RangeComponent<TRange>>? thisObjRef;
 
     [JSInvokable]
-    public async Task SliderChanged(int val, int from, int to)
+    public async Task SliderChanged(TRange val, TRange from, TRange to)
     {
-        RangeItem.From = from;
-        RangeItem.To = to;
-        StateHasChanged();
+        RangeModel.From = from;
+        RangeModel.To = to;
         await OnChange.InvokeAsync();
-    }
-
-    protected override void OnParametersSet()
-    {
-        RangeItem.From = RangeItem.From is not null ? RangeItem.From : RangeItem.LowerBound;
-        RangeItem.To = RangeItem.To is not null ? RangeItem.To : RangeItem.UpperBound;
     }
 
     protected override void OnInitialized()
@@ -91,34 +84,47 @@
             // Инициализируем объект контейнер и передаем ему ссылку на экземляр объекта этой страницы
             // Далее ловим его на стороне JS
             thisObjRef = DotNetObjectReference.Create(this);
-            await module.InvokeVoidAsync(JsInteropConstants.InitSliderFuncName, ComponentUniqueName, thisObjRef, RangeItem.LowerBound, RangeItem.UpperBound, RangeItem.From, RangeItem.To, 1);
-            StateHasChanged();
+            await module.InvokeVoidAsync(
+                JsInteropConstants.InitSliderFuncName,
+                ComponentUniqueName,
+                thisObjRef,
+                RangeModel.LowerBound,
+                RangeModel.UpperBound,
+                RangeModel.From,
+                RangeModel.To, step);
         }
     }
 
     private async Task FromHandler(ChangeEventArgs args)
     {
-        if (module is not null)
+
+        if (module is not null && args.Value is not null)
         {
-            if (Int32.TryParse(args.Value.ToString(), out int from))
-            {
-                RangeItem.From = from;
-                await OnChange.InvokeAsync();
-                await module.InvokeVoidAsync(JsInteropConstants.SetSliderFuncName, ComponentUniqueName, RangeItem.From, RangeItem.To);
-            }
+
+            RangeModel.FromAsString = args!.Value!.ToString()!;
+
+            await OnChange.InvokeAsync();
+            await module.InvokeVoidAsync(
+                JsInteropConstants.SetSliderFuncName,
+                ComponentUniqueName,
+                RangeModel.From,
+                RangeModel.To);
         }
     }
 
+
     private async Task ToHandler(ChangeEventArgs args)
     {
-        if (module is not null)
+        if (module is not null && args.Value is not null)
         {
-            if (Int32.TryParse(args.Value.ToString(), out int to))
-            {
-                RangeItem.To = to;
-                await OnChange.InvokeAsync();
-                await module.InvokeVoidAsync(JsInteropConstants.SetSliderFuncName, ComponentUniqueName, RangeItem.From, RangeItem.To);
-            }
+            RangeModel.ToAsString = args!.Value!.ToString()!;
+
+            await OnChange.InvokeAsync();
+            await module.InvokeVoidAsync(
+                JsInteropConstants.SetSliderFuncName,
+                ComponentUniqueName,
+                RangeModel.From,
+                RangeModel.To);
         }
     }
 
@@ -132,11 +138,15 @@
 
     public void Reset()
     {
-        RangeItem.Reset();
+        RangeModel.Reset();
 
         if (module is not null)
         {
-            module.InvokeVoidAsync(JsInteropConstants.SetSliderFuncName, ComponentUniqueName, RangeItem.LowerBound, RangeItem.UpperBound);
+            module.InvokeVoidAsync(
+                JsInteropConstants.SetSliderFuncName,
+                ComponentUniqueName,
+                RangeModel.LowerBound,
+                RangeModel.UpperBound);
         }
     }
 }

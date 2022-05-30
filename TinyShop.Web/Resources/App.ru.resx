@@ -123,6 +123,9 @@
   <data name="Add to cart" xml:space="preserve">
     <value>В корзину</value>
   </data>
+  <data name="Additional filters" xml:space="preserve">
+    <value>Дополнительные фильтры</value>
+  </data>
   <data name="Apply" xml:space="preserve">
     <value>Применить</value>
   </data>

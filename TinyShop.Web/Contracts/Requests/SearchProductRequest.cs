@@ -2,7 +2,7 @@
 {
     public record SearchProductRequest
     {
-        public string SearchSentence { get; init; }
+        public string SearchSentence { get; init; } = null!;
         public int NumberOfRecords { get; init; }
     }
 }

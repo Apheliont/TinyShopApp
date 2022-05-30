@@ -1,50 +1,196 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TinyShop.Catalog.CustomTypes;
-using TinyShop.Catalog.DTOs;
-using TinyShop.Catalog.Entities;
+﻿using TinyShop.Catalog.Entities;
 using System.Linq.Dynamic.Core;
-using System.Dynamic;
+using Microsoft.EntityFrameworkCore;
+using TinyShop.Catalog.DTOs;
+using AutoMapper;
+using Newtonsoft.Json;
 
 namespace TinyShop.Catalog.Extensions
 {
     public static class QueryExtensions
     {
-        public static IQueryable<Product> ApplyDynamicFilter(this IQueryable<Product> query, ExpandoObject dynamicFilter)
+        public static async Task<ProductsInfoDto> FilterProducts(this IQueryable<Product> query, ProductFilterDto productFilter, IMapper mapper)
         {
-            
-            //query = query.Skip((dynamicFilter.PageNumber - 1) * dynamicFilter.RowsPerPage).Take(dynamicFilter.RowsPerPage);
-            //if (dynamicFilter.Filters is null)
-            //    return query;
-            if (dynamicFilter is null)
+            ProductsInfoDto productsInfo = new();
+            IQueryable<Product> allInCategoryQuery = query.Where(p => p.Category.Id == productFilter.CategoryId);
+            IQueryable<Product> allWithDetailsQuery = allInCategoryQuery.Where(p => p.Details != null);
+            IQueryable<Product> filteredProductsQuery = allInCategoryQuery;
+
+            if (productFilter.Price is not null)
             {
-                throw new Exception("Dynamic filter is not initialized");
+                filteredProductsQuery = filteredProductsQuery.Where(p =>
+                    p.Price >= productFilter.Price.LowerBound &&
+                    p.Price <= productFilter.Price.UpperBound);
             }
 
-            foreach (KeyValuePair<string, object?> keyValuePair in dynamicFilter)
+            if (productFilter.CategoryFilters is not null)
             {
-                if (keyValuePair.Value is null)
+                foreach (CategoryFilterDto filter in productFilter.CategoryFilters)
                 {
-                    throw new Exception("Filter value cannot be null");
-                }
+                    if (filter.Result is null) continue;
 
-                ExpandoObject value = (ExpandoObject)keyValuePair.Value;
-                string key = keyValuePair.Key;
+                    switch (filter.Type.ToLower())
+                    {
+                        case "range<double>":
+                            {
+                                RangeDto<double>? range = JsonConvert.DeserializeObject<RangeDto<double>>(filter.Result.ToString()!);
+                                if (range is null) break;
 
-                ((IDictionary<string, object?>)value).TryGetValue("Type", out object? dataType);
+                                filteredProductsQuery = filteredProductsQuery.Where(p =>
+                                    p.Details == null ? false : p.Details
+                                        .RootElement
+                                        .GetProperty(filter.Name)
+                                        .GetDouble() >= range.LowerBound &&
+                                    p.Details
+                                        .RootElement
+                                        .GetProperty(filter.Name)
+                                        .GetDouble() <= range.UpperBound);
+                                break;
+                            }
 
-                switch (dataType?.ToString()?.ToLower())
-                {
-                    case "orderby":
-                        query = query.OrderBy($"{Enum.GetName(typeof(OrderByEnum), value.Data)} {Enum.GetName(typeof(SortOrderEnum), dynamicFilter.SortOrder)}");
-                        break;
+                        case "range<int>":
+                            {
+                                RangeDto<int>? range = JsonConvert.DeserializeObject<RangeDto<int>>(filter.Result.ToString()!);
+                                if (range is null) break;
+
+                                filteredProductsQuery = filteredProductsQuery.Where(p =>
+                                    p.Details == null ? false : p.Details
+                                        .RootElement
+                                        .GetProperty(filter.Name)
+                                        .GetInt32() >= range.LowerBound &&
+                                    p.Details
+                                        .RootElement
+                                        .GetProperty(filter.Name)
+                                        .GetInt32() <= range.UpperBound);
+                                break;
+                            }
+
+
+                        case "checkbox":
+                            {
+                                List<string>? checkedItems = JsonConvert.DeserializeObject<List<string>>(filter.Result.ToString()!);
+                                if (checkedItems == null || !checkedItems.Any()) break;
+
+                                filteredProductsQuery = filteredProductsQuery.Where(p => p.Details == null ? false :
+                                    checkedItems.Contains(
+                                        p.Details
+                                        .RootElement
+                                        .GetProperty(filter.Name)
+                                        .GetString() ?? ""));
+                                break;
+                            }
+
+                        case "radio":
+                            {
+                                string checkedItem = filter.Result.ToString()!.ToLower();
+
+                                filteredProductsQuery = filteredProductsQuery.Where(p =>
+                                    p.Details == null ? false :
+                                    p.Details.RootElement.GetProperty(filter.Name).GetString() == checkedItem);
+                                break;
+                            }
+
+                    }
                 }
             }
 
-            return query;
+
+            productsInfo.Metadata.FoundRecords = filteredProductsQuery.Count();
+
+            filteredProductsQuery = filteredProductsQuery.OrderBy($"{productFilter.OrderBy} {productFilter.SortOrder}");
+            List<Product> products = await filteredProductsQuery.Skip((productFilter.PageNumber - 1) * productFilter.RowsPerPage)
+                .Take(productFilter.RowsPerPage).ToListAsync();
+            if (products.Count == 0) return productsInfo;
+
+            productsInfo.Products = mapper.Map<List<ProductDto>>(products);
+
+            return productsInfo;
+        }
+
+        public static async Task<ProductsInfoDto> GetProductsAndInfo(this IQueryable<Product> query, ProductFilterDto productFilter, IMapper mapper)
+        {
+            ProductsInfoDto productsInfo = await FilterProducts(query, productFilter, mapper);
+
+
+
+            IQueryable<Product> allInCategoryQuery = query.Where(p => p.Category.Id == productFilter.CategoryId);
+            IQueryable<Product> allWithDetailsQuery = allInCategoryQuery.Where(p => p.Details != null);
+            IQueryable<Product> filteredProductsQuery = allInCategoryQuery;
+
+            List<CategoryFilter>? categoryFilters = allInCategoryQuery.FirstOrDefault()?.Category.CategoryFilters;
+
+            if (categoryFilters is not null)
+            {
+                productsInfo.Metadata.CategoryFilters = new List<CategoryFilterDto>();
+                foreach (CategoryFilter filter in categoryFilters)
+                {
+                    CategoryFilterDto categoryFilterDto = mapper.Map<CategoryFilterDto>(filter);
+                    switch (filter.Type.ToLower())
+                    {
+                        case "checkbox" or "radio":
+                            {
+                                var result = new List<string>();
+                                foreach(Product product in allWithDetailsQuery)
+                                {
+                                    var det = product.Details;
+                                    string productDetailName = det!.RootElement.GetProperty(filter.Name).ToString().ToLower();
+                                    result.Add(productDetailName);
+                                }
+
+                                categoryFilterDto.Result = result.Distinct().ToList();
+                                break;
+                            }
+
+                        case "range<double>":
+                            {
+                                var result = allWithDetailsQuery
+                                    .Select(t =>
+                                         t.Details!
+                                        .RootElement
+                                        .GetProperty(filter.Name)
+                                        .GetDouble())
+                                    .ToList();
+                                categoryFilterDto.Result = new RangeDto<double>
+                                {
+                                    LowerBound = result.Min(),
+                                    UpperBound = result.Max()
+                                };
+                                break;
+                            }
+
+                        case "range<int>":
+                            {
+                                var result = allWithDetailsQuery
+                                    .Select(t =>
+                                         t.Details!
+                                        .RootElement
+                                        .GetProperty(filter.Name)
+                                        .GetInt32())
+                                    .ToList();
+
+                                categoryFilterDto.Result = new RangeDto<int>
+                                {
+                                    LowerBound = result.Min(),
+                                    UpperBound = result.Max()
+                                };
+                                break;
+                            }
+
+                    }
+                    productsInfo.Metadata.CategoryFilters.Add(categoryFilterDto);
+                }
+            }
+
+            productsInfo.Metadata.Price = await allInCategoryQuery
+                .GroupBy(p => 1)
+                .Select(p =>
+                    new RangeDto<int>
+                    {
+                        LowerBound = (int)Math.Floor(p.Min(g => g.Price)),
+                        UpperBound = (int)Math.Ceiling(p.Max(g => g.Price))
+                    }).FirstOrDefaultAsync();
+
+            return productsInfo;
         }
     }
 }

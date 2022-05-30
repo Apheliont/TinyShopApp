@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0-windows10.0.20348.0</TargetFramework>
     <UserSecretsId>aspnet-TinyShop-32C7BBF7-AC42-4FEE-BD41-9FEE789426F5</UserSecretsId>
+	  <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

@@ -5,6 +5,6 @@ namespace TinyShop.Contracts
 {
     public record GetBreadcrumbsResponse
     {
-        public List<BreadcrumbDto> Breadcrumbs { get; set; }
+        public List<BreadcrumbDto> Breadcrumbs { get; set; } = null!;
     }
 }

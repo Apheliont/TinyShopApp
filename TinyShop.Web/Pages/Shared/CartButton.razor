@@ -17,8 +17,8 @@
 
 @code {
     private const string CartButtonClass = "cartButton";
-    private int cartItemsCount;
-    private IJSObjectReference module;
+    private int cartItemsCount = 0;
+    private IJSObjectReference? module;
 
     protected override void OnInitialized()
     {

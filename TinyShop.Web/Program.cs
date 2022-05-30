@@ -78,7 +78,6 @@ builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<TinyShop.Web.Services.ILocalStorageService, TinyShop.Web.Services.LocalStorageService>();
 builder.Services.AddScoped<IUriService, UriService>();
-builder.Services.AddSingleton<IMapModelService, MapModelService>();
 builder.Services.AddScoped<AppState>();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddHttpClient();

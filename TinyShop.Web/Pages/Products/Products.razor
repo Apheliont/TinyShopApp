@@ -1,5 +1,6 @@
 ﻿@page "/categories/{categoryId:int}/products"
 @layout ProductsLayout
+@using AutoMapper
 @using TinyShop.Web.CustomTypes
 @using TinyShop.Web.Models
 @using TinyShop.Web.Services
@@ -12,8 +13,10 @@
 @inject NavigationManager NavigationManager
 @inject IUserService userService
 @inject IStringLocalizer<App> Localizer
-@inject IMapModelService mapModelService
+@inject IMapper mapper
+@inject IJSRuntime JSRuntime
 @implements IDisposable
+
 
 <div class="ui grid">
     <div class="row">
@@ -22,15 +25,18 @@
         <div class="twelve wide column">
             <SortPannelComponent MetadataModel="@ProductsInfo.Metadata"
                                  FilterModel="@FilterModel"
-                                 OnSortChange="() => PageHasChanged(1)" />
+                                 OnSortChange="() => PageHasChanged()" />
         </div>
     </div>
     <div class="row">
         <div class="four wide column">
             <CategoryMenu AccordionCssString="categories-menu" />
-            <ProductFilterComponent FilterModel="@FilterModel"
-                                    OnApplyFilter="() => PageHasChanged(1)"
-                                    OnResetFilter="() => PageHasChanged(1)" />
+            @if (readyToRender)
+            {
+                <ProductFilterComponent FilterModel="@FilterModel"
+                                    OnApplyFilter="() => PageHasChanged()"
+                                    OnResetFilter="() => PageHasChanged()" />
+            }
         </div>
         <div class="twelve wide column">
             <ProductListComponent Products="@ProductsInfo.Products" />
@@ -61,67 +67,106 @@
 
     public ProductsInfoModel ProductsInfo { get; set; } = new();
 
-    public ProductFilterModel FilterModel { get; set; }
+    public ProductFilterModel FilterModel { get; set; } = new();
+
+    private IJSObjectReference? module;
 
     private int numberOfPages;
+    private bool readyToRender = false;
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        FilterModel = new ProductFilterModel { CategoryId = CategoryId };
+        if (firstRender)
+        {
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+            NavigationManager.LocationChanged += HandleLocationChanged;
+            InitFilterModel();
+            await InitializeData();
+    }
+
+    private void InitFilterModel()
+    {
+        FilterModel.CategoryId = CategoryId;
         FilterModel.PageNumber = PageNumber ?? 1;
         FilterModel.OrderBy = OrderBy is null ? OrderByEnum.ProductName : (OrderByEnum)OrderBy;
         FilterModel.SortOrder = SortOrder is null ? SortOrderEnum.ASC : (SortOrderEnum)SortOrder;
         FilterModel.RowsPerPage = RowsPerPage is null ? RowsPerPageEnum._25 : (RowsPerPageEnum)RowsPerPage;
-
-        await InitializeData();
     }
 
 
     private async Task InitializeData()
     {
-        var filter = mapModelService.CreateFilterDto(FilterModel);
-        ProductsInfo = await productService.FilterProducts(filter);
-
-        if (ProductsInfo is not null)
+        try
         {
-            mapModelService.FillupFilterModel(ProductsInfo.Metadata, FilterModel);
-            numberOfPages = (int)(Math.Ceiling((double)ProductsInfo.Metadata.FoundRecords / (int)FilterModel.RowsPerPage));
+            ProductsInfo = await productService.GetProductsAndInfo(FilterModel);
+            if (ProductsInfo is not null)
+            {
+                mapper.Map<ProductMetadataModel, ProductFilterModel>(ProductsInfo.Metadata, FilterModel);
+                numberOfPages = (int)(Math.Ceiling((double)ProductsInfo.Metadata.FoundRecords / (int)FilterModel.RowsPerPage));
+                readyToRender = true;
+            }
         }
-
+        catch
+        {
+            if (module is not null)
+            {
+                await module.InvokeVoidAsync(
+                JsInteropConstants.ShowToastFuncName, "Error", $"Something bad happened", "red", 0);
+            }
+        }
     }
 
-    protected override void OnInitialized()
+    private async Task FilterProducts()
     {
-        NavigationManager.LocationChanged += HandleLocationChanged;
+        try
+        {
+            ProductsInfo = await productService.FilterProducts(FilterModel);
+            if (ProductsInfo is not null)
+            {
+                numberOfPages = (int)(Math.Ceiling((double)ProductsInfo.Metadata.FoundRecords / (int)FilterModel.RowsPerPage));
+            }
+        }
+        catch
+        {
+            if (module is not null)
+            {
+                await module.InvokeVoidAsync(
+                JsInteropConstants.ShowToastFuncName, "Error", $"Something bad happened", "red", 0);
+            }
+        }
     }
 
-    private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         base.InvokeAsync(async () =>
         {
-            await InitializeData();
+            await FilterProducts();
             StateHasChanged();
         });
     }
-
-
 
     void IDisposable.Dispose()
     {
         NavigationManager.LocationChanged -= HandleLocationChanged;
     }
 
-    private void PageHasChanged(int page)
+    private void PageHasChanged()
     {
-        FilterModel.PageNumber = page;
+        FilterModel.PageNumber = 1;
         var address = NavigationManager.GetUriWithQueryParameters(
-        new Dictionary<string, object>
-                        {
-                    { nameof(PageNumber), FilterModel.PageNumber },
-                    { nameof(OrderBy), (int)FilterModel.OrderBy },
-                    { nameof(SortOrder), (int)FilterModel.SortOrder },
-                    { nameof(RowsPerPage), (int)FilterModel.RowsPerPage },
-                        });
+        new Dictionary<string, object?>
+                                            {
+                                { nameof(PageNumber), FilterModel.PageNumber },
+                                { nameof(OrderBy), (int)FilterModel.OrderBy },
+                                { nameof(SortOrder), (int)FilterModel.SortOrder },
+                                { nameof(RowsPerPage), (int)FilterModel.RowsPerPage },
+                                            });
         NavigationManager.NavigateTo(address);
     }
 }

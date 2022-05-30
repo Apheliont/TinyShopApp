@@ -20,6 +20,20 @@ services:
                 - microsoftSQL
             volumes:
                 - db-data:/var/opt/mssql/data
+
+        postgres:
+            image: postgres
+            restart: on-failure
+            ports:
+                - 5432:5432
+            environment:
+                POSTGRES_PASSWORD: mYAwesomePassw0rd
+
+        adminer:
+            image: adminer
+            restart: on-failure
+            ports:
+            - 8080:8080
         
         rabbitmq:
             image: rabbitmq:3-management

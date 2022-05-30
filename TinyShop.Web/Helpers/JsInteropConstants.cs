@@ -32,6 +32,7 @@
         public const string ShowElementFuncName = "showElement";
         public const string ChangeItemWidthFuncName = "changeItemWidth";
         public const string SetItemWidthFuncName = "setItemWidth";
+        public const string ShowToastFuncName = "showToast";
 
     }
 }

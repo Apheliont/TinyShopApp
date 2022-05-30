@@ -1,9 +1,8 @@
 ﻿namespace TinyShop.Catalog.DTOs
 {
-    public record RangeDto
+    public record RangeDto<T>
     {
-        public double LowerBound { get; set; }
-        public double UpperBound { get; set; }
-        public string Measurement { get; set; }
+        public T LowerBound { get; set; } = default!;
+        public T UpperBound { get; set; } = default!;
     }
 }

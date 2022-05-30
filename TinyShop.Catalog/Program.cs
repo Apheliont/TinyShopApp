@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using TinyShop.Catalog;
-using TinyShop.Catalog.Consumers;
 using TinyShop.Catalog.Repositories;
 
 IConfiguration config = new ConfigurationBuilder()
@@ -14,11 +13,15 @@ IConfiguration config = new ConfigurationBuilder()
                                 .AddJsonFile("appsettings.json")
                                 .Build();
 
-IHostBuilder builder = Host.CreateDefaultBuilder(args).ConfigureServices(services =>
+IHostBuilder builder = Host.CreateDefaultBuilder(args)
+
+    .ConfigureServices(services =>
 {
     services.AddDbContext<AppDbContext>(opt =>
     {
-        opt.UseSqlServer(config.GetConnectionString("Default"));
+        opt.UseNpgsql(config.GetConnectionString("Default"),
+                     options => options.EnableRetryOnFailure())
+            .UseSnakeCaseNamingConvention();
     });
 
     IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
@@ -35,6 +38,7 @@ IHostBuilder builder = Host.CreateDefaultBuilder(args).ConfigureServices(service
         x.SetKebabCaseEndpointNameFormatter();
         x.UsingRabbitMq((context, cfg) =>
         {
+            cfg.ConfigureJsonSerializerOptions();
             cfg.Host(config["RabbitMq:connectionString"]);
             cfg.ConfigureEndpoints(context);
         });

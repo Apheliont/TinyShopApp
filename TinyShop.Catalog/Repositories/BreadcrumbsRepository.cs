@@ -17,17 +17,13 @@ namespace TinyShop.Catalog.Repositories
             int currentId = id;
             if (isProduct)
             {
-                Product? product = await _db.Products.Include(product => product.Categories)
+                Product? product = await _db.Products.Include(product => product.Category)
                                                 .SingleOrDefaultAsync(p => p.Id == id);
                 if (product is not null)
                 {
                     // TODO: Rework this logic to more precise
                     result.Add(new BreadcrumbDto { Id = product.Id, ItemName = product.ProductName, IsProduct = true });
-                    var firstCategory = product.Categories.FirstOrDefault();
-                    if (firstCategory is not null)
-                    {
-                        currentId = firstCategory.Id;
-                    }
+                    currentId = product.Category.Id;
                 }
             }
             List<Category> allCategories = await _db.Categories.ToListAsync();

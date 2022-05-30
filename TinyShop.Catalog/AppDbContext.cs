@@ -13,31 +13,28 @@ namespace TinyShop.Catalog
         public DbSet<Product> Products { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<CategoryFilter> CategoryFilters { get; set; }
 
-        public AppDbContext()
-        {
+        public AppDbContext() { }
 
-        }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer("Password=mYAwesomePassw0rd;Persist Security Info=True;User ID=sa;Initial Catalog=TinyShop.Catalog;Data Source=localhost");
-        //}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder
+                .UseNpgsql("Host=localhost;Database=TinyShop.Catalog;Username=postgres;Password=mYAwesomePassw0rd")
+                .UseSnakeCaseNamingConvention();
+            base.OnConfiguring(optionsBuilder);
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Product>().Property(p => p.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
-            modelBuilder.Entity<Product>().Property(p => p.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
-            modelBuilder.Entity<Category>().Property(p => p.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
-            modelBuilder.Entity<Category>().Property(p => p.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
-            modelBuilder.Entity<Category>()
-                .HasMany(c => c.Products)
-                .WithMany(p => p.Categories)
-                .UsingEntity<CategoriesProducts>(
-                    p => p.HasOne(j => j.Product).WithMany(m => m.CategoriesProducts).HasForeignKey(pt => pt.ProductId),
-                    p => p.HasOne(j => j.Category).WithMany(m => m.CategoriesProducts).HasForeignKey(pt => pt.CategoryId),
-                    p => p.HasIndex(u => new { u.CategoryId, u.ProductId }).IsUnique()
-                );
+            modelBuilder.Entity<Product>().Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_DATE");
+            modelBuilder.Entity<Product>().Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_DATE");
+            modelBuilder.Entity<Category>().Property(p => p.CreatedAt).HasDefaultValueSql("CURRENT_DATE");
+            modelBuilder.Entity<Category>().Property(p => p.UpdatedAt).HasDefaultValueSql("CURRENT_DATE");
+            modelBuilder.Entity<CategoryFilter>().Property(p => p.Index).HasDefaultValue(0);
+            modelBuilder.Entity<Category>().HasMany(c => c.Products).WithOne(p => p.Category);
 
             modelBuilder.Entity<Category>()
                 .HasMany(c => c.SubCategories)

@@ -1,9 +1,9 @@
-﻿using System.Dynamic;
+﻿using TinyShop.Catalog.DTOs;
 
 namespace TinyShop.Contracts
 {
     public record FilterProductsRequest
     {
-        public ExpandoObject Filter { get; init; }
+        public ProductFilterDto Filter { get; set; } = null!;
     }
 }

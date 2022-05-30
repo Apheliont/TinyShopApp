@@ -1,0 +1,68 @@
+﻿@using TinyShop.Web.CustomTypes
+@using TinyShop.Web.Models
+@implements IResetableComponent
+
+@if (RadioModel is not null)
+{
+    <div class="ui relaxed list">
+        @foreach (string itemName in RadioModel.ItemNames)
+        {
+            <div class="item">
+                <div class="ui radio checkbox">
+                    <input type="radio"
+                        name="@ComponentUniqueName"
+                        value="@itemName"
+                        checked="@itemName.Equals(RadioModel.SelectedItem)"
+                        @onchange="async (args) => await ChangePropState(args)">
+                    <label>@itemName</label>
+                </div>
+            </div>
+        }
+        <div class="item">
+            <div class="ui radio checkbox">
+                <input type="radio"
+                    name="@ComponentUniqueName"
+                    value=""
+                    checked="@String.IsNullOrEmpty(RadioModel.SelectedItem)"
+                    @onchange="async (args) => await ChangePropState(args)">
+                <label>No matter</label>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    public List<IResetableComponent> ChildComponentList { get; set; } = null!;
+
+    [Parameter]
+    public string ComponentUniqueName { get; set; } = null!;
+
+    [Parameter]
+    public RadioModel? RadioModel { get; set; }
+
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+
+    private async Task ChangePropState(ChangeEventArgs args)
+    {
+        if (RadioModel is not null)
+        {
+            RadioModel.SelectedItem = args.Value?.ToString() ?? "";
+            await OnChange.InvokeAsync();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        ChildComponentList.Add(this);
+    }
+
+    public void Reset()
+    {
+        RadioModel?.Reset();
+        StateHasChanged();
+    }
+}
+

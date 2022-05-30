@@ -1,5 +1,5 @@
 ﻿using MassTransit;
-using System.Dynamic;
+using TinyShop.Catalog.DTOs;
 using TinyShop.Catalog.Repositories;
 using TinyShop.Contracts;
 
@@ -15,13 +15,13 @@ namespace TinyShop.Catalog.Consumers
         }
         public async Task Consume(ConsumeContext<FilterProductsRequest> context)
         {
-            ExpandoObject filter = context.Message.Filter;
-            if (filter is null)
+            ProductFilterDto productFilter = context.Message.Filter;
+            if (productFilter is null)
             {
                 throw new InvalidOperationException("Request data not found");
             }
 
-            var foundProducts = await _productRepository.FilterProducts(filter);
+            var foundProducts = await _productRepository.FilterProducts(productFilter);
 
             await context.RespondAsync(new FilterProductsResponse { ProductsInfo = foundProducts });
         }

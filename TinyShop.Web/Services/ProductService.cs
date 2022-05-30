@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Threading;
 using System.Threading.Tasks;
 using TinyShop.Contracts;
+using TinyShop.Web.DTOs;
 using TinyShop.Web.Models;
 
 namespace TinyShop.Web.Services
@@ -15,12 +16,14 @@ namespace TinyShop.Web.Services
         private readonly IRequestClient<FilterProductsRequest> _filterProduct;
         private readonly IRequestClient<GetProductRequest> _getProduct;
         private readonly IRequestClient<GetProductsRequest> _getProducts;
+        private readonly IRequestClient<GetProductsAndInfoRequest> _getProductsAndInfo;
         private readonly IRequestClient<SearchProductRequest> _searchProducts;
         public ProductService(
                 IMapper mapper,
                 IRequestClient<FilterProductsRequest> filterProduct,
                 IRequestClient<GetProductRequest> getProduct,
                 IRequestClient<GetProductsRequest> getProducts,
+                IRequestClient<GetProductsAndInfoRequest> getProductsAndInfo,
                 IRequestClient<SearchProductRequest> searchProducts
             )
         {
@@ -28,12 +31,13 @@ namespace TinyShop.Web.Services
             _filterProduct = filterProduct;
             _getProduct = getProduct;
             _getProducts = getProducts;
+            _getProductsAndInfo = getProductsAndInfo;
             _searchProducts = searchProducts;
         }
-        public async Task<ProductsInfoModel> FilterProducts(ExpandoObject filter)
+        public async Task<ProductsInfoModel> FilterProducts(ProductFilterModel filter)
         {
             var res = await _filterProduct.GetResponse<FilterProductsResponse>
-                        (new FilterProductsRequest { Filter = filter });
+                        (new FilterProductsRequest { Filter = _mapper.Map<ProductFilterDto>(filter) });
             return _mapper.Map<ProductsInfoModel>(res.Message.ProductsInfo);
         }
 
@@ -49,6 +53,13 @@ namespace TinyShop.Web.Services
             var res = await _getProducts.GetResponse<GetProductsResponse>
                         (new GetProductsRequest { Ids = ids });
             return _mapper.Map<List<ProductModel>>(res.Message.Products);
+        }
+
+        public async Task<ProductsInfoModel> GetProductsAndInfo(ProductFilterModel filter)
+        {
+            var res = await _getProductsAndInfo.GetResponse<GetProductsAndInfoResponse>
+            (new FilterProductsRequest { Filter = _mapper.Map<ProductFilterDto>(filter) });
+            return _mapper.Map<ProductsInfoModel>(res.Message.ProductsInfo);
         }
 
         public async Task<List<ProductModel>> SearchProducts(string searchSentence, int numberOfRecords, CancellationToken token)

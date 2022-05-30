@@ -1,25 +1,20 @@
 ﻿@using System.Reflection
+@using System.Dynamic
+@using Newtonsoft.Json
 @using TinyShop.Web.Models
 @using TinyShop.Web.CustomTypes
 @inject IStringLocalizer<App> Localizer
 @inject IJSRuntime JSRuntime
-@implements IAsyncDisposable
+@*@implements IAsyncDisposable*@
 
 <CascadingValue Value="@ChildComponentList">
     <div class="ui fluid vertical menu">
-        <div class="ui styled fluid accordion">
-            <div class="active title">
-                <i class="dropdown icon"></i>
-                @Localizer["Price"]
-            </div>
-
-            <div class="active content">
-                <RangeComponent ComponentUniqueName="Price"
-                                RangeItem="FilterModel.Price"
-                                OnChange="ComponentChanged" />
-            </div>
-
-
+        <div class="item">
+            <div class="header">@Localizer["Price"]</div>
+            <RangeComponent ComponentUniqueName="Price"
+                            RangeModel="@FilterModel.Price"
+                            Measurement="ru"
+                            OnChange="ComponentChanged" />
         </div>
         <div class="item">
             <RatingComponent ComponentUniqueName="Rating"
@@ -27,40 +22,64 @@
                              RatingItem="FilterModel.Rating"
                              OnChange="ComponentChanged" />
         </div>
-        @if (FilterModel.DynamicFilter is not null)
+
+        @if (FilterModel.CategoryFilters is not null)
         {
-            var details = FilterModel.DynamicFilter;
             <div class="ui styled fluid accordion">
-                @foreach (PropertyInfo prop in details.GetType().GetProperties())
-                {
-                    <div class="title">
-                        <i class="dropdown icon"></i>
-                        @Localizer[details.DescriptionAttr(prop.Name)]
-                    </div>
-                    <div class="content">
-                        @switch (prop.PropertyType)
-                        {
-                            case Type t when t == typeof(CheckboxListModel):
-                                <CheckboxListComponent ComponentUniqueName="@prop.Name"
-                                       CheckboxListItem="@((CheckboxListModel)prop.GetValue(details, null))"
-                                       OnChange="ComponentChanged" />
-                                break;
-                            case Type t when t == typeof(CheckboxModel):
-                                <CheckboxComponent ComponentUniqueName="@prop.Name"
-                                   CheckboxItem="@((CheckboxModel)prop.GetValue(details, null))"
-                                   OnChange="ComponentChanged" />
-                                break;
-                            case Type t when t == typeof(RangeModel):
-                                <RangeComponent ComponentUniqueName="@prop.Name"
-                                RangeItem="@((RangeModel)prop.GetValue(details, null))"
-                                OnChange="ComponentChanged" />
-                                break;
-                            default:
-                                <p>@prop.Name</p>
-                                break;
-                        }
-                    </div>
-                }
+                <div class="active title">
+                    <i class="dropdown icon"></i>
+                    @Localizer["Additional filters"]
+                </div>
+                <div class="active content" style="padding: 0px !important">
+                    @foreach (CategoryFilter filter in FilterModel.CategoryFilters)
+                    {
+                        if (filter.Result is null) continue;
+
+                        <div class="item">
+                            <div class="header">@Localizer[filter.Description ?? ""]</div>
+
+                            @switch (filter.Type.ToLower())
+                            {
+                                case "checkbox":
+                                    {
+                                        CheckboxModel checkbox = (CheckboxModel)filter.Result;
+                                        <CheckboxComponent CheckboxModel="@checkbox"
+                                            OnChange="ComponentChanged" />
+                                        break;
+                                    }
+
+                                case "radio":
+                                    {
+                                        RadioModel radio = (RadioModel)filter.Result;
+                                        <RadioComponent ComponentUniqueName="@filter.Name"
+                                            RadioModel="@radio"
+                                            OnChange="ComponentChanged" />
+                                        break;
+                                    }
+
+                                case "range<int>":
+                                    {
+                                        RangeModel<int> range = (RangeModel<int>)filter.Result;
+                                        <RangeComponent ComponentUniqueName="@filter.Name"
+                                            Measurement="@filter.Measurement"
+                                            RangeModel="@(range)"
+                                            OnChange="ComponentChanged" />
+                                        break;
+                                    }
+
+                                case "range<double>":
+                                    {
+                                        RangeModel<double> range = (RangeModel<double>)filter.Result;
+                                        <RangeComponent ComponentUniqueName="@filter.Name"
+                                            Measurement="@filter.Measurement"
+                                            RangeModel="@(range)"
+                                            OnChange="ComponentChanged" />
+                                        break;
+                                    }
+                            }
+                        </div>
+                    }
+                </div>
             </div>
         }
 
@@ -77,7 +96,7 @@
 
 @code {
     [Parameter]
-    public ProductFilterModel FilterModel { get; set; }
+    public ProductFilterModel FilterModel { get; set; } = null!;
 
     [Parameter]
     public EventCallback OnResetFilter { get; set; }
@@ -91,25 +110,33 @@
     private bool IsResetDisabled = true;
 
 
-    private IJSObjectReference module;
+    //private IJSObjectReference? module;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
+    //        await module.InvokeVoidAsync(JsInteropConstants.InitAccordionFuncName);
+    //    }
+    //}
+
+    protected override void OnParametersSet()
     {
-        if (firstRender)
+        if (FilterModel.CategoryFilters is not null)
         {
-            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
-            await module.InvokeVoidAsync(JsInteropConstants.InitAccordionFuncName);
+            FilterModel.CategoryFilters = FilterModel.CategoryFilters.OrderBy(x => x.Index).ToList();
         }
     }
 
 
-    async ValueTask IAsyncDisposable.DisposeAsync()
-    {
-        if (module is not null)
-        {
-            await module.DisposeAsync();
-        }
-    }
+    //async ValueTask IAsyncDisposable.DisposeAsync()
+    //{
+    //    if (module is not null)
+    //    {
+    //        await module.DisposeAsync();
+    //    }
+    //}
 
 
     private async Task ApplyFilterHandler()

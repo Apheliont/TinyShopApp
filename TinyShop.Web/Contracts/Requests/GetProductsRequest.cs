@@ -2,6 +2,6 @@
 {
     public record GetProductsRequest
     {
-        public int[] Ids { get; init; }
+        public int[] Ids { get; init; } = null!;
     }
 }
