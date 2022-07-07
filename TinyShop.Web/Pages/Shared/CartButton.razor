@@ -29,7 +29,7 @@
     {
         if (firstRender)
         {
-            //cartItemsCount = await purchaseService.GetItemsCountInCart();
+            cartItemsCount = await purchaseService.GetItemsCountInCart();
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
             StateHasChanged();
         }
@@ -38,7 +38,7 @@
 
     private async void OnCartItemsCountChange()
     {
-        //cartItemsCount = await purchaseService.GetItemsCountInCart();
+        cartItemsCount = await purchaseService.GetItemsCountInCart();
         if (module is not null)
         {
             await module.InvokeVoidAsync(JsInteropConstants.FlashFuncName, CartButtonClass);

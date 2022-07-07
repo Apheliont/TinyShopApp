@@ -1,9 +1,0 @@
-﻿CREATE TABLE [dbo].[Products]
-(
-	[Id] INT NOT NULL PRIMARY KEY IDENTITY(1, 1), 
-    [ProductName] NVARCHAR(200) NOT NULL, 
-    [Description] NVARCHAR(2000) NOT NULL, 
-    [Price] MONEY NOT NULL,
-    [CreatedAt] DATETIME2 DEFAULT GETUTCDATE(),
-    [UpdatedAt] DATETIME2 DEFAULT GETUTCDATE(),
-)

@@ -14,6 +14,11 @@ namespace TinyShop.Catalog
         public DbSet<Image> Images { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CategoryFilter> CategoryFilters { get; set; }
+        public DbSet<CategoryFilterTranslation> CategoryFilterTranslations { get; set; }
+        public DbSet<CategoryTranslation> CategoryTranslations { get; set; }
+        public DbSet<ProductTranslation> ProductTranslations { get; set; }
+        public DbSet<Language> Languages { get; set; }
+        public DbSet<Country> Countries { get; set; }
 
         public AppDbContext() { }
 
@@ -49,6 +54,10 @@ namespace TinyShop.Catalog
                     p => p.HasOne(j => j.Product).WithMany(m => m.ProductsImages).HasForeignKey(pt => pt.ProductId),
                     p => p.HasIndex(u => new { u.ImageId, u.ProductId }).IsUnique()
                 );
+
+            modelBuilder.Entity<ProductTranslation>().HasKey(pt => new { pt.ProductId, pt.LanguageCode });
+            modelBuilder.Entity<CategoryFilterTranslation>().HasKey(cft => new { cft.CategoryFilterId, cft.LanguageCode });
+            modelBuilder.Entity<CategoryTranslation>().HasKey(ct => new { ct.CategoryId, ct.LanguageCode });
         }
     }
 }

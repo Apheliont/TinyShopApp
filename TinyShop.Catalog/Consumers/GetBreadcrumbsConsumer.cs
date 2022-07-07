@@ -13,7 +13,7 @@ namespace TinyShop.Catalog.Consumers
         }
         public async Task Consume(ConsumeContext<GetBreadcrumbsRequest> context)
         {
-            var dtos = await _breadcrumbsRepository.Get(context.Message.Id, context.Message.IsProduct);
+            var dtos = await _breadcrumbsRepository.Get(context.Message);
             await context.RespondAsync(new GetBreadcrumbsResponse { Breadcrumbs = dtos });
         }
     }

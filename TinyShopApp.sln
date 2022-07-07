@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLib", "DataAccessLib\DataAccessLib.csproj", "{C843EC2D-8448-475F-B19A-016F662F331F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyShop.ProductSearch", "TinyShop.ProductSearch\TinyShop.ProductSearch.csproj", "{44C3334A-FE39-460B-A0F8-ED70F70F8D02}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyShop.Identity", "TinyShop.Identity\TinyShop.Identity.csproj", "{762E4A90-5FE0-4C41-B599-811B84666F61}"
@@ -32,10 +30,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C843EC2D-8448-475F-B19A-016F662F331F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C843EC2D-8448-475F-B19A-016F662F331F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C843EC2D-8448-475F-B19A-016F662F331F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C843EC2D-8448-475F-B19A-016F662F331F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{44C3334A-FE39-460B-A0F8-ED70F70F8D02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{44C3334A-FE39-460B-A0F8-ED70F70F8D02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44C3334A-FE39-460B-A0F8-ED70F70F8D02}.Release|Any CPU.ActiveCfg = Release|Any CPU

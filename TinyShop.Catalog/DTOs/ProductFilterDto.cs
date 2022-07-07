@@ -10,6 +10,7 @@ namespace TinyShop.Catalog.DTOs
         public int PageNumber { get; set; } = 1;
         public OrderByEnum OrderBy { get; set; } = OrderByEnum.ProductName;
         public SortOrderEnum SortOrder { get; set; } = SortOrderEnum.DESC;
+        public UserSettingsDto? UserSettings { get; set; }
         public RangeDto<int>? Price { get; set; }
         public List<CategoryFilterDto>? CategoryFilters { get; set; }
     }

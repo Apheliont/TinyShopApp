@@ -12,5 +12,5 @@ namespace TinyShop.Catalog.CustomTypes
         ProductName = 1,
         Price = 2,
         Rating = 3
-    };
+    }
 }

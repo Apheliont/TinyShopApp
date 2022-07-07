@@ -1,6 +1,7 @@
 ﻿@using TinyShop.Web.Models
 @using TinyShop.Web.Services
 @using TinyShop.Web.Pages.Shared.Layouts
+@using System.Globalization
 @layout CategoriesLayout
 @page "/categories/{CategoryId:int}"
 @inject ICategoryService categoryService
@@ -47,7 +48,8 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        categories = await categoryService.GetSubcategories(CategoryId);
+        UserSettings userSettings = new UserSettings { PreferedLanguageCode = CultureInfo.CurrentCulture.TwoLetterISOLanguageName };
+        categories = await categoryService.GetSubcategories(CategoryId, userSettings);
     }
 
     private async Task CategoryClickHandler(CategoryModel category)

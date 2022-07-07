@@ -1,7 +1,0 @@
-﻿CREATE TABLE [dbo].[UserCarts]
-(
-	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
-	[UserId] NVARCHAR(450) NULL,
-	[CartId] INT NULL,
-	CONSTRAINT [UQ_UserCarts_UniqueUserId] UNIQUE([Id])
-)

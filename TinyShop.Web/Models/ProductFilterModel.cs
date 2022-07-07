@@ -10,6 +10,7 @@ namespace TinyShop.Web.Models
         public int PageNumber { get; set; } = 1;
         public OrderByEnum OrderBy { get; set; } = OrderByEnum.ProductName;
         public SortOrderEnum SortOrder { get; set; } = SortOrderEnum.DESC;
+        public UserSettings? UserSettings { get; set; }
         public RatingModel? Rating { get; set; } = new();
         public RangeModel<int> Price { get; set; } = new();
         public List<CategoryFilter>? CategoryFilters { get; set; }

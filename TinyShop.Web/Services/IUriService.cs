@@ -6,6 +6,6 @@ namespace TinyShop.Web.Services
 {
     public interface IUriService
     {
-        Task<List<BreadcrumbModel>> GetBreadcrumbs(string uri);
+        Task<List<BreadcrumbModel>> GetBreadcrumbs(string uri, UserSettings userSettings);
     }
 }

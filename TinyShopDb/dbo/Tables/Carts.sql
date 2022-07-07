@@ -1,6 +1,0 @@
-﻿CREATE TABLE [dbo].[Carts]
-(
-	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
-	[ItemQuantity] INT NOT NULL DEFAULT 0,
-    [UpdatedAt] DATETIME2 NULL 
-)

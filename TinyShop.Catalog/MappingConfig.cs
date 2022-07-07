@@ -28,8 +28,19 @@ namespace TinyShop.Catalog
                         .ConvertUsing(new JDocToExpando());
                 config.CreateMap<Image, ImageDto>();
                 config.CreateMap<Category, CategoryDto>();
+                config.CreateMap<ProductTranslation, Product>();
+                config.CreateMap<CategoryTranslation, Category>();
+                config.CreateMap<CategoryFilterTranslation, CategoryFilter>();
                 config.CreateMap<CategoryFilter, CategoryFilterDto>()
                         .ForMember(x => x.Result, opt => opt.Ignore());
+                config.CreateMap<Category, BreadcrumbDto>()
+                        .ForMember(b => b.ItemName, opt => opt.MapFrom(src => src.CategoryName))
+                        .ForMember(b => b.Id, opt => opt.MapFrom(src => src.Id))
+                        .ForMember(b => b.IsProduct, opt => opt.MapFrom(src => false));
+                config.CreateMap<Product, BreadcrumbDto>()
+                        .ForMember(b => b.ItemName, opt => opt.MapFrom(src => src.ProductName))
+                        .ForMember(b => b.Id, opt => opt.MapFrom(src => src.Id))
+                        .ForMember(b => b.IsProduct, opt => opt.MapFrom(src => true));
             });
             return mappingConfig;
         }

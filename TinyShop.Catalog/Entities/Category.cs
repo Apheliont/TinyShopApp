@@ -9,6 +9,7 @@ namespace TinyShop.Catalog.Entities
     {
         [Key]
         public int Id { get; set; }
+        public Language OriginalLanguage { get; set; } = null!;
         [Required]
         [MaxLength(200)]
         public string CategoryName { get; set; } = null!;
@@ -21,5 +22,6 @@ namespace TinyShop.Catalog.Entities
         public List<CategoryFilter>? CategoryFilters { get; set; }
         public List<Category>? SubCategories { get; set; }
         public List<Product>? Products { get; set; }
+        public List<CategoryTranslation>? CategoryTranslations { get; set; }
     }
 }

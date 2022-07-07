@@ -192,6 +192,7 @@ namespace TinyShop.Web
 
 
                 config.CreateMap<ProductMetadataModel, ProductFilterModel>();
+                config.CreateMap<UserSettings, UserSettingsDto>();
                 config.CreateMap<ProductFilterModel, ProductFilterDto>()
                     .ForMember(dest => dest.RowsPerPage, opt => opt.MapFrom(src => (int)src.RowsPerPage))
                     .ForMember(dest => dest.CategoryFilters, opt => opt.MapFrom(src => src.CategoryFilters))

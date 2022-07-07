@@ -17,13 +17,14 @@ namespace TinyShop.Web.Services
             _requestClient = requestClient;
             _mapper = mapper;
         }
-        public async Task<List<BreadcrumbModel>> Get(int id, bool isProduct)
+        public async Task<List<BreadcrumbModel>> Get(int id, bool isProduct, UserSettingsDto userSettings)
         {
             var result = await _requestClient.GetResponse<GetBreadcrumbsResponse>(new
             GetBreadcrumbsRequest
             {
                 Id = id,
-                IsProduct = isProduct
+                IsProduct = isProduct,
+                UserSettings = userSettings
             });
             return _mapper.Map<List<BreadcrumbModel>>(result.Message.Breadcrumbs);
         }

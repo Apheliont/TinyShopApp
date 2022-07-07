@@ -80,7 +80,7 @@
                                     else
                                     {
                                         <button class="product__buy-to-cart-btn"
-                                             @onclick="async () => { await AddToCartHandler(product); }">
+                                    @onclick="async () => { await AddToCartHandler(product); }">
                                             @Localizer["Add to cart"]
                                         </button>
                                     }
@@ -93,21 +93,17 @@
                 {
                     <div class="ui bottom attached tab segment product-info__tabData" data-tab="specifications">
                         <div class="ui grid product-info__tab-specifications">
-                            @foreach (string key in product.Details.Keys)
-                            {
-                                <div class="sixteen wide column">
-                                    <p><b>@key</b></p>
+                            <div class="sixteen wide column">
+                                @foreach (KeyValuePair<string, dynamic> detail in product.Details)
+                                {
                                     <div class="ui two column grid">
-                                        @foreach (var row in product.Details[key])
-                                        {
-                                            <div class="row">
-                                                <div class="column">@row.Name</div>
-                                                <div class="column">@row.Value</div>
-                                            </div>
-                                        }
+                                        <div class="row">
+                                            <div class="column">@detail.Key</div>
+                                            <div class="column">@detail.Value</div>
+                                        </div>
                                     </div>
-                                </div>
-                            }
+                                }
+                            </div>
                         </div>
                     </div>
                 }

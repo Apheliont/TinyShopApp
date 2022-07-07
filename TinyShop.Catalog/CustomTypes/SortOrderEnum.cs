@@ -13,5 +13,5 @@ namespace TinyShop.Catalog.CustomTypes
         DESC = 1,
         [Description("Straight order")]
         ASC = 2
-    };
+    }
 }

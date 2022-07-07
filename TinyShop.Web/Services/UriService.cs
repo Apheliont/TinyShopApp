@@ -1,21 +1,25 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TinyShop.Web.DTOs;
 using TinyShop.Web.Models;
 
 namespace TinyShop.Web.Services
 {
     public class UriService : IUriService
     {
-        private ConcurrentDictionary<int, List<BreadcrumbModel>> categoryCache = new ConcurrentDictionary<int, List<BreadcrumbModel>>();
-        private ConcurrentDictionary<int, List<BreadcrumbModel>> productCache = new ConcurrentDictionary<int, List<BreadcrumbModel>>();
+        private ConcurrentDictionary<string, List<BreadcrumbModel>> categoryCache = new ConcurrentDictionary<string, List<BreadcrumbModel>>();
+        private ConcurrentDictionary<string, List<BreadcrumbModel>> productCache = new ConcurrentDictionary<string, List<BreadcrumbModel>>();
         private readonly IBreadcrumbsService _breadcrumbsService;
+        private readonly IMapper _mapper;
 
-        public UriService(IBreadcrumbsService breadcrumbsService)
+        public UriService(IBreadcrumbsService breadcrumbsService, IMapper mapper)
         {
             _breadcrumbsService = breadcrumbsService;
+            _mapper = mapper;
         }
 
         private bool GetIdFromURI(string uri, string type, out int id)
@@ -29,17 +33,20 @@ namespace TinyShop.Web.Services
             return false;
         }
 
-        public async Task<List<BreadcrumbModel>> GetBreadcrumbs(string uri)
+        public async Task<List<BreadcrumbModel>> GetBreadcrumbs(string uri, UserSettings userSettings)
         {
+            UserSettingsDto userSettingsDto = _mapper.Map<UserSettingsDto>(userSettings);
+
             if (GetIdFromURI(uri, "categories", out int categoryId))
             {
-                if (categoryCache.ContainsKey(categoryId))
+                var key = $"{categoryId}-{userSettings.PreferedLanguageCode}";
+                if (categoryCache.ContainsKey(key))
                 {
-                    return categoryCache.GetValueOrDefault(categoryId);
+                    return categoryCache.GetValueOrDefault(key)!;
                 }
                 else
                 {
-                    var res = await _breadcrumbsService.Get(categoryId, false);
+                    var res = await _breadcrumbsService.Get(categoryId, false, userSettingsDto);
                     if (res.Any())
                     {
                         int lastIdx = res.Count - 1;
@@ -53,26 +60,22 @@ namespace TinyShop.Web.Services
                             return item;
                         }).ToList();
 
-                        categoryCache.TryAdd(categoryId, res);
+                        categoryCache.TryAdd(key, res);
                         return res;
-                    }
-                    else
-                    {
-                        categoryCache.TryAdd(categoryId, null);
-                        return null;
                     }
                 }
             }
 
             if (GetIdFromURI(uri, "products", out int productId))
             {
-                if (productCache.ContainsKey(productId))
+                var key = $"{productId}-{userSettings.PreferedLanguageCode}";
+                if (productCache.ContainsKey(key))
                 {
-                    return productCache.GetValueOrDefault(productId);
+                    return productCache.GetValueOrDefault(key)!;
                 }
                 else
                 {
-                    var res = await _breadcrumbsService.Get(productId, true);
+                    var res = await _breadcrumbsService.Get(productId, true, userSettingsDto);
                     if (res.Any())
                     {
                         int lastIdx = res.Count - 1;
@@ -90,18 +93,12 @@ namespace TinyShop.Web.Services
                             return item;
                         }).ToList();
 
-                        productCache.TryAdd(productId, res);
+                        productCache.TryAdd(key, res);
                         return res;
-                    }
-                    else
-                    {
-                        productCache.TryAdd(productId, null);
-                        return null;
                     }
                 }
             }
-
-            return null;
+            return new List<BreadcrumbModel>();
         }
 
     }

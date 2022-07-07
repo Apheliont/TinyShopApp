@@ -20,10 +20,7 @@ namespace TinyShop.Catalog.Repositories
         public async Task<ProductsInfoDto> FilterProducts(ProductFilterDto productFilter)
         {
 
-            return await _db
-                .Products
-                .Include(p => p.Category)
-                .FilterProducts(productFilter, _mapper);
+            return await _db.FilterProducts(productFilter, _mapper);
         }
 
         public async Task<ProductDto> GetProduct(int productId)
@@ -44,10 +41,7 @@ namespace TinyShop.Catalog.Repositories
 
         public async Task<ProductsInfoDto> GetProductsAndInfo(ProductFilterDto productFilter)
         {
-            return await _db
-                .Products
-                .Include(p => p.Category).ThenInclude(c => c.CategoryFilters)
-                .GetProductsAndInfo(productFilter, _mapper);
+            return await _db.GetProductsAndInfo(productFilter, _mapper);
         }
     }
 }

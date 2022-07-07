@@ -1,47 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TinyShop.Catalog.DTOs;
-using TinyShop.Catalog.Entities;
+﻿using TinyShop.Catalog.DTOs;
+using TinyShop.Contracts;
+using TinyShop.Catalog.Extensions;
+using AutoMapper;
 
 namespace TinyShop.Catalog.Repositories
 {
     public class BreadcrumbsRepository : IBreadcrumbsRepository
     {
         private readonly AppDbContext _db;
-        public BreadcrumbsRepository(AppDbContext db)
+        private readonly IMapper _mapper;
+        public BreadcrumbsRepository(AppDbContext db, IMapper mapper)
         {
             _db = db;
+            _mapper = mapper;
         }
-        public async Task<List<BreadcrumbDto>> Get(int id, bool isProduct)
+        public async Task<List<BreadcrumbDto>> Get(GetBreadcrumbsRequest request)
         {
-            List<BreadcrumbDto> result = new List<BreadcrumbDto>();
-            int currentId = id;
-            if (isProduct)
-            {
-                Product? product = await _db.Products.Include(product => product.Category)
-                                                .SingleOrDefaultAsync(p => p.Id == id);
-                if (product is not null)
-                {
-                    // TODO: Rework this logic to more precise
-                    result.Add(new BreadcrumbDto { Id = product.Id, ItemName = product.ProductName, IsProduct = true });
-                    currentId = product.Category.Id;
-                }
-            }
-            List<Category> allCategories = await _db.Categories.ToListAsync();
-            while (true)
-            {
-                var foundCategory = allCategories.SingleOrDefault(c => c.Id == currentId);
-                if (foundCategory is not null)
-                {
-                    result.Add(new BreadcrumbDto { Id = currentId, ItemName = foundCategory.CategoryName });
-                    if (foundCategory.ParentId is null)
-                    {
-                        break;
-                    }
-
-                    currentId = foundCategory.ParentId.Value;
-                }
-            }
-            return result;
+            return await _db.GetBreadcrumbs(request, _mapper);
         }
     }
 }

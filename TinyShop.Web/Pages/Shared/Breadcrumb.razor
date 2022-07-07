@@ -1,5 +1,6 @@
 ﻿@using TinyShop.Web.Models
 @using TinyShop.Web.Services
+@using System.Globalization
 @inject IStringLocalizer<App> Localizer
 @inject NavigationManager NavigationManager
 @inject IUriService UriService
@@ -52,6 +53,7 @@
     private async Task GetBreadcrumbs()
     {
         string uri = NavigationManager.Uri;
-        breadcrumbs = await UriService.GetBreadcrumbs(uri);
+        UserSettings userSettings = new UserSettings { PreferedLanguageCode = CultureInfo.CurrentCulture.TwoLetterISOLanguageName };
+        breadcrumbs = await UriService.GetBreadcrumbs(uri, userSettings);
     }
 }

@@ -13,7 +13,11 @@ namespace TinyShop.Catalog.Consumers
         }
         public async Task Consume(ConsumeContext<GetSubcategoriesRequest> context)
         {
-            var dtos = await _categoryRepository.GetSubcategories(context.Message.CategoryId);
+            var dtos = await _categoryRepository.GetSubcategories
+                (
+                    context.Message.CategoryId,
+                    context.Message.UserSettings
+                );
             await context.RespondAsync(new GetSubcategoriesResponse { Subcategories = dtos });
         }
     }

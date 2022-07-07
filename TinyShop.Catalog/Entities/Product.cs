@@ -9,6 +9,7 @@ namespace TinyShop.Catalog.Entities
     {
         [Key]
         public int Id { get; set; }
+        public Language OriginalLanguage { get; set; } = null!;
         [Required]
         [MaxLength(200)]
         public string ProductName { get; set; } = null!;
@@ -22,5 +23,6 @@ namespace TinyShop.Catalog.Entities
         [Column(TypeName = "jsonb")]
         public JsonDocument? Details { get; set; }
         public void Dispose() => Details?.Dispose();
+        public List<ProductTranslation>? ProductTranslations { get; set; }
     }
 }

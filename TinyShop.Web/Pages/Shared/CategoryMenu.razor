@@ -1,5 +1,6 @@
 ﻿@using TinyShop.Web.Models
 @using TinyShop.Web.Services
+@using System.Globalization
 @inject ICategoryService categoryService
 @inject IUriService uriService
 @inject ILocalStorageService localStorage
@@ -60,6 +61,7 @@
     private string openedMenuCssString;
     private List<CategoryModel> categories;
     private string accordionCssString = "ui styled accordion";
+    private UserSettings userSettings = null!;
 
     private string GetNavLinkCssClass(CategoryModel category)
     {
@@ -85,21 +87,26 @@
         }
         NavigationManager.NavigateTo(url);
 
-        var res = await uriService.GetBreadcrumbs(url);
+        var res = await uriService.GetBreadcrumbs(url, userSettings);
         rootCategoryId = (res is not null && res.Any()) ? res.Last().Id : null;
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        categories = await categoryService.GetRoot();
+        UserSettings userSettings = new UserSettings
+        { 
+            PreferedLanguageCode = CultureInfo.CurrentCulture.TwoLetterISOLanguageName
+        };
+        categories = await categoryService.GetRoot(userSettings);
         openedMenuCssString = IsMenuOpened ? "active content" : "content";
     }
 
 
     protected override async Task OnInitializedAsync()
     {
+        userSettings = new UserSettings { PreferedLanguageCode = CultureInfo.CurrentCulture.TwoLetterISOLanguageName };
         string uri = NavigationManager.Uri;
-        var res = await uriService.GetBreadcrumbs(uri);
+        var res = await uriService.GetBreadcrumbs(uri, userSettings);
         rootCategoryId = (res is not null && res.Any()) ? res.Last().Id : null;
     }
 }

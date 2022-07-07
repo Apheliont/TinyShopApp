@@ -9,6 +9,7 @@
 @using System.Text;
 @using TinyShop.Web.Extensions
 @using TinyShop.Web.Pages.Products.ProductFilter
+@using System.Globalization
 @inject IProductService productService
 @inject NavigationManager NavigationManager
 @inject IUserService userService
@@ -84,14 +85,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-            NavigationManager.LocationChanged += HandleLocationChanged;
-            InitFilterModel();
-            await InitializeData();
+        NavigationManager.LocationChanged += HandleLocationChanged;
+        InitFilterModel();
+        await InitializeData();
     }
 
     private void InitFilterModel()
     {
         FilterModel.CategoryId = CategoryId;
+        FilterModel.UserSettings = new UserSettings { PreferedLanguageCode = CultureInfo.CurrentCulture.TwoLetterISOLanguageName };
         FilterModel.PageNumber = PageNumber ?? 1;
         FilterModel.OrderBy = OrderBy is null ? OrderByEnum.ProductName : (OrderByEnum)OrderBy;
         FilterModel.SortOrder = SortOrder is null ? SortOrderEnum.ASC : (SortOrderEnum)SortOrder;

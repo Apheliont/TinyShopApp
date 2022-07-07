@@ -5,7 +5,6 @@
 @using TinyShop.Web.CustomTypes
 @inject IStringLocalizer<App> Localizer
 @inject IJSRuntime JSRuntime
-@*@implements IAsyncDisposable*@
 
 <CascadingValue Value="@ChildComponentList">
     <div class="ui fluid vertical menu">
@@ -23,7 +22,7 @@
                              OnChange="ComponentChanged" />
         </div>
 
-        @if (FilterModel.CategoryFilters is not null)
+        @if (FilterModel.CategoryFilters is not null && FilterModel.CategoryFilters.Any())
         {
             <div class="ui styled fluid accordion">
                 <div class="active title">
@@ -110,17 +109,6 @@
     private bool IsResetDisabled = true;
 
 
-    //private IJSObjectReference? module;
-
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    if (firstRender)
-    //    {
-    //        module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", JsInteropConstants.JsScriptFilePath);
-    //        await module.InvokeVoidAsync(JsInteropConstants.InitAccordionFuncName);
-    //    }
-    //}
-
     protected override void OnParametersSet()
     {
         if (FilterModel.CategoryFilters is not null)
@@ -128,15 +116,6 @@
             FilterModel.CategoryFilters = FilterModel.CategoryFilters.OrderBy(x => x.Index).ToList();
         }
     }
-
-
-    //async ValueTask IAsyncDisposable.DisposeAsync()
-    //{
-    //    if (module is not null)
-    //    {
-    //        await module.DisposeAsync();
-    //    }
-    //}
 
 
     private async Task ApplyFilterHandler()
